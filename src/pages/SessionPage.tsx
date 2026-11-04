@@ -43,6 +43,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
   const { data, error } = useQuestions(exam.id);
   const [session, setSession] = useState<Session | null>(() => loadActive(exam.id));
   const [confirming, setConfirming] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
   const finished = useRef(false);
 
   useEffect(() => {
@@ -54,12 +55,18 @@ export function SessionPage({ exam }: { exam: Exam }) {
       if (!session || !data || finished.current) return;
       finished.current = true;
       const attempt = finishSession(exam, data.itemsByKey, session, { timedOut });
-      clearActive(exam.id);
       if (attempt.total === 0) {
+        clearActive(exam.id);
         navigate(paths.exam(exam.id), { replace: true });
         return;
       }
-      saveAttempt(attempt);
+      // 결과를 저장하지 못하면 진행 세션을 지우지 않고 다시 제출할 수 있게 둔다.
+      if (!saveAttempt(attempt)) {
+        finished.current = false;
+        setSaveFailed(true);
+        return;
+      }
+      clearActive(exam.id);
       navigate(paths.result(exam.id, attempt.id), { replace: true });
     },
     [session, data, exam],
@@ -122,7 +129,8 @@ export function SessionPage({ exam }: { exam: Exam }) {
     setSession((s) => (s ? { ...s, answers: { ...s.answers, [key]: a } } : s));
 
   const go = (to: number) => {
-    if (to < 0 || to >= total) return;
+    // 지금 문항을 다시 누른 것은 이동이 아니므로 잠그지 않는다.
+    if (to < 0 || to >= total || to === session.current) return;
     const target = session.itemKeys[to]!;
     if (session.locked[target]) return;
     setConfirming(false);
@@ -160,6 +168,20 @@ export function SessionPage({ exam }: { exam: Exam }) {
       </div>
 
       <main className="wrap stack">
+        {saveFailed && (
+          <div className="confirm stack" role="alert">
+            <b>결과를 저장하지 못했습니다.</b>
+            <span className="small">
+              브라우저 저장 공간이 부족하거나 저장이 막혀 있을 수 있습니다. 푼 내용은 그대로 남아
+              있으니, 저장 공간을 정리한 뒤 다시 제출하세요.
+            </span>
+            <div className="row">
+              <button type="button" className="btn primary" onClick={() => finish()}>
+                다시 제출
+              </button>
+            </div>
+          </div>
+        )}
         <QuestionView
           key={key}
           exam={exam}

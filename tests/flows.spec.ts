@@ -98,6 +98,9 @@ test('실전: 표시, 문항 이동, 문제-해결 잠금, 제출 후 결과와 
   expect(psIndex).toBeGreaterThanOrEqual(0);
   await expect(page.getByText('넘어가면 돌아올 수 없습니다')).toBeVisible();
   await answerSampleCorrectly(page);
+  // 지금 문항 번호를 다시 눌러도 잠기지 않는다.
+  await cells.nth(psIndex).click();
+  await expect(page.locator('article').getByRole('radio').first()).toBeEnabled();
   await page.getByRole('button', { name: '나중에 보기 표시' }).click();
   const next = psIndex < total - 1 ? psIndex + 1 : 0;
   await cells.nth(next).click();
@@ -120,6 +123,39 @@ test('실전: 표시, 문항 이동, 문제-해결 잠금, 제출 후 결과와 
   await page.getByRole('link', { name: '시험 홈', exact: true }).click();
   await expect(page.locator('.history tbody tr')).toHaveCount(1);
   await expect(page.locator('.history')).toContainText('불합격');
+});
+
+test('결과를 저장하지 못하면 풀던 세션을 지우지 않고 다시 제출할 수 있다', async ({ page }) => {
+  await openExam(page, 'SAMPLE-01');
+  await modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' }).click();
+  await answerSampleCorrectly(page);
+  // 저장 공간이 꽉 찬 것처럼 결과 기록 저장만 실패시킨다.
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key: string, value: string) {
+      if (key.includes(':attempts:') && !(window as { allowSave?: boolean }).allowSave)
+        throw new DOMException('full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: '제출' }).last().click();
+  await page.getByRole('button', { name: '제출하기' }).click();
+  await expect(page.getByRole('alert')).toContainText('결과를 저장하지 못했습니다');
+  await expect(page).toHaveURL(/\/play$/);
+  expect(
+    await page.evaluate(() => localStorage.getItem('cme:v1:active:sample-all-types')),
+  ).not.toBeNull();
+  expect(
+    await page.evaluate(() => localStorage.getItem('cme:v1:stats:sample-all-types')),
+  ).toBeNull();
+
+  await page.evaluate(() => ((window as { allowSave?: boolean }).allowSave = true));
+  await page.getByRole('button', { name: '다시 제출' }).click();
+  await expect(page).toHaveURL(/\/result\//);
+  await expect(page.locator('.score .big')).toHaveText('10%');
+  expect(
+    await page.evaluate(() => localStorage.getItem('cme:v1:active:sample-all-types')),
+  ).toBeNull();
 });
 
 test('나가기 후 시험 홈에서 이어 풀기와 버리기', async ({ page }) => {

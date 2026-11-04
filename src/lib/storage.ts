@@ -46,21 +46,25 @@ export function loadAttempt(examId: string, id: string): Attempt | undefined {
   return loadAttempts(examId).find((a) => a.id === id);
 }
 
-/** 결과를 저장하고 문항별 통계를 갱신한다. 저장 공간이 모자라면 오래된 기록부터 지운다. */
+/**
+ * 결과를 저장하고 문항별 통계를 갱신한다. 저장 공간이 모자라면 오래된 기록부터 지운다.
+ * 결과를 저장하지 못하면 통계도 건드리지 않고 false를 돌려준다(다시 제출해도 두 번 세지 않게).
+ */
 export function saveAttempt(a: Attempt): boolean {
+  let list = [a, ...loadAttempts(a.examId).filter((x) => x.id !== a.id)].slice(0, MAX_ATTEMPTS);
+  let saved = false;
+  while (list.length > 0 && !saved) {
+    saved = write(`attempts:${a.examId}`, list);
+    list = list.slice(0, -1);
+  }
+  if (!saved) return false;
   const stats = loadStats(a.examId);
   for (const [key, score] of Object.entries(a.itemScores)) {
     const s = stats[key] ?? { n: 0, sum: 0, last: 0, at: 0 };
     stats[key] = { n: s.n + 1, sum: s.sum + score, last: score, at: a.finishedAt };
   }
   write(`stats:${a.examId}`, stats);
-  let list = [a, ...loadAttempts(a.examId).filter((x) => x.id !== a.id)].slice(0, MAX_ATTEMPTS);
-  while (list.length > 0) {
-    if (write(`attempts:${a.examId}`, list)) return true;
-    if (list.length === 1) break;
-    list = list.slice(0, -1);
-  }
-  return false;
+  return true;
 }
 
 /** 마지막으로 풀었을 때 틀린 item */
