@@ -6,6 +6,16 @@
 - 기록: 브라우저(localStorage)에 저장. 기기 간 동기화는 2단계에서 Cloudflare D1로 붙일 예정
 - 배포: Cloudflare Workers(정적 파일). `main`에 push하면 GitHub Actions가 배포
 
+## 작업 방식
+
+Claude Code와 Codex가 함께 작업하며, **한쪽이 구현하면 다른 쪽이 리뷰한다**(교차 리뷰). merge는 사용자가 결정한다.
+
+| 문서                                       | 내용                                                  |
+| ------------------------------------------ | ----------------------------------------------------- |
+| [AGENTS.md](AGENTS.md)                     | AI 작업자 공통 규칙(Claude, Codex 모두). 작업 전 필독 |
+| [docs/REVIEW.md](docs/REVIEW.md)           | 교차 리뷰 절차·확인 항목·결과 작성 기준               |
+| [docs/data-format.md](docs/data-format.md) | 문제 데이터 형식                                      |
+
 ## 개발
 
 ```
