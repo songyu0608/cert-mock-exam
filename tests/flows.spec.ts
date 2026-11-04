@@ -123,16 +123,23 @@ test('실전: 표시, 문항 이동, 문제-해결 잠금, 제출 후 결과와 
 });
 
 test('나가기 후 시험 홈에서 이어 풀기와 버리기', async ({ page }) => {
-  await openExam(page, 'AIF-C01');
-  await modeCard(page, '연습').getByRole('button', { name: '시작' }).click();
-  await page.locator('.opt').first().click();
+  // 출제 순서가 무작위라 첫 문항 유형이 매번 다르다. 모든 유형을 아는 견본 시험으로 확인한다.
+  await openExam(page, 'SAMPLE-01');
+  const practice = modeCard(page, '연습');
+  await practice.getByRole('combobox').selectOption('all');
+  await practice.getByRole('button', { name: '시작' }).click();
+  const stem = await page.locator('.q-text').innerText();
+  await answerSampleCorrectly(page);
   await page.getByRole('link', { name: '나가기' }).click();
-  await expect(page.getByRole('status').filter({ hasText: '연습 진행 중 · 1/20번' })).toBeVisible();
+  await expect(page.getByRole('status').filter({ hasText: '연습 진행 중 · 1/10번' })).toBeVisible();
   await expect(
     modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' }),
   ).toBeDisabled();
   await page.getByRole('button', { name: '이어 풀기' }).click();
-  await expect(page.locator('.opt.sel')).toHaveCount(1);
+  // 같은 문항이 열리고, 입력해 둔 답이 남아 있어 정답으로 채점된다.
+  await expect(page.locator('.q-text')).toHaveText(stem);
+  await page.getByRole('button', { name: '정답 확인' }).click();
+  await expect(page.getByRole('status').filter({ hasText: '정답입니다' })).toBeVisible();
   await page.getByRole('link', { name: '나가기' }).click();
   await page.getByRole('button', { name: '버리기' }).click();
   await expect(modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' })).toBeEnabled();
