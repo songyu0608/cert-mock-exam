@@ -1,0 +1,4 @@
+dist
+dist-e2e
+pnpm-lock.yaml
+exams/**/questions.json

@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "cert-mock-exam",
+  "compatibility_date": "2026-10-23",
+  "assets": {
+    "directory": "./dist",
+    // 주소가 /exam/aws-aif-c01 처럼 바뀌어도 새로고침하면 index.html을 돌려준다.
+    "not_found_handling": "single-page-application",
+  },
+  "workers_dev": true,
+  "preview_urls": false,
+  "send_metrics": false,
+}

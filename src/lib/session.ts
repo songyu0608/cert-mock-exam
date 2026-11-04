@@ -1,0 +1,216 @@
+// 풀이 세션: 출제(문항 고르기), 진행 상태, 결과 계산.
+import type { Exam, Question } from '../data/schema.ts';
+import { flattenQuestion, type Item } from './items.ts';
+import {
+  blankAnswer,
+  makeView,
+  scoreItem,
+  shuffle,
+  type Answer,
+  type Rng,
+  type View,
+} from './scoring.ts';
+
+export type Mode = 'mock' | 'practice' | 'review';
+
+export const MODE_LABEL: Record<Mode, string> = {
+  mock: '실전 모의고사',
+  practice: '연습',
+  review: '오답 다시 풀기',
+};
+
+export interface Session {
+  id: string;
+  examId: string;
+  mode: Mode;
+  itemKeys: string[];
+  views: Record<string, View>;
+  answers: Record<string, Answer>;
+  /** 연습·오답 모드에서 "정답 확인"을 누른 item */
+  checked: Record<string, true>;
+  flagged: Record<string, true>;
+  /** 돌아갈 수 없게 잠긴 item(문제-해결 세트) */
+  locked: Record<string, true>;
+  current: number;
+  startedAt: number;
+  /** 실전 모드 제한 시각(ms) */
+  deadline?: number;
+}
+
+export interface DomainResult {
+  total: number;
+  score: number;
+}
+
+export interface Attempt {
+  id: string;
+  examId: string;
+  mode: Mode;
+  startedAt: number;
+  finishedAt: number;
+  /** 채점한 item 수(연습 모드는 정답 확인한 item만) */
+  total: number;
+  score: number;
+  percent: number;
+  /** 실전 모드만 */
+  passed?: boolean;
+  timedOut?: boolean;
+  byDomain: Record<string, DomainResult>;
+  /** item key → 점수(0~1) */
+  itemScores: Record<string, number>;
+  /** 결과 화면에서 다시 보기 위한 세션 사본 */
+  session: Session;
+}
+
+export function newId(): string {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
+/** 도메인 비중대로 n개를 나눈다(큰 나머지 방식). */
+export function allocate(
+  n: number,
+  weights: { id: string; weight: number }[],
+): Record<string, number> {
+  const sum = weights.reduce((s, w) => s + w.weight, 0);
+  const raw = weights.map((w) => ({ id: w.id, exact: (n * w.weight) / sum }));
+  const out = Object.fromEntries(raw.map((r) => [r.id, Math.floor(r.exact)]));
+  let left = n - Object.values(out).reduce((s, x) => s + x, 0);
+  const byRemainder = [...raw].sort(
+    (a, b) => b.exact - Math.floor(b.exact) - (a.exact - Math.floor(a.exact)),
+  );
+  for (const r of byRemainder) {
+    if (left <= 0) break;
+    out[r.id]! += 1;
+    left -= 1;
+  }
+  return out;
+}
+
+/**
+ * 실전 모드 출제. 도메인 비중대로 문항을 고르고, 문항 순서를 섞는다.
+ * 사례 연구처럼 여러 item인 문항은 통째로 넣는다. 도메인에 문항이 모자라면 다른 도메인에서 채운다.
+ */
+export function pickMockQuestions(
+  exam: Exam,
+  questions: Question[],
+  n: number,
+  rng: Rng = Math.random,
+): Question[] {
+  const quota = allocate(n, exam.domains);
+  const size = (q: Question) => flattenQuestion(q).length;
+  const picked: Question[] = [];
+  const rest: Question[] = [];
+  let count = 0;
+  for (const d of exam.domains) {
+    const pool = shuffle(
+      questions.filter((q) => q.domain.split('.')[0] === d.id),
+      rng,
+    );
+    let got = 0;
+    for (const q of pool) {
+      const s = size(q);
+      if (got + s <= quota[d.id]!) {
+        picked.push(q);
+        got += s;
+      } else rest.push(q);
+    }
+    count += got;
+  }
+  for (const q of shuffle(rest, rng)) {
+    if (count >= n) break;
+    const s = size(q);
+    if (count + s <= n) {
+      picked.push(q);
+      count += s;
+    }
+  }
+  return shuffle(picked, rng);
+}
+
+/** 문항 수를 고르는 시험은 시간을 문항 수에 비례해 정한다. */
+export function mockMinutes(exam: Exam, n: number): number {
+  return Math.round((exam.mock.minutes * n) / exam.mock.questions);
+}
+
+export function createSession(
+  exam: Exam,
+  questions: Question[],
+  mode: Mode,
+  opts: { now?: number; minutes?: number; rng?: Rng; onlyKeys?: Set<string> } = {},
+): Session {
+  const rng = opts.rng ?? Math.random;
+  const now = opts.now ?? Date.now();
+  const items = questions
+    .flatMap(flattenQuestion)
+    .filter((i) => !opts.onlyKeys || opts.onlyKeys.has(i.key));
+  const views: Record<string, View> = {};
+  const answers: Record<string, Answer> = {};
+  for (const it of items) {
+    const v = makeView(it.body, rng);
+    views[it.key] = v;
+    answers[it.key] = blankAnswer(it.body, v);
+  }
+  return {
+    id: newId(),
+    examId: exam.id,
+    mode,
+    itemKeys: items.map((i) => i.key),
+    views,
+    answers,
+    checked: {},
+    flagged: {},
+    locked: {},
+    current: 0,
+    startedAt: now,
+    ...(mode === 'mock' && opts.minutes ? { deadline: now + opts.minutes * 60_000 } : {}),
+  };
+}
+
+/** 연습·오답 모드에서 채점 대상인 item(정답 확인한 것), 실전 모드는 전부 */
+export function gradedKeys(session: Session): string[] {
+  return session.mode === 'mock'
+    ? session.itemKeys
+    : session.itemKeys.filter((k) => session.checked[k]);
+}
+
+export function finishSession(
+  exam: Exam,
+  itemsByKey: Map<string, Item>,
+  session: Session,
+  opts: { now?: number; timedOut?: boolean } = {},
+): Attempt {
+  const now = opts.now ?? Date.now();
+  const keys = gradedKeys(session);
+  const itemScores: Record<string, number> = {};
+  const byDomain: Record<string, DomainResult> = Object.fromEntries(
+    exam.domains.map((d) => [d.id, { total: 0, score: 0 }]),
+  );
+  let score = 0;
+  for (const k of keys) {
+    const item = itemsByKey.get(k);
+    if (!item) continue;
+    const s = scoreItem(item, session.answers[k], exam.scoring);
+    itemScores[k] = s;
+    score += s;
+    const d = (byDomain[item.topDomain] ??= { total: 0, score: 0 });
+    d.total += 1;
+    d.score += s;
+  }
+  const total = Object.keys(itemScores).length;
+  const percent = total ? Math.round((score / total) * 1000) / 10 : 0;
+  return {
+    id: session.id,
+    examId: exam.id,
+    mode: session.mode,
+    startedAt: session.startedAt,
+    finishedAt: now,
+    total,
+    score,
+    percent,
+    ...(session.mode === 'mock' ? { passed: percent >= exam.mock.passPercent } : {}),
+    ...(opts.timedOut ? { timedOut: true } : {}),
+    byDomain,
+    itemScores,
+    session,
+  };
+}

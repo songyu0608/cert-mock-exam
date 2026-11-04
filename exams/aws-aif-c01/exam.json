@@ -1,0 +1,74 @@
+{
+  "id": "aws-aif-c01",
+  "vendor": "aws",
+  "code": "AIF-C01",
+  "name": "AWS Certified AI Practitioner",
+  "lang": "ko",
+  "level": "Foundational",
+  "domains": [
+    {
+      "id": "1",
+      "name": "AI 및 ML 기초",
+      "weight": 20
+    },
+    {
+      "id": "2",
+      "name": "생성형 AI 기초",
+      "weight": 24
+    },
+    {
+      "id": "3",
+      "name": "파운데이션 모델 적용",
+      "weight": 28
+    },
+    {
+      "id": "4",
+      "name": "책임 있는 AI 지침",
+      "weight": 14
+    },
+    {
+      "id": "5",
+      "name": "AI 솔루션 보안·규정 준수·거버넌스",
+      "weight": 14
+    }
+  ],
+  "mock": {
+    "questions": 65,
+    "minutes": 90,
+    "passPercent": 72,
+    "questionChoices": null
+  },
+  "types": ["single", "multi", "ordering", "matching"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "65문항",
+      "label": "채점 50 + 비채점 15"
+    },
+    {
+      "value": "90분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "700 / 1000",
+      "label": "합격 환산 점수"
+    },
+    {
+      "value": "4가지",
+      "label": "선다형·복수 응답·순서·연결"
+    }
+  ],
+  "sources": [
+    {
+      "label": "AIF-C01 공식 시험 안내서",
+      "url": "https://docs.aws.amazon.com/pdfs/aws-certification/latest/ai-practitioner-01/ai-practitioner-01.pdf",
+      "checked": "2026-10-24"
+    },
+    {
+      "label": "AWS 자격증 페이지",
+      "url": "https://aws.amazon.com/certification/certified-ai-practitioner/",
+      "checked": "2026-10-24"
+    }
+  ],
+  "notes": "65문항 · 90분. 도메인 비중(20/24/28/14/14%)대로 출제하고, 제출 후 채점과 해설을 보여 줍니다. 실제 시험의 비채점 15문항은 구분할 수 없으므로 모두 채점합니다."
+}

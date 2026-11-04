@@ -1,3 +1,31 @@
 # cert-mock-exam
 
-자격증 모의고사를 풀고 채점하는 개인용 사이트.
+자격증 모의고사를 풀고 채점하는 개인용 사이트. 시험을 고르고 실전 모의고사, 연습, 오답 다시 풀기 중 하나로 푼다.
+
+- 시험: AWS AIB-C01(183문항), AIF-C01(229문항)
+- 기록: 브라우저(localStorage)에 저장. 기기 간 동기화는 2단계에서 Cloudflare D1로 붙일 예정
+- 배포: Cloudflare Workers(정적 파일). `main`에 push하면 GitHub Actions가 배포
+
+## 개발
+
+```
+pnpm install
+pnpm dev          # http://localhost:5173
+pnpm test         # 단위 테스트(채점, 출제, 변환)
+pnpm test:e2e     # 브라우저 테스트(모든 문항 유형 견본 시험 포함)
+pnpm build        # 문항 형식 검사 + 타입 검사 + 빌드
+```
+
+## 시험 추가
+
+`exams/<시험 id>/exam.json`과 `questions.json`을 만든다. 형식은 [docs/data-format.md](docs/data-format.md).
+`pnpm validate`로 검사한다.
+
+## 배포 설정
+
+저장소 Settings → Secrets and variables → Actions에 다음 두 값을 넣으면 `main` push 때 배포한다. 없으면 배포 단계를 건너뛴다.
+
+- `CLOUDFLARE_API_TOKEN`: Workers 편집 권한이 있는 API 토큰
+- `CLOUDFLARE_ACCOUNT_ID`
+
+배포 주소는 `https://cert-mock-exam.<계정 서브도메인>.workers.dev`.
