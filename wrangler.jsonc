@@ -23,7 +23,7 @@
   "vars": {
     // 동기화를 허용할 비밀키의 등록 코드(SHA-256 16진수). 여러 개면 쉼표로 구분한다.
     // 키 원문은 절대 넣지 않는다.
-    "SYNC_KEY_HASHES": "",
+    "SYNC_KEY_HASHES": "046e139786f260a718ed3ab2fd7f0556c94227e02e1aadd7a6160be019ebedb1",
   },
   "workers_dev": true,
   "preview_urls": false,
