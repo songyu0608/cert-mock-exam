@@ -20,6 +20,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "build:e2e": "vite build --mode e2e --outDir dist-e2e",
+    "e2e:server": "pnpm build:e2e && rm -rf .wrangler/e2e && wrangler d1 migrations apply DB --local -c wrangler.e2e.jsonc --persist-to .wrangler/e2e && wrangler dev -c wrangler.e2e.jsonc --ip 127.0.0.1 --port 4173 --persist-to .wrangler/e2e",
     "test:e2e": "playwright test"
   },
   "dependencies": {

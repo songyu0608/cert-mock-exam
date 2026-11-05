@@ -4,17 +4,22 @@ import { ExamHome } from './pages/ExamHome.tsx';
 import { ExamList } from './pages/ExamList.tsx';
 import { ResultPage } from './pages/ResultPage.tsx';
 import { SessionPage } from './pages/SessionPage.tsx';
+import { SettingsPage } from './pages/SettingsPage.tsx';
+import { startAutoSync } from './lib/sync.ts';
 import { onLinkClick, paths, useRoute } from './router.ts';
 
 export function App() {
   const route = useRoute();
   const exam = 'examId' in route ? getExam(route.examId) : undefined;
 
+  useEffect(() => startAutoSync(), []);
+
   useEffect(() => {
     document.title = exam ? `${exam.code} · 자격증 모의고사` : '자격증 모의고사';
   }, [exam]);
 
   if (route.name === 'list') return <ExamList />;
+  if (route.name === 'settings') return <SettingsPage />;
   if (exam && route.name === 'exam') return <ExamHome key={exam.id} exam={exam} />;
   if (exam && route.name === 'play') return <SessionPage key={exam.id} exam={exam} />;
   if (exam && route.name === 'result')

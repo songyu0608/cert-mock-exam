@@ -5,6 +5,7 @@ import type { Item } from '../lib/items.ts';
 import { isComplete, isTouched, type Answer } from '../lib/scoring.ts';
 import { MODE_LABEL, finishSession, type Session } from '../lib/session.ts';
 import { clearActive, loadActive, saveActive, saveAttempt } from '../lib/storage.ts';
+import { syncNow } from '../lib/sync.ts';
 import { useQuestions } from '../lib/useQuestions.ts';
 import { navigate, onLinkClick, paths } from '../router.ts';
 
@@ -67,6 +68,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
         return;
       }
       clearActive(exam.id);
+      void syncNow();
       navigate(paths.result(exam.id, attempt.id), { replace: true });
     },
     [session, data, exam],

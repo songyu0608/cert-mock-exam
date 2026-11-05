@@ -72,6 +72,10 @@ jobs:
         run: pnpm install --frozen-lockfile
       - if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
         run: pnpm build
+      # D1 테이블 변경(migrations/)을 먼저 적용한다. 이미 적용한 것은 건너뛴다. 토큰에 D1 Edit 권한이 필요하다.
+      - name: Apply D1 migrations
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        run: pnpm exec wrangler d1 migrations apply DB --remote
       # 공식 action 대신 lockfile에 고정한 wrangler를 쓴다(포트폴리오 저장소와 같은 방식).
       - name: Deploy to Cloudflare Workers
         if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''

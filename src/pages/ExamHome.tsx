@@ -20,7 +20,9 @@ import {
   saveActive,
   wrongKeys,
 } from '../lib/storage.ts';
+import { getKey, syncNow } from '../lib/sync.ts';
 import { useQuestions } from '../lib/useQuestions.ts';
+import { useRecordsVersion } from '../lib/useRecords.ts';
 import { navigate, onLinkClick, paths } from '../router.ts';
 
 const PRACTICE_COUNTS = [10, 20, 50] as const;
@@ -28,7 +30,9 @@ const PRACTICE_COUNTS = [10, 20, 50] as const;
 export function ExamHome({ exam }: { exam: Exam }) {
   const { data, error } = useQuestions(exam.id);
   // 기록을 지우거나 세션을 버리면 다시 읽도록 하는 값
-  const [rev, setRev] = useState(0);
+  const [localRev, setRev] = useState(0);
+  // 다른 기기에서 받은 기록도 반영한다.
+  const rev = localRev + useRecordsVersion(exam.id);
   const active = useMemo(() => (rev >= 0 ? loadActive(exam.id) : null), [exam.id, rev]);
   const attempts = useMemo(() => (rev >= 0 ? loadAttempts(exam.id) : []), [exam.id, rev]);
   const stats = useMemo(() => (rev >= 0 ? loadStats(exam.id) : {}), [exam.id, rev]);
@@ -37,6 +41,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
   const [domains, setDomains] = useState<string[]>(exam.domains.map((d) => d.id));
   const [practiceN, setPracticeN] = useState<number | 'all'>(20);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [resetFailed, setResetFailed] = useState(false);
 
   const wrong = useMemo(() => {
     if (!data) return [];
@@ -320,9 +325,12 @@ export function ExamHome({ exam }: { exam: Exam }) {
                 type="button"
                 className="btn sm danger"
                 onClick={() => {
-                  resetExam(exam.id);
+                  const ok = resetExam(exam.id);
+                  setResetFailed(!ok);
                   setConfirmReset(false);
+                  if (!ok) return;
                   setRev((r) => r + 1);
+                  void syncNow();
                 }}
               >
                 지우기
@@ -342,7 +350,20 @@ export function ExamHome({ exam }: { exam: Exam }) {
             </button>
           )}
         </div>
-        <p className="small muted">기록은 이 브라우저에만 저장됩니다.</p>
+        {resetFailed && (
+          <p className="note small" role="alert">
+            기록을 지우지 못했습니다(저장 공간 부족). 브라우저 저장 공간을 정리한 뒤 다시
+            시도하세요.
+          </p>
+        )}
+        <p className="small muted">
+          {getKey()
+            ? '기록은 이 브라우저에 저장하고, 같은 비밀키를 넣은 기기와 주고받습니다. 초기화도 함께 적용됩니다.'
+            : '기록은 이 브라우저에만 저장됩니다.'}{' '}
+          <a href={paths.settings()} onClick={onLinkClick}>
+            동기화 설정
+          </a>
+        </p>
       </section>
 
       {exam.sources.length > 0 && (
