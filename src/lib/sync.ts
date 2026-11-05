@@ -5,6 +5,7 @@ import {
   applyReset,
   clearPending,
   clearPendingReset,
+  loadResetAt,
   loadPendingAttempts,
   loadPendingResets,
   markAllPending,
@@ -143,14 +144,27 @@ async function api<T>(key: string, path: string, init?: RequestInit): Promise<T>
 }
 
 const PUSH_BATCH = 20;
+const STORAGE_FULL =
+  '받은 기록을 이 브라우저에 저장하지 못했습니다(저장 공간 부족). 공간을 정리한 뒤 다시 동기화하세요.';
 let running: Promise<SyncStatus> | null = null;
+let queued: Promise<SyncStatus> | null = null;
 
-/** 올릴 기록을 올리고 새 기록을 받는다. 이미 돌고 있으면 그 결과를 기다린다. */
+/**
+ * 올릴 기록을 올리고 새 기록을 받는다. 이미 돌고 있으면 그 실행이 이번 변경을 놓쳤을 수 있으므로
+ * 끝난 뒤 한 번 더 돈다(그사이 여러 번 불려도 한 번으로 모은다).
+ */
 export function syncNow(): Promise<SyncStatus> {
-  running ??= run().finally(() => {
-    running = null;
+  if (!running) {
+    running = run().finally(() => {
+      running = null;
+    });
+    return running;
+  }
+  queued ??= running.then(() => {
+    queued = null;
+    return syncNow();
   });
-  return running;
+  return queued;
 }
 
 async function run(): Promise<SyncStatus> {
@@ -182,21 +196,30 @@ async function run(): Promise<SyncStatus> {
     let cursor = config.cursor ?? 0;
     for (;;) {
       const res = await api<PullResponse>(key, `sync?since=${cursor}`);
-      for (const r of res.resets) applyReset(r.examId, r.at);
+      for (const r of res.resets) {
+        applyReset(r.examId, r.at);
+        if (loadResetAt(r.examId) < r.at) throw new SyncError(STORAGE_FULL);
+      }
       const byExam = new Map<string, RemoteAttempt[]>();
       for (const a of res.attempts) byExam.set(a.examId, [...(byExam.get(a.examId) ?? []), a]);
       for (const [examId, rows] of byExam) {
-        pulled += mergeRemote(
+        const r = mergeRemote(
           examId,
-          rows.map((r) => ({ id: r.id, at: r.finishedAt, scores: r.scores, body: r.body })),
+          rows.map((x) => ({ id: x.id, at: x.finishedAt, scores: x.scores, body: x.body })),
         );
+        // 받은 기록을 저장하지 못했으면 커서를 앞으로 옮기지 않는다(다음에 다시 받는다).
+        if (!r.saved) throw new SyncError(STORAGE_FULL);
+        pulled += r.added;
       }
       cursor = res.cursor;
+      // 페이지마다 커서를 남겨, 중간에 실패해도 받은 데까지는 다시 받지 않는다.
+      // 키가 그사이 바뀌었으면 덮어쓰지 않는다.
+      if (loadConfig().key !== key) break;
+      saveConfig({ ...loadConfig(), cursor });
       if (!res.more) break;
     }
 
     const at = Date.now();
-    // 키가 그사이 바뀌었으면 커서를 덮어쓰지 않는다.
     if (loadConfig().key === key) saveConfig({ key, cursor, lastOk: at });
     emit({ state: 'ok', at, pulled, pushed });
   } catch (e) {
@@ -206,7 +229,7 @@ async function run(): Promise<SyncStatus> {
   return status;
 }
 
-/** 앱을 열 때와 다시 볼 때(탭 전환·화면 켜짐) 동기화한다. 너무 잦지 않게 1분 간격을 둔다. */
+/** 앱을 열 때, 다시 볼 때(탭 전환·화면 켜짐), 켜 둔 동안 5분마다 동기화한다. 너무 잦지 않게 1분 간격을 둔다. */
 export function startAutoSync(): () => void {
   let last = 0;
   const tick = () => {
@@ -219,5 +242,10 @@ export function startAutoSync(): () => void {
   };
   tick();
   document.addEventListener('visibilitychange', onVisible);
-  return () => document.removeEventListener('visibilitychange', onVisible);
+  // 화면을 계속 켜 두고 쓰는 동안에도 다른 기기의 기록을 받도록 5분마다 확인한다.
+  const timer = setInterval(onVisible, 5 * 60_000);
+  return () => {
+    document.removeEventListener('visibilitychange', onVisible);
+    clearInterval(timer);
+  };
 }

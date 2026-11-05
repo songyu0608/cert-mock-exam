@@ -134,8 +134,10 @@ function addScores(examId: string, entries: ScoreEntry[]): boolean {
  * 점수 기록 저장에 실패해도 결과 기록에 남아 있는 동안은 loadScores가 채운다.
  */
 export function saveAttempt(a: Attempt): boolean {
-  loadScores(a.examId); // 예전 형식이면 먼저 옮긴다.
-  const list = [a, ...read<Attempt[]>(`attempts:${a.examId}`, []).filter((x) => x.id !== a.id)];
+  // 같은 id가 이미 저장돼 있으면(같은 세션을 두 탭에서 제출) 처음 것을 그대로 둔다.
+  // 결과 기록은 바꾸지 않는다: 점수 기록과 서버(INSERT OR IGNORE)도 처음 것을 유지한다.
+  if (loadScores(a.examId).some((e) => e.id === a.id)) return true;
+  const list = [a, ...read<Attempt[]>(`attempts:${a.examId}`, [])];
   if (!writeAttempts(a.examId, list)) return false;
   addScores(a.examId, [toScoreEntry(a)]);
   markPending(a.examId, a.id);
@@ -175,27 +177,30 @@ export function applyReset(examId: string, at: number): boolean {
 /**
  * 다른 기기에서 받은 결과를 합친다. 이미 있는 id는 건너뛴다.
  * body가 없으면(서버에도 점수 요약만 있는 오래된 기록) 점수 기록에만 넣는다.
+ * saved가 false면 점수 기록을 저장하지 못한 것이다(저장 공간 부족). 이때는 같은 기록을 다시 받아야 한다.
+ * 답안(body)은 공간이 모자라면 오래된 것부터 빠질 수 있지만, 통계는 점수 기록으로 유지된다.
  */
 export function mergeRemote(
   examId: string,
   rows: { id: string; at: number; scores: Record<string, number>; body: Attempt | null }[],
-): number {
+): { added: number; saved: boolean } {
   const resetAt = loadResetAt(examId);
   const fresh = rows.filter((r) => r.at > resetAt);
-  if (!fresh.length) return 0;
+  if (!fresh.length) return { added: 0, saved: true };
   loadScores(examId);
   const before = read<ScoreEntry[]>(`scores:${examId}`, []).length;
-  addScores(
+  const saved = addScores(
     examId,
     fresh.map((r) => ({ id: r.id, at: r.at, s: r.scores })),
   );
   const added = read<ScoreEntry[]>(`scores:${examId}`, []).length - before;
+  if (!saved) return { added: 0, saved: false };
   const local = read<Attempt[]>(`attempts:${examId}`, []);
   const ids = new Set(local.map((a) => a.id));
   const bodies = fresh.flatMap((r) => (r.body && !ids.has(r.id) ? [r.body] : []));
   if (bodies.length) writeAttempts(examId, [...local, ...bodies]);
   if (added || bodies.length) notify(examId);
-  return added;
+  return { added, saved: true };
 }
 
 /** 아직 서버에 올리지 못한 결과 */

@@ -137,3 +137,13 @@ describe('비밀키', () => {
     );
   });
 });
+
+describe('같은 결과 id', () => {
+  it('두 번 저장해도 처음 결과를 그대로 둔다(결과 기록은 바꾸지 않음)', () => {
+    expect(saveAttempt(attempt('a1', 10, { q1: 0 }))).toBe(true);
+    expect(saveAttempt(attempt('a1', 20, { q1: 1 }))).toBe(true);
+    expect(loadAttempts(EXAM)).toHaveLength(1);
+    expect(loadAttempts(EXAM)[0]!.itemScores).toEqual({ q1: 0 });
+    expect(loadStats(EXAM).q1).toMatchObject({ n: 1, last: 0 });
+  });
+});
