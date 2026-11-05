@@ -1,0 +1,26 @@
+// e2e 테스트 전용: 견본 시험이 들어간 dist-e2e를 로컬 D1과 함께 띄운다(배포하지 않음).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "cert-mock-exam-e2e",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-10-23",
+  "assets": {
+    "directory": "./dist-e2e",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cert-mock-exam-e2e",
+      "database_id": "00000000-0000-0000-0000-00000000e2e0",
+      "migrations_dir": "migrations",
+    },
+  ],
+  "vars": {
+    // tests/sync.spec.ts의 테스트 키 cme-E2ET-ESTK-EY00-0000-0000-0000-00 의 등록 코드
+    "SYNC_KEY_HASHES": "250c3646e0bf7e768bbdfcef6e7668fa24cdac6b6ad8eddd07751fe34965b6da",
+  },
+  "send_metrics": false,
+}

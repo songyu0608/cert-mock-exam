@@ -2,14 +2,23 @@ import { VendorBadge } from '../components/VendorBadge.tsx';
 import { exams } from '../data/exams.ts';
 import { onLinkClick, paths } from '../router.ts';
 import { loadActive, loadAttempts } from '../lib/storage.ts';
+import { useRecordsVersion } from '../lib/useRecords.ts';
+import { getKey } from '../lib/sync.ts';
 
 export function ExamList() {
+  // 다른 기기에서 기록을 받으면 다시 그린다.
+  useRecordsVersion();
   const vendors = [...new Set(exams.map((e) => e.vendor))];
   return (
     <main className="wrap stack">
       <header>
         <h1>자격증 모의고사</h1>
         <p className="lede">시험을 고르고 실전 모의고사, 연습, 오답 다시 풀기 중 하나로 풉니다.</p>
+        <p className="small" style={{ margin: 0 }}>
+          <a href={paths.settings()} onClick={onLinkClick}>
+            기기 간 기록 동기화 {getKey() ? '설정' : '켜기'}
+          </a>
+        </p>
       </header>
       {vendors.map((v) => (
         <section key={v} className="vendor" aria-labelledby={`v-${v}`}>

@@ -203,6 +203,17 @@ h2 {
   }
 }
 
+/* 동기화 설정: 비밀키와 등록 코드는 길어서 줄을 넘겨도 끊어 보여 준다. */
+code.key {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  background: var(--soft);
+  border-radius: 6px;
+  padding: 4px 8px;
+  word-break: break-all;
+  min-width: 0;
+}
+
 /* 시험 목록 */
 .vendor {
   display: flex;

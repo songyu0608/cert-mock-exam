@@ -1,8 +1,9 @@
-// 작은 주소 라우터. 페이지가 네 개뿐이라 라이브러리 없이 history API만 쓴다.
+// 작은 주소 라우터. 페이지가 몇 개뿐이라 라이브러리 없이 history API만 쓴다.
 import { useEffect, useState, type MouseEvent } from 'react';
 
 export type Route =
   | { name: 'list' }
+  | { name: 'settings' }
   | { name: 'exam'; examId: string }
   | { name: 'play'; examId: string }
   | { name: 'result'; examId: string; attemptId: string }
@@ -11,6 +12,7 @@ export type Route =
 export function parse(pathname: string): Route {
   const p = pathname.replace(/\/+$/, '').split('/').filter(Boolean).map(decodeURIComponent);
   if (p.length === 0) return { name: 'list' };
+  if (p.length === 1 && p[0] === 'settings') return { name: 'settings' };
   if (p[0] === 'exam' && p[1]) {
     if (p.length === 2) return { name: 'exam', examId: p[1] };
     if (p.length === 3 && p[2] === 'play') return { name: 'play', examId: p[1] };
@@ -22,6 +24,7 @@ export function parse(pathname: string): Route {
 
 export const paths = {
   list: () => '/',
+  settings: () => '/settings',
   exam: (id: string) => `/exam/${encodeURIComponent(id)}`,
   play: (id: string) => `/exam/${encodeURIComponent(id)}/play`,
   result: (id: string, attemptId: string) =>

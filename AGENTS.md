@@ -36,5 +36,7 @@ choi(GitHub: `songyu0608`)가 혼자 쓰는 자격증 모의고사 사이트. �
 - 문항 `id`는 기록과 연결되므로 기존 문항의 id를 바꾸거나 재사용하지 않는다. 새 문항은 이어지는 번호를 쓴다.
 - 문항을 추가·수정하면 `pnpm validate`를 돌린다.
 - 모든 유형 견본 시험은 `tests/fixtures/exams/`에 있고 e2e 빌드(`--mode e2e`)에만 들어간다.
-- 기록 저장은 `src/lib/storage.ts`만 거친다(기기 간 동기화를 붙일 자리).
+- 기록 저장은 `src/lib/storage.ts`만 거친다. 기기 간 동기화는 `src/lib/sync.ts`(브라우저)와 `worker/`(API), `migrations/`(D1 테이블).
+- 결과 기록은 한 번 만들면 바꾸지 않는다(합집합으로 합치므로). 문항별 통계는 저장하지 않고 점수 기록에서 계산한다.
+- D1 테이블을 바꿀 때는 기존 migration을 고치지 않고 새 파일(`migrations/000N_….sql`)을 추가한다.
 - 저장소는 Public이다. API 토큰 등 비밀 값은 커밋하지 않는다. 배포 비밀 값은 GitHub Actions 시크릿에 둔다.

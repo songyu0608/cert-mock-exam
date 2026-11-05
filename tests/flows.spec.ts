@@ -145,9 +145,12 @@ test('결과를 저장하지 못하면 풀던 세션을 지우지 않고 다시 
   expect(
     await page.evaluate(() => localStorage.getItem('cme:v1:active:sample-all-types')),
   ).not.toBeNull();
+  // 결과를 저장하지 못했으면 점수 기록에도 넣지 않는다(다시 제출해도 두 번 세지 않게).
   expect(
-    await page.evaluate(() => localStorage.getItem('cme:v1:stats:sample-all-types')),
-  ).toBeNull();
+    await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('cme:v1:scores:sample-all-types') ?? '[]'),
+    ),
+  ).toEqual([]);
 
   await page.evaluate(() => ((window as { allowSave?: boolean }).allowSave = true));
   await page.getByRole('button', { name: '다시 제출' }).click();

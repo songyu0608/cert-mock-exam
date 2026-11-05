@@ -9,7 +9,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: 'http://localhost:4173',
+    baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
     launchOptions: { executablePath },
   },
@@ -18,9 +18,10 @@ export default defineConfig({
     { name: 'mobile', use: { ...devices['Pixel 7'] } },
   ],
   webServer: {
-    // 견본 시험이 들어간 e2e 빌드를 띄운다.
-    command: 'pnpm build:e2e && pnpm exec vite preview --outDir dist-e2e --port 4173 --strictPort',
-    url: 'http://localhost:4173',
+    // 견본 시험이 들어간 e2e 빌드를 Worker(동기화 API)와 빈 로컬 D1로 띄운다.
+    command: 'pnpm e2e:server',
+    url: 'http://127.0.0.1:4173',
+    timeout: 180_000,
     reuseExistingServer: !process.env.CI,
   },
 });
