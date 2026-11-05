@@ -3,14 +3,12 @@
 import type { Attempt } from './session.ts';
 import {
   applyReset,
-  clearPending,
-  clearPendingReset,
+  clearSynced,
   loadResetAt,
-  loadPendingAttempts,
-  loadPendingResets,
-  markAllPending,
+  markSynced,
   mergeRemote,
-  pendingPayload,
+  pendingAttempts,
+  pendingResets,
   read,
   write,
 } from './storage.ts';
@@ -73,10 +71,10 @@ export async function keyHash(key: string): Promise<string> {
 
 export const getKey = () => loadConfig().key ?? null;
 
-/** 키를 이 기기에 저장하고, 이 기기의 기존 기록을 모두 올릴 목록에 넣는다. */
-export function setKey(key: string, examIds: readonly string[]): void {
+/** 키를 이 기기에 저장한다. 다음 동기화에서 이 기기의 기존 기록을 모두 올린다. */
+export function setKey(key: string): void {
   saveConfig({ key });
-  markAllPending(examIds);
+  clearSynced();
   emit({ state: 'off' });
 }
 
@@ -183,21 +181,21 @@ async function run(): Promise<SyncStatus> {
     if (loadConfig().key !== key) throw new KeyChanged();
   };
   try {
-    for (const [examId, at] of Object.entries(loadPendingResets())) {
+    for (const { examId, at } of pendingResets()) {
       await api(key, 'reset', { method: 'POST', body: JSON.stringify({ examId, at }) });
       sameKey();
-      clearPendingReset(examId, at);
+      markSynced(examId, [], at);
     }
 
     let pushed = 0;
-    const pending = loadPendingAttempts();
+    const pending = pendingAttempts();
     for (let i = 0; i < pending.length; i += PUSH_BATCH) {
-      const batch = pending.slice(i, i + PUSH_BATCH);
-      const attempts = batch.flatMap((p) => pendingPayload(p) ?? []);
-      if (attempts.length)
-        await api(key, 'attempts', { method: 'POST', body: JSON.stringify({ attempts }) });
+      const attempts = pending.slice(i, i + PUSH_BATCH);
+      await api(key, 'attempts', { method: 'POST', body: JSON.stringify({ attempts }) });
       sameKey();
-      clearPending(batch.map((p) => p.id));
+      const byExam = new Map<string, string[]>();
+      for (const a of attempts) byExam.set(a.examId, [...(byExam.get(a.examId) ?? []), a.id]);
+      for (const [examId, ids] of byExam) markSynced(examId, ids);
       pushed += attempts.length;
     }
 
@@ -209,6 +207,7 @@ async function run(): Promise<SyncStatus> {
       for (const r of res.resets) {
         applyReset(r.examId, r.at);
         if (loadResetAt(r.examId) < r.at) throw new SyncError(STORAGE_FULL);
+        markSynced(r.examId, [], r.at);
       }
       const byExam = new Map<string, RemoteAttempt[]>();
       for (const a of res.attempts) byExam.set(a.examId, [...(byExam.get(a.examId) ?? []), a]);

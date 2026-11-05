@@ -1,12 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Attempt } from './session.ts';
-import {
-  loadPendingAttempts,
-  loadPendingResets,
-  loadScores,
-  resetExam,
-  saveAttempt,
-} from './storage.ts';
+import { loadScores, pendingAttempts, pendingResets, resetExam, saveAttempt } from './storage.ts';
 import { setKey, syncNow } from './sync.ts';
 
 // 노드에는 localStorage가 없어서 메모리로 흉내 낸다. fail에 맞는 키는 저장 공간 부족처럼 실패한다.
@@ -22,6 +16,12 @@ class MemoryStorage {
   }
   removeItem(k: string) {
     this.map.delete(k);
+  }
+  get length() {
+    return this.map.size;
+  }
+  key(i: number) {
+    return [...this.map.keys()][i] ?? null;
   }
 }
 let store: MemoryStorage;
@@ -89,7 +89,30 @@ describe('동기화', () => {
     await first;
     expect(await second).toMatchObject({ state: 'ok' });
     expect(calls).toContain('/api/reset');
-    expect(loadPendingResets()).toEqual({});
+    expect(pendingResets()).toEqual([]);
+  });
+
+  it('올린 표시를 저장하지 못해도 기록을 빠뜨리지 않고 다음 동기화에서 다시 올린다', async () => {
+    // 결과만 저장되고 동기화용 표시는 저장되지 않는 상황(예전 구현의 pending 목록 포함)
+    store.fail = /:pending:|:synced:/;
+    saveAttempt({
+      id: 'a1',
+      examId: EXAM,
+      finishedAt: 10,
+      itemScores: { q1: 1 },
+    } as unknown as Attempt);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url === '/api/attempts'
+          ? ok({ ok: true })
+          : ok({ attempts: [], resets: [], cursor: 0, more: false }),
+      ),
+    );
+    expect(await syncNow()).toMatchObject({ state: 'ok', pushed: 1 });
+    store.fail = null;
+    expect(await syncNow()).toMatchObject({ state: 'ok', pushed: 1 });
+    expect(await syncNow()).toMatchObject({ state: 'ok', pushed: 0 });
   });
 
   it('올리는 중에 키를 바꾸면 예전 키의 응답으로 새 키의 올릴 목록을 지우지 않는다', async () => {
@@ -116,12 +139,12 @@ describe('동기화', () => {
     );
     const first = syncNow();
     await vi.waitFor(() => expect(posts).toEqual(['Bearer cme-TEST']));
-    setKey('cme-B', [EXAM]);
+    setKey('cme-B');
     const second = syncNow();
     release();
     await first;
     expect(await second).toMatchObject({ state: 'ok', pushed: 1 });
     expect(posts).toEqual(['Bearer cme-TEST', 'Bearer cme-B']);
-    expect(loadPendingAttempts()).toEqual([]);
+    expect(pendingAttempts()).toEqual([]);
   });
 });

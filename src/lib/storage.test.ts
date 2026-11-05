@@ -4,12 +4,13 @@ import {
   applyReset,
   loadAttempt,
   loadAttempts,
-  loadPendingAttempts,
   loadScores,
   loadStats,
+  markSynced,
   mergeRemote,
   MAX_ATTEMPTS,
-  pendingPayload,
+  pendingAttempts,
+  pendingResets,
   resetExam,
   saveAttempt,
   wrongKeys,
@@ -27,6 +28,12 @@ class MemoryStorage {
   }
   removeItem(k: string) {
     this.map.delete(k);
+  }
+  get length() {
+    return this.map.size;
+  }
+  key(i: number) {
+    return [...this.map.keys()][i] ?? null;
   }
 }
 let store: MemoryStorage;
@@ -91,7 +98,7 @@ describe('저장 형식', () => {
     expect(loadScores(EXAM)).toHaveLength(MAX_ATTEMPTS + 5);
     expect(loadStats(EXAM).q1?.n).toBe(MAX_ATTEMPTS + 5);
     // 밀려난 기록은 점수 요약만 올린다.
-    const evicted = pendingPayload({ examId: EXAM, id: 'a1', at: 1 });
+    const evicted = pendingAttempts().find((p) => p.id === 'a1');
     expect(evicted).toMatchObject({ id: 'a1', scores: { q1: 1 }, body: null });
   });
 
@@ -113,13 +120,36 @@ describe('저장 형식', () => {
   });
 });
 
+describe('올릴 기록', () => {
+  it('서버에 있다고 확인한 것만 빼고 모두 올린다(받은 기록은 다시 올리지 않음)', () => {
+    saveAttempt(attempt('a1', 10, { q1: 0 }));
+    saveAttempt(attempt('a2', 20, { q1: 1 }));
+    mergeRemote(EXAM, [row(attempt('r1', 30, { q1: 1 }))]);
+    expect(pendingAttempts().map((p) => p.id)).toEqual(['a1', 'a2']);
+    markSynced(EXAM, ['a1', 'a2']);
+    expect(pendingAttempts()).toEqual([]);
+  });
+
+  it('올린 표시를 저장하지 못해도 다음에 다시 올린다', () => {
+    saveAttempt(attempt('a1', 10, { q1: 0 }));
+    const setItem = store.setItem.bind(store);
+    store.setItem = (k, v) => {
+      if (k.includes(':synced:')) throw new DOMException('full', 'QuotaExceededError');
+      setItem(k, v);
+    };
+    markSynced(EXAM, ['a1']);
+    expect(pendingAttempts().map((p) => p.id)).toEqual(['a1']);
+  });
+});
+
 describe('기록 지우기', () => {
   it('지운 시각 이전 기록은 지우고, 나중에 받아도 버린다', () => {
     saveAttempt(attempt('a1', 10, { q1: 0 }));
     resetExam(EXAM, 50);
     expect(loadAttempts(EXAM)).toEqual([]);
     expect(loadStats(EXAM)).toEqual({});
-    expect(loadPendingAttempts()).toEqual([]);
+    expect(pendingAttempts()).toEqual([]);
+    expect(pendingResets()).toEqual([{ examId: EXAM, at: 50 }]);
     mergeRemote(EXAM, [row(attempt('a0', 40, { q1: 0 })), row(attempt('a2', 60, { q1: 1 }))]);
     expect(loadAttempts(EXAM).map((a) => a.id)).toEqual(['a2']);
   });

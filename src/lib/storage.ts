@@ -149,7 +149,6 @@ export function saveAttempt(a: Attempt): boolean {
   const list = [a, ...read<Attempt[]>(`attempts:${a.examId}`, [])];
   if (!writeAttempts(a.examId, list, a.id)) return false;
   addScores(a.examId, [toScoreEntry(a)]);
-  markPending(a.examId, a.id);
   notify(a.examId);
   return true;
 }
@@ -157,8 +156,6 @@ export function saveAttempt(a: Attempt): boolean {
 /** 이 기기에서 지운 시각을 남기고 기록을 지운다. 동기화하면 다른 기기에서도 지워진다. */
 export function resetExam(examId: string, now = Date.now()): void {
   applyReset(examId, now);
-  const pending = read<Record<string, number>>('pending:resets', {});
-  write('pending:resets', { ...pending, [examId]: Math.max(pending[examId] ?? 0, now) });
   clearActive(examId);
 }
 
@@ -175,10 +172,9 @@ export function applyReset(examId: string, at: number): boolean {
     read<ScoreEntry[]>(`scores:${examId}`, []).filter((e) => e.at > at),
   );
   write(`stats:${examId}`, null);
-  write(
-    'pending:attempts',
-    loadPendingAttempts().filter((p) => p.examId !== examId || p.at > at),
-  );
+  const left = new Set(read<ScoreEntry[]>(`scores:${examId}`, []).map((e) => e.id));
+  const synced = loadSynced(examId);
+  write(`synced:${examId}`, { ...synced, ids: synced.ids.filter((id) => left.has(id)) });
   notify(examId);
   return true;
 }
@@ -204,6 +200,10 @@ export function mergeRemote(
   );
   const added = read<ScoreEntry[]>(`scores:${examId}`, []).length - before;
   if (!saved) return { added: 0, saved: false };
+  markSynced(
+    examId,
+    fresh.map((r) => r.id),
+  );
   const local = read<Attempt[]>(`attempts:${examId}`, []);
   const ids = new Set(local.map((a) => a.id));
   const bodies = fresh.flatMap((r) => (r.body && !ids.has(r.id) ? [r.body] : []));
@@ -212,61 +212,75 @@ export function mergeRemote(
   return { added, saved: true };
 }
 
-/** 아직 서버에 올리지 못한 결과 */
-export interface PendingAttempt {
-  examId: string;
-  id: string;
-  at: number;
-}
-export const loadPendingAttempts = () => read<PendingAttempt[]>('pending:attempts', []);
+// ---- 서버와 맞춘 상태 ----
+// 올릴 목록을 따로 저장하지 않는다. 서버에 있다고 확인한 것(synced)만 저장하고, 이 기기 기록과의
+// 차이를 올린다. synced 저장에 실패해도 같은 기록을 한 번 더 올릴 뿐(서버는 같은 id를 무시한다),
+// 이 기기에 저장된 결과가 올릴 대상에서 빠지는 일은 없다.
 
-function markPending(examId: string, id: string): void {
-  const list = loadPendingAttempts().filter((p) => p.id !== id);
-  const a = read<Attempt[]>(`attempts:${examId}`, []).find((x) => x.id === id);
-  write('pending:attempts', [...list, { examId, id, at: a?.finishedAt ?? Date.now() }]);
+interface Synced {
+  /** 서버에 있는 결과 id */
+  ids: string[];
+  /** 서버에 있는 지운 시각 */
+  reset: number;
+}
+const loadSynced = (examId: string) => read<Synced>(`synced:${examId}`, { ids: [], reset: 0 });
+
+/** 이 기기 저장소에서 kinds 중 하나로 기록이 있는 시험 id */
+function storedExamIds(kinds: readonly string[]): string[] {
+  const pattern = new RegExp(`^${PREFIX}:(?:${kinds.join('|')}):(.+)$`);
+  const ids = new Set<string>();
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const m = pattern.exec(localStorage.key(i) ?? '');
+      if (m?.[1]) ids.add(m[1]);
+    }
+  } catch {
+    // 저장소를 읽지 못하면 올릴 것도 없다.
+  }
+  return [...ids];
+}
+const examIdsWithRecords = () => storedExamIds(['attempts', 'scores', 'reset']);
+
+/** 서버에 있다고 확인한 결과 id와 지운 시각을 남긴다. */
+export function markSynced(examId: string, ids: readonly string[], reset = 0): void {
+  const s = loadSynced(examId);
+  write(`synced:${examId}`, {
+    ids: [...new Set([...s.ids, ...ids])],
+    reset: Math.max(s.reset, reset),
+  });
+}
+
+/** 키를 바꾸면 새 키의 서버에는 아무것도 없다고 보고 이 기기 기록을 모두 다시 올린다. */
+export function clearSynced(): void {
+  for (const examId of storedExamIds(['synced'])) write(`synced:${examId}`, null);
 }
 
 /** 서버에 올릴 결과: 결과 기록이 남아 있으면 답안까지, 밀려났으면 점수 요약만 */
-export function pendingPayload(p: PendingAttempt) {
-  const body = read<Attempt[]>(`attempts:${p.examId}`, []).find((a) => a.id === p.id) ?? null;
-  const entry = read<ScoreEntry[]>(`scores:${p.examId}`, []).find((e) => e.id === p.id);
-  const scores = body?.itemScores ?? entry?.s;
-  if (!scores) return null;
-  return { examId: p.examId, id: p.id, finishedAt: body?.finishedAt ?? p.at, scores, body };
+export function pendingAttempts() {
+  return examIdsWithRecords().flatMap((examId) => {
+    const done = new Set(loadSynced(examId).ids);
+    const bodies = read<Attempt[]>(`attempts:${examId}`, []);
+    return loadScores(examId)
+      .filter((e) => !done.has(e.id))
+      .map((e) => {
+        const body = bodies.find((a) => a.id === e.id) ?? null;
+        return {
+          examId,
+          id: e.id,
+          finishedAt: body?.finishedAt ?? e.at,
+          scores: body?.itemScores ?? e.s,
+          body,
+        };
+      });
+  });
 }
 
-export function clearPending(ids: readonly string[]): void {
-  const done = new Set(ids);
-  write(
-    'pending:attempts',
-    loadPendingAttempts().filter((p) => !done.has(p.id)),
-  );
-}
-
-export const loadPendingResets = () => read<Record<string, number>>('pending:resets', {});
-export function clearPendingReset(examId: string, at: number): void {
-  const pending = loadPendingResets();
-  if ((pending[examId] ?? 0) <= at) {
-    delete pending[examId];
-    write('pending:resets', pending);
-  }
-}
-
-/** 동기화를 처음 켤 때, 이 기기에 있던 기록을 모두 올릴 목록에 넣는다. */
-export function markAllPending(examIds: readonly string[]): void {
-  const list = loadPendingAttempts();
-  const ids = new Set(list.map((p) => p.id));
-  for (const examId of examIds) {
-    for (const e of loadScores(examId)) {
-      if (!ids.has(e.id)) list.push({ examId, id: e.id, at: e.at });
-    }
+/** 서버에 올릴 지운 시각 */
+export function pendingResets(): { examId: string; at: number }[] {
+  return examIdsWithRecords().flatMap((examId) => {
     const at = loadResetAt(examId);
-    if (at) {
-      const pending = loadPendingResets();
-      write('pending:resets', { ...pending, [examId]: Math.max(pending[examId] ?? 0, at) });
-    }
-  }
-  write('pending:attempts', list);
+    return at > loadSynced(examId).reset ? [{ examId, at }] : [];
+  });
 }
 
 /** 마지막으로 풀었을 때 틀린 item */

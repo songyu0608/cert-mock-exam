@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { exams } from '../data/exams.ts';
 import {
   forgetKey,
   generateKey,
@@ -14,7 +13,6 @@ import {
 import { useSyncStatus } from '../lib/useRecords.ts';
 import { onLinkClick, paths } from '../router.ts';
 
-const examIds = exams.map((e) => e.id);
 const time = (at: number) => new Date(at).toLocaleString('ko-KR');
 
 function statusText(s: SyncStatus): string {
@@ -48,7 +46,7 @@ export function SettingsPage() {
   const status = useSyncStatus();
 
   const connect = (k: string) => {
-    setKey(k, examIds);
+    setKey(k);
     setKeyState(k);
     void syncNow();
   };
