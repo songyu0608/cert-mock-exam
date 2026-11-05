@@ -122,10 +122,16 @@ function writeAttempts(examId: string, list: Attempt[], keepId?: string): boolea
   let rest = sorted.slice(0, MAX_ATTEMPTS);
   const keep = keepId === undefined ? undefined : sorted.find((a) => a.id === keepId);
   if (keep && !rest.includes(keep)) rest = [...rest.slice(0, MAX_ATTEMPTS - 1), keep];
+  // 점수 저장에 실패했던 결과는 본문이 점수의 유일한 사본이다. 밀어내기 전에 점수 기록에 넣고,
+  // 넣지 못하면 결과 기록을 줄이지 않는다.
+  const resetAt = loadResetAt(examId);
+  const keepScores = (dropped: Attempt[]) =>
+    addScores(examId, dropped.filter((a) => a.finishedAt > resetAt).map(toScoreEntry));
+  if (!keepScores(sorted.filter((a) => !rest.includes(a)))) return false;
   while (rest.length > 0) {
     if (write(`attempts:${examId}`, rest)) return true;
     const drop = rest.findLastIndex((a) => a !== keep);
-    if (drop < 0) return false;
+    if (drop < 0 || !keepScores([rest[drop]!])) return false;
     rest = rest.toSpliced(drop, 1);
   }
   return list.length === 0 && write(`attempts:${examId}`, []);

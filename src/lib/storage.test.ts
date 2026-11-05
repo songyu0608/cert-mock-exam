@@ -109,6 +109,24 @@ describe('저장 형식', () => {
     expect(loadStats(EXAM).q1).toMatchObject({ n: MAX_ATTEMPTS + 1, last: 1 });
   });
 
+  it('점수 저장에 실패했던 결과가 밀려나도 점수는 남는다', () => {
+    saveAttempt(attempt('a0', 1, { q1: 0 }));
+    const setItem = store.setItem.bind(store);
+    store.setItem = (k, v) => {
+      if (k.includes(':scores:')) throw new DOMException('full', 'QuotaExceededError');
+      setItem(k, v);
+    };
+    expect(saveAttempt(attempt('mine', 5, { q1: 0 }))).toBe(true);
+    store.setItem = setItem;
+    mergeRemote(
+      EXAM,
+      Array.from({ length: MAX_ATTEMPTS }, (_, i) => row(attempt(`r${i}`, 1000 + i, { q1: 1 }))),
+    );
+    expect(loadAttempt(EXAM, 'mine')).toBeUndefined();
+    expect(loadScores(EXAM).some((e) => e.id === 'mine')).toBe(true);
+    expect(pendingAttempts().map((p) => p.id)).toContain('mine');
+  });
+
   it('받은 기록이 더 최근이어도(기기 시계 차이) 방금 저장한 결과는 밀려나지 않는다', () => {
     mergeRemote(
       EXAM,
