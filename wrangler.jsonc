@@ -16,7 +16,7 @@
       "binding": "DB",
       "database_name": "cert-mock-exam",
       // Cloudflare 대시보드에서 만든 D1의 Database ID(비밀 값 아님)
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "ea20f0a8-c2ea-4a45-b0ee-1e3bb6241d0e",
       "migrations_dir": "migrations",
     },
   ],
