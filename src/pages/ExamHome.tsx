@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
+import { VendorBadge } from '../components/VendorBadge.tsx';
 import type { Exam } from '../data/schema.ts';
 import { flattenQuestion } from '../lib/items.ts';
 import { shuffle } from '../lib/scoring.ts';
@@ -101,6 +102,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
       </nav>
       <header className="stack" style={{ gap: 8 }}>
         <div className="row">
+          <VendorBadge vendor={exam.vendor} />
           <span className="code">{exam.code}</span>
           {exam.level && <span className="muted small">{exam.level}</span>}
         </div>

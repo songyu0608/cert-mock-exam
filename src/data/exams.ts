@@ -42,6 +42,6 @@ export const VENDOR_LABEL: Record<string, string> = {
   aws: 'AWS',
   github: 'GitHub',
   microsoft: 'Microsoft',
-  anthropic: 'Claude (Anthropic)',
+  anthropic: 'Claude',
   sample: '견본',
 };

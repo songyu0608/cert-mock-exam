@@ -159,16 +159,48 @@ h2 {
   padding: 18px;
   min-width: 0;
 }
-.code {
+.code,
+.vb {
   font-family: var(--f-mono);
   font-weight: 600;
   letter-spacing: 0.04em;
-  background: var(--accent);
-  color: var(--accent-ink);
   padding: 2px 8px;
   border-radius: 6px;
   font-size: 13px;
+  line-height: 1.5;
   white-space: nowrap;
+}
+/* 시험 코드는 업체 배지와 겹치지 않게 테두리만 둔다. */
+.code {
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+/* 업체 배지: 로고 대신 업체 대표색을 입힌 글자(상표 가이드라인상 로고는 쓰지 않는다). */
+.vb {
+  background: var(--soft);
+  color: var(--ink);
+}
+.vb-aws {
+  background: #232f3e;
+  color: #ff9900;
+}
+.vb-anthropic {
+  background: #d97757;
+  color: #141413;
+}
+.vb-github {
+  background: #1f2328;
+  color: #ffffff;
+}
+.vb-microsoft {
+  background: #0078d4;
+  color: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .vb-aws,
+  :root:not([data-theme='light']) .vb-github {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 22%);
+  }
 }
 
 /* 시험 목록 */

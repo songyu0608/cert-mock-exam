@@ -1,4 +1,5 @@
-import { VENDOR_LABEL, exams } from '../data/exams.ts';
+import { VendorBadge } from '../components/VendorBadge.tsx';
+import { exams } from '../data/exams.ts';
 import { onLinkClick, paths } from '../router.ts';
 import { loadActive, loadAttempts } from '../lib/storage.ts';
 
@@ -12,7 +13,9 @@ export function ExamList() {
       </header>
       {vendors.map((v) => (
         <section key={v} className="vendor" aria-labelledby={`v-${v}`}>
-          <h2 id={`v-${v}`}>{VENDOR_LABEL[v] ?? v}</h2>
+          <h2 id={`v-${v}`}>
+            <VendorBadge vendor={v} />
+          </h2>
           <div className="cards">
             {exams
               .filter((e) => e.vendor === v)
