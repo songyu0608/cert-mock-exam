@@ -154,6 +154,21 @@ describe('기록 지우기', () => {
     expect(loadAttempts(EXAM).map((a) => a.id)).toEqual(['a2']);
   });
 
+  it('지운 시각을 저장하지 못하면 기록을 지우지 않고 실패를 알린다', () => {
+    saveAttempt(attempt('a1', 10, { q1: 0 }));
+    const setItem = store.setItem.bind(store);
+    store.setItem = (k, v) => {
+      if (k.includes(':reset:')) throw new DOMException('full', 'QuotaExceededError');
+      setItem(k, v);
+    };
+    expect(resetExam(EXAM, 50)).toBe(false);
+    expect(loadAttempts(EXAM).map((a) => a.id)).toEqual(['a1']);
+    expect(loadStats(EXAM).q1?.n).toBe(1);
+    // 지운 시각을 받아 적용할 때도 같다(동기화는 이때 오류를 내고 커서를 옮기지 않는다).
+    expect(applyReset(EXAM, 60)).toBe(false);
+    expect(loadAttempts(EXAM)).toHaveLength(1);
+  });
+
   it('더 이른 지운 시각은 무시한다', () => {
     applyReset(EXAM, 50);
     mergeRemote(EXAM, [row(attempt('a2', 60, { q1: 1 }))]);

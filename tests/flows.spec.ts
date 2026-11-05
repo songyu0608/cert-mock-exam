@@ -161,6 +161,28 @@ test('결과를 저장하지 못하면 풀던 세션을 지우지 않고 다시 
   ).toBeNull();
 });
 
+test('초기화 시각을 저장하지 못하면 기록을 지우지 않고 알린다', async ({ page }) => {
+  await openExam(page, 'SAMPLE-01');
+  await modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' }).click();
+  await answerSampleCorrectly(page);
+  await page.getByRole('button', { name: '제출' }).last().click();
+  await page.getByRole('button', { name: '제출하기' }).click();
+  await page.getByRole('link', { name: '시험 홈', exact: true }).click();
+  await expect(page.locator('.history tbody tr')).toHaveCount(1);
+
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key: string, value: string) {
+      if (key.includes(':reset:')) throw new DOMException('full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: '기록 초기화' }).click();
+  await page.getByRole('button', { name: '지우기' }).click();
+  await expect(page.getByRole('alert')).toContainText('기록을 지우지 못했습니다');
+  await expect(page.locator('.history tbody tr')).toHaveCount(1);
+});
+
 test('나가기 후 시험 홈에서 이어 풀기와 버리기', async ({ page }) => {
   // 출제 순서가 무작위라 첫 문항 유형이 매번 다르다. 모든 유형을 아는 견본 시험으로 확인한다.
   await openExam(page, 'SAMPLE-01');

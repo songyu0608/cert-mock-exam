@@ -153,16 +153,25 @@ export function saveAttempt(a: Attempt): boolean {
   return true;
 }
 
-/** 이 기기에서 지운 시각을 남기고 기록을 지운다. 동기화하면 다른 기기에서도 지워진다. */
-export function resetExam(examId: string, now = Date.now()): void {
+/**
+ * 이 기기에서 지운 시각을 남기고 기록을 지운다. 동기화하면 다른 기기에서도 지워진다.
+ * 지운 시각을 저장하지 못하면(저장 공간 부족) 아무것도 지우지 않고 false를 돌려준다.
+ */
+export function resetExam(examId: string, now = Date.now()): boolean {
   applyReset(examId, now);
+  if (loadResetAt(examId) < now) return false;
   clearActive(examId);
+  return true;
 }
 
-/** 지운 시각을 적용한다. 더 이른 시각이면 무시한다. */
+/**
+ * 지운 시각을 적용한다. 더 이른 시각이면 무시한다.
+ * 지운 시각을 먼저 저장하고, 저장하지 못하면 기록을 지우지 않는다. 시각 없이 지우면 다른 기기에
+ * 전해지지 않고, 나중에 서버에서 다시 받을 때 지운 기록이 되살아나기 때문이다.
+ */
 export function applyReset(examId: string, at: number): boolean {
   if (at <= loadResetAt(examId)) return false;
-  write(`reset:${examId}`, at);
+  if (!write(`reset:${examId}`, at)) return false;
   write(
     `attempts:${examId}`,
     read<Attempt[]>(`attempts:${examId}`, []).filter((a) => a.finishedAt > at),
