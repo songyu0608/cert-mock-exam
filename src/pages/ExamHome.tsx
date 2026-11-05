@@ -1,0 +1,362 @@
+import { useMemo, useState } from 'react';
+import { DomainTable } from '../components/DomainTable.tsx';
+import type { Exam } from '../data/schema.ts';
+import { flattenQuestion } from '../lib/items.ts';
+import { shuffle } from '../lib/scoring.ts';
+import {
+  MODE_LABEL,
+  createSession,
+  mockMinutes,
+  pickMockQuestions,
+  type Mode,
+} from '../lib/session.ts';
+import {
+  clearActive,
+  loadActive,
+  loadAttempts,
+  loadStats,
+  resetExam,
+  saveActive,
+  wrongKeys,
+} from '../lib/storage.ts';
+import { useQuestions } from '../lib/useQuestions.ts';
+import { navigate, onLinkClick, paths } from '../router.ts';
+
+const PRACTICE_COUNTS = [10, 20, 50] as const;
+
+export function ExamHome({ exam }: { exam: Exam }) {
+  const { data, error } = useQuestions(exam.id);
+  // 기록을 지우거나 세션을 버리면 다시 읽도록 하는 값
+  const [rev, setRev] = useState(0);
+  const active = useMemo(() => (rev >= 0 ? loadActive(exam.id) : null), [exam.id, rev]);
+  const attempts = useMemo(() => (rev >= 0 ? loadAttempts(exam.id) : []), [exam.id, rev]);
+  const stats = useMemo(() => (rev >= 0 ? loadStats(exam.id) : {}), [exam.id, rev]);
+
+  const [mockN, setMockN] = useState(exam.mock.questions);
+  const [domains, setDomains] = useState<string[]>(exam.domains.map((d) => d.id));
+  const [practiceN, setPracticeN] = useState<number | 'all'>(20);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const wrong = useMemo(() => {
+    if (!data) return [];
+    return wrongKeys(stats).filter((k) => data.itemsByKey.has(k));
+  }, [data, stats]);
+
+  const domainRows = useMemo(
+    () =>
+      exam.domains.map((d) => {
+        const keys = data?.items.filter((i) => i.topDomain === d.id).map((i) => i.key) ?? [];
+        const seen = keys.filter((k) => stats[k]);
+        const sum = seen.reduce((s, k) => s + stats[k]!.last, 0);
+        return {
+          id: d.id,
+          pct: seen.length ? (sum / seen.length) * 100 : null,
+          detail: `${seen.length}/${keys.length} 풀이`,
+        };
+      }),
+    [exam, data, stats],
+  );
+
+  const start = (mode: Mode) => {
+    if (!data) return;
+    let s;
+    if (mode === 'mock') {
+      const picked = pickMockQuestions(exam, data.questions, mockN);
+      s = createSession(exam, picked, 'mock', { minutes: mockMinutes(exam, mockN) });
+    } else if (mode === 'practice') {
+      const pool = shuffle(
+        data.questions.filter((q) => domains.includes(q.domain.split('.')[0] ?? '')),
+      );
+      const picked = [];
+      let n = 0;
+      for (const q of pool) {
+        if (practiceN !== 'all' && n >= practiceN) break;
+        picked.push(q);
+        n += flattenQuestion(q).length;
+      }
+      s = createSession(exam, picked, 'practice');
+    } else {
+      const set = new Set(wrong);
+      const picked = shuffle(
+        data.questions.filter((q) => flattenQuestion(q).some((i) => set.has(i.key))),
+      );
+      s = createSession(exam, picked, 'review', { onlyKeys: set });
+    }
+    if (!s.itemKeys.length) return;
+    saveActive(s);
+    navigate(paths.play(exam.id));
+  };
+
+  const practiceAvailable = data
+    ? data.items.filter((i) => domains.includes(i.topDomain)).length
+    : 0;
+  const blocked = !!active;
+
+  return (
+    <main className="wrap stack">
+      <nav className="crumb">
+        <a href={paths.list()} onClick={onLinkClick}>
+          ← 시험 목록
+        </a>
+      </nav>
+      <header className="stack" style={{ gap: 8 }}>
+        <div className="row">
+          <span className="code">{exam.code}</span>
+          {exam.level && <span className="muted small">{exam.level}</span>}
+        </div>
+        <h1>{exam.name}</h1>
+        {exam.notes && <p className="lede">{exam.notes}</p>}
+      </header>
+
+      {exam.facts.length > 0 && (
+        <div className="facts">
+          {exam.facts.map((f) => (
+            <div key={f.label}>
+              <b>{f.value}</b>
+              <span>{f.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {error && <p className="note">문항을 불러오지 못했습니다: {error}</p>}
+
+      {active && (
+        <div className="banner spread" role="status">
+          <span>
+            <b>{MODE_LABEL[active.mode]}</b> 진행 중 · {active.current + 1}/{active.itemKeys.length}
+            번
+          </span>
+          <span className="row">
+            <button
+              type="button"
+              className="btn primary"
+              onClick={() => navigate(paths.play(exam.id))}
+            >
+              이어 풀기
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                clearActive(exam.id);
+                setRev((r) => r + 1);
+              }}
+            >
+              버리기
+            </button>
+          </span>
+        </div>
+      )}
+
+      <section className="modes" aria-label="풀이 모드">
+        <div className="panel mode">
+          <h2>실전 모의고사</h2>
+          <p>도메인 비중대로 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에 채점합니다.</p>
+          {exam.mock.questionChoices ? (
+            <label className="row small">
+              문항 수
+              <select
+                className="sel"
+                value={mockN}
+                onChange={(e) => setMockN(Number(e.target.value))}
+              >
+                {exam.mock.questionChoices.map((n) => (
+                  <option key={n} value={n}>
+                    {n}문항 · {mockMinutes(exam, n)}분
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <p className="small">
+              {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
+            </p>
+          )}
+          <div className="row">
+            <button
+              type="button"
+              className="btn primary"
+              disabled={!data || blocked}
+              onClick={() => start('mock')}
+            >
+              시작
+            </button>
+          </div>
+        </div>
+
+        <div className="panel mode">
+          <h2>연습</h2>
+          <p>문항마다 바로 채점하고 해설을 봅니다. 도메인을 골라 풀 수 있습니다.</p>
+          <div className="chips" role="group" aria-label="도메인">
+            {exam.domains.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                className="chip"
+                aria-pressed={domains.includes(d.id)}
+                title={d.name}
+                onClick={() =>
+                  setDomains((cur) =>
+                    cur.includes(d.id) ? cur.filter((x) => x !== d.id) : [...cur, d.id].sort(),
+                  )
+                }
+              >
+                도메인 {d.id}
+              </button>
+            ))}
+          </div>
+          <label className="row small">
+            문항 수
+            <select
+              className="sel"
+              value={practiceN}
+              onChange={(e) =>
+                setPracticeN(e.target.value === 'all' ? 'all' : Number(e.target.value))
+              }
+            >
+              {PRACTICE_COUNTS.map((n) => (
+                <option key={n} value={n}>
+                  {n}문항
+                </option>
+              ))}
+              <option value="all">전체 ({practiceAvailable})</option>
+            </select>
+          </label>
+          <div className="row">
+            <button
+              type="button"
+              className="btn primary"
+              disabled={!data || blocked || practiceAvailable === 0}
+              onClick={() => start('practice')}
+            >
+              시작
+            </button>
+          </div>
+        </div>
+
+        <div className="panel mode">
+          <h2>오답 다시 풀기</h2>
+          <p>마지막으로 풀었을 때 틀린 문항만 다시 풉니다. 맞히면 목록에서 빠집니다.</p>
+          <p className="small">
+            틀린 문항 <b>{wrong.length}</b>개
+          </p>
+          <div className="row">
+            <button
+              type="button"
+              className="btn primary"
+              disabled={!data || blocked || wrong.length === 0}
+              onClick={() => start('review')}
+            >
+              시작
+            </button>
+          </div>
+        </div>
+      </section>
+      {blocked && (
+        <p className="small muted">진행 중인 세션을 이어 풀거나 버린 뒤 새로 시작할 수 있습니다.</p>
+      )}
+
+      <section className="panel stack" aria-labelledby="dom-h">
+        <h2 id="dom-h">도메인별 비중과 내 정답률</h2>
+        <DomainTable exam={exam} rows={domainRows} />
+        <p className="small muted">정답률은 문항마다 마지막으로 푼 결과로 계산합니다.</p>
+      </section>
+
+      <section className="panel stack" aria-labelledby="hist-h">
+        <h2 id="hist-h">풀이 기록</h2>
+        {attempts.length === 0 ? (
+          <p className="muted small">아직 기록이 없습니다.</p>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table className="history">
+              <thead>
+                <tr>
+                  <th>날짜</th>
+                  <th>모드</th>
+                  <th>점수</th>
+                  <th>결과</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attempts.map((a) => (
+                  <tr key={a.id}>
+                    <td>
+                      <a href={paths.result(exam.id, a.id)} onClick={onLinkClick}>
+                        {new Date(a.finishedAt).toLocaleString('ko-KR', {
+                          month: 'numeric',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </a>
+                    </td>
+                    <td>{MODE_LABEL[a.mode]}</td>
+                    <td>
+                      {Math.round(a.score * 10) / 10}/{a.total} ({a.percent}%)
+                    </td>
+                    <td>
+                      {a.passed === undefined ? (
+                        '–'
+                      ) : (
+                        <span className={`pill ${a.passed ? 'ok' : 'bad'}`}>
+                          {a.passed ? '합격' : '불합격'}
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <div className="row">
+          {confirmReset ? (
+            <>
+              <span className="small">이 시험의 기록과 통계를 모두 지울까요?</span>
+              <button
+                type="button"
+                className="btn sm danger"
+                onClick={() => {
+                  resetExam(exam.id);
+                  setConfirmReset(false);
+                  setRev((r) => r + 1);
+                }}
+              >
+                지우기
+              </button>
+              <button type="button" className="btn sm" onClick={() => setConfirmReset(false)}>
+                취소
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="btn sm ghost"
+              onClick={() => setConfirmReset(true)}
+              disabled={attempts.length === 0 && Object.keys(stats).length === 0}
+            >
+              기록 초기화
+            </button>
+          )}
+        </div>
+        <p className="small muted">기록은 이 브라우저에만 저장됩니다.</p>
+      </section>
+
+      {exam.sources.length > 0 && (
+        <footer className="src">
+          시험 형식 출처:{' '}
+          {exam.sources.map((s, i) => (
+            <span key={s.url}>
+              {i > 0 && ', '}
+              <a href={s.url} target="_blank" rel="noopener noreferrer">
+                {s.label}
+              </a>
+            </span>
+          ))}
+          {exam.sources[0]?.checked && ` (${exam.sources[0].checked} 확인)`}
+        </footer>
+      )}
+    </main>
+  );
+}

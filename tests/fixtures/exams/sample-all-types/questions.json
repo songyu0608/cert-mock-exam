@@ -1,0 +1,170 @@
+[
+  {
+    "id": "s-single",
+    "domain": "1.1",
+    "type": "single",
+    "origin": "claude",
+    "stem": "Git에서 새 브랜치를 만들고 바로 이동하는 명령은?",
+    "options": [
+      {
+        "text": "`git switch -c feature`",
+        "correct": true,
+        "why": "-c는 만들고 이동합니다."
+      },
+      {
+        "text": "`git branch -d feature`",
+        "correct": false,
+        "why": "-d는 삭제입니다."
+      },
+      {
+        "text": "`git merge feature`",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "id": "s-multi",
+    "domain": "1.1",
+    "type": "multi",
+    "origin": "claude",
+    "stem": "다음 중 소수를 두 개 고르십시오.",
+    "options": [
+      {
+        "text": "2",
+        "correct": true
+      },
+      {
+        "text": "3",
+        "correct": true
+      },
+      {
+        "text": "4",
+        "correct": false
+      },
+      {
+        "text": "6",
+        "correct": false
+      }
+    ]
+  },
+  {
+    "id": "s-order",
+    "domain": "1.2",
+    "type": "ordering",
+    "origin": "claude",
+    "stem": "GitHub Actions 워크플로가 실행되는 순서대로 고르십시오.",
+    "items": ["이벤트 발생", "러너 할당", "스텝 실행"],
+    "distractors": ["저장소 삭제"]
+  },
+  {
+    "id": "s-order-move",
+    "domain": "1.2",
+    "type": "ordering",
+    "origin": "claude",
+    "stem": "단계를 순서대로 배열하십시오.",
+    "items": ["1단계 계획", "2단계 구현", "3단계 배포"]
+  },
+  {
+    "id": "s-match",
+    "domain": "1.2",
+    "type": "matching",
+    "origin": "claude",
+    "stem": "각 파일의 용도를 연결하십시오.",
+    "reuse": false,
+    "prompts": [
+      {
+        "text": "CODEOWNERS",
+        "answer": "own"
+      },
+      {
+        "text": "dependabot.yml",
+        "answer": "dep"
+      }
+    ],
+    "responses": [
+      {
+        "key": "own",
+        "text": "리뷰어 자동 지정"
+      },
+      {
+        "key": "dep",
+        "text": "의존성 업데이트"
+      },
+      {
+        "key": "ci",
+        "text": "빌드 실행"
+      }
+    ]
+  },
+  {
+    "id": "s-yesno",
+    "domain": "1.1",
+    "type": "yesno",
+    "origin": "claude",
+    "stem": "다음 문장이 맞는지 판단하십시오.",
+    "statements": [
+      {
+        "text": "Pull request는 브랜치 간 변경을 제안한다.",
+        "answer": true
+      },
+      {
+        "text": "Fork는 원본 저장소를 삭제한다.",
+        "answer": false,
+        "why": "Fork는 복사본을 만듭니다."
+      }
+    ]
+  },
+  {
+    "id": "s-case",
+    "domain": "2.1",
+    "type": "case",
+    "origin": "claude",
+    "stem": "사례 연구",
+    "scenario": "A사는 저장소 50개를 운영하며 **모든 PR에 리뷰 1명 이상**을 요구하려 합니다.",
+    "questions": [
+      {
+        "type": "single",
+        "stem": "가장 적합한 기능은?",
+        "options": [
+          {
+            "text": "브랜치 보호 규칙",
+            "correct": true
+          },
+          {
+            "text": "Wiki",
+            "correct": false
+          }
+        ]
+      },
+      {
+        "type": "yesno",
+        "stem": "다음 설정이 요구 사항을 만족하는지 판단하십시오.",
+        "statements": [
+          {
+            "text": "필수 리뷰 수를 1로 설정한다.",
+            "answer": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "s-ps",
+    "domain": "2.1",
+    "type": "problem-solution",
+    "origin": "claude",
+    "stem": "해결책이 목표를 달성하는지 판단하십시오.",
+    "scenario": "비밀 값이 로그에 노출되었습니다.",
+    "goal": "앞으로 워크플로 로그에 비밀 값이 보이지 않게 한다.",
+    "solutions": [
+      {
+        "text": "값을 GitHub Secrets로 옮긴다.",
+        "meetsGoal": true
+      },
+      {
+        "text": "저장소 이름을 바꾼다.",
+        "meetsGoal": false
+      }
+    ]
+  }
+]

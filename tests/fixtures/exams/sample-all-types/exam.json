@@ -1,0 +1,12 @@
+{
+  "id": "sample-all-types",
+  "vendor": "sample",
+  "code": "SAMPLE-01",
+  "name": "모든 문항 유형 견본",
+  "domains": [
+    { "id": "1", "name": "기본 유형", "weight": 50 },
+    { "id": "2", "name": "묶음 유형", "weight": 50 }
+  ],
+  "mock": { "questions": 10, "minutes": 10, "passPercent": 70 },
+  "types": ["single", "multi", "ordering", "matching", "case", "yesno", "problem-solution"]
+}

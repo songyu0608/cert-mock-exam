@@ -1,0 +1,64 @@
+{
+  "id": "aws-aib-c01",
+  "vendor": "aws",
+  "code": "AIB-C01",
+  "name": "AWS Certified AI Business Strategist",
+  "lang": "ko",
+  "level": "Business",
+  "domains": [
+    {
+      "id": "1",
+      "name": "AI 기초 및 활용 능력",
+      "weight": 24
+    },
+    {
+      "id": "2",
+      "name": "AI 전략 및 비즈니스 가치 창출",
+      "weight": 28
+    },
+    {
+      "id": "3",
+      "name": "AI 거버넌스 및 책임 있는 AI 리더십",
+      "weight": 24
+    },
+    {
+      "id": "4",
+      "name": "비즈니스 준비성, 리더십, AI 혁신",
+      "weight": 24
+    }
+  ],
+  "mock": {
+    "questions": 65,
+    "minutes": 130,
+    "passPercent": 72,
+    "questionChoices": [50, 65, 85]
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "130분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "700 / 1000",
+      "label": "합격 환산 점수"
+    },
+    {
+      "value": "2가지",
+      "label": "선다형·복수 응답"
+    },
+    {
+      "value": "미기재",
+      "label": "공식 문항 수"
+    }
+  ],
+  "sources": [
+    {
+      "label": "AIB-C01 공식 시험 안내서",
+      "url": "https://docs.aws.amazon.com/pdfs/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.pdf",
+      "checked": "2026-10-24"
+    }
+  ],
+  "notes": "공식 안내서에 문항 수가 없어 문항 수를 고르게 했습니다(기본 65문항, 시간은 130분 기준 비례). 도메인 비중(24/28/24/24%)대로 출제합니다."
+}
