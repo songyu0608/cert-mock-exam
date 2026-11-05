@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import type { Attempt } from './session.ts';
 import {
   applyReset,
+  loadAttempt,
   loadAttempts,
   loadPendingAttempts,
   loadScores,
@@ -99,6 +100,16 @@ describe('저장 형식', () => {
     mergeRemote(EXAM, [row(attempt('old', 1, { q1: 0 }))]);
     expect(loadAttempts(EXAM).some((a) => a.id === 'old')).toBe(false);
     expect(loadStats(EXAM).q1).toMatchObject({ n: MAX_ATTEMPTS + 1, last: 1 });
+  });
+
+  it('받은 기록이 더 최근이어도(기기 시계 차이) 방금 저장한 결과는 밀려나지 않는다', () => {
+    mergeRemote(
+      EXAM,
+      Array.from({ length: MAX_ATTEMPTS }, (_, i) => row(attempt(`r${i}`, 1000 + i, { q1: 1 }))),
+    );
+    expect(saveAttempt(attempt('mine', 5, { q1: 0 }))).toBe(true);
+    expect(loadAttempt(EXAM, 'mine')).toBeDefined();
+    expect(loadAttempts(EXAM)).toHaveLength(MAX_ATTEMPTS);
   });
 });
 

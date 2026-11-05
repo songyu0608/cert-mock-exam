@@ -117,6 +117,9 @@ interface PullResponse {
   more: boolean;
 }
 
+/** 동기화 도중 키가 바뀌거나 지워졌다. 새 키의 기록을 건드리지 않고 멈춘다(새 키는 다음 실행이 맡는다). */
+class KeyChanged extends Error {}
+
 class SyncError extends Error {
   readonly unauthorized: boolean;
   constructor(message: string, unauthorized = false) {
@@ -175,9 +178,14 @@ async function run(): Promise<SyncStatus> {
     return status;
   }
   emit({ state: 'running' });
+  // 서버 응답을 기다린 뒤 이 기기 기록을 바꾸기 전에 매번 확인한다.
+  const sameKey = () => {
+    if (loadConfig().key !== key) throw new KeyChanged();
+  };
   try {
     for (const [examId, at] of Object.entries(loadPendingResets())) {
       await api(key, 'reset', { method: 'POST', body: JSON.stringify({ examId, at }) });
+      sameKey();
       clearPendingReset(examId, at);
     }
 
@@ -188,6 +196,7 @@ async function run(): Promise<SyncStatus> {
       const attempts = batch.flatMap((p) => pendingPayload(p) ?? []);
       if (attempts.length)
         await api(key, 'attempts', { method: 'POST', body: JSON.stringify({ attempts }) });
+      sameKey();
       clearPending(batch.map((p) => p.id));
       pushed += attempts.length;
     }
@@ -196,6 +205,7 @@ async function run(): Promise<SyncStatus> {
     let cursor = config.cursor ?? 0;
     for (;;) {
       const res = await api<PullResponse>(key, `sync?since=${cursor}`);
+      sameKey();
       for (const r of res.resets) {
         applyReset(r.examId, r.at);
         if (loadResetAt(r.examId) < r.at) throw new SyncError(STORAGE_FULL);
@@ -213,16 +223,16 @@ async function run(): Promise<SyncStatus> {
       }
       cursor = res.cursor;
       // 페이지마다 커서를 남겨, 중간에 실패해도 받은 데까지는 다시 받지 않는다.
-      // 키가 그사이 바뀌었으면 덮어쓰지 않는다.
-      if (loadConfig().key !== key) break;
       saveConfig({ ...loadConfig(), cursor });
       if (!res.more) break;
     }
 
     const at = Date.now();
-    if (loadConfig().key === key) saveConfig({ key, cursor, lastOk: at });
+    saveConfig({ key, cursor, lastOk: at });
     emit({ state: 'ok', at, pulled, pushed });
   } catch (e) {
+    // 키를 바꾸거나 끊었으면 예전 키의 오류는 알리지 않는다(상태는 바꿀 때 이미 알렸다).
+    if (e instanceof KeyChanged || loadConfig().key !== key) return status;
     const err = e instanceof SyncError ? e : new SyncError(String(e));
     emit({ state: 'error', message: err.message, unauthorized: err.unauthorized });
   }

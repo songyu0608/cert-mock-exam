@@ -112,12 +112,21 @@ export function computeStats(scores: readonly ScoreEntry[]): Stats {
 
 export const loadStats = (examId: string) => computeStats(loadScores(examId));
 
-/** 최근 것부터 MAX_ATTEMPTS개까지 저장한다. 공간이 모자라면 오래된 것부터 뺀다. */
-function writeAttempts(examId: string, list: Attempt[]): boolean {
-  let rest = [...list].sort((a, b) => b.finishedAt - a.finishedAt).slice(0, MAX_ATTEMPTS);
+/**
+ * 최근 것부터 MAX_ATTEMPTS개까지 저장한다. 공간이 모자라면 오래된 것부터 뺀다.
+ * keepId는 끝난 시각과 무관하게 남긴다. 기기 시계가 달라 다른 기기 기록이 더 최근으로 보여도,
+ * 방금 제출한 결과가 밀려나 결과 화면에서 사라지지 않게 하기 위해서다.
+ */
+function writeAttempts(examId: string, list: Attempt[], keepId?: string): boolean {
+  const sorted = [...list].sort((a, b) => b.finishedAt - a.finishedAt);
+  let rest = sorted.slice(0, MAX_ATTEMPTS);
+  const keep = keepId === undefined ? undefined : sorted.find((a) => a.id === keepId);
+  if (keep && !rest.includes(keep)) rest = [...rest.slice(0, MAX_ATTEMPTS - 1), keep];
   while (rest.length > 0) {
     if (write(`attempts:${examId}`, rest)) return true;
-    rest = rest.slice(0, -1);
+    const drop = rest.findLastIndex((a) => a !== keep);
+    if (drop < 0) return false;
+    rest = rest.toSpliced(drop, 1);
   }
   return list.length === 0 && write(`attempts:${examId}`, []);
 }
@@ -138,7 +147,7 @@ export function saveAttempt(a: Attempt): boolean {
   // 결과 기록은 바꾸지 않는다: 점수 기록과 서버(INSERT OR IGNORE)도 처음 것을 유지한다.
   if (loadScores(a.examId).some((e) => e.id === a.id)) return true;
   const list = [a, ...read<Attempt[]>(`attempts:${a.examId}`, [])];
-  if (!writeAttempts(a.examId, list)) return false;
+  if (!writeAttempts(a.examId, list, a.id)) return false;
   addScores(a.examId, [toScoreEntry(a)]);
   markPending(a.examId, a.id);
   notify(a.examId);

@@ -1,7 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Attempt } from './session.ts';
-import { loadPendingResets, loadScores, resetExam } from './storage.ts';
-import { syncNow } from './sync.ts';
+import {
+  loadPendingAttempts,
+  loadPendingResets,
+  loadScores,
+  resetExam,
+  saveAttempt,
+} from './storage.ts';
+import { setKey, syncNow } from './sync.ts';
 
 // 노드에는 localStorage가 없어서 메모리로 흉내 낸다. fail에 맞는 키는 저장 공간 부족처럼 실패한다.
 class MemoryStorage {
@@ -84,5 +90,38 @@ describe('동기화', () => {
     expect(await second).toMatchObject({ state: 'ok' });
     expect(calls).toContain('/api/reset');
     expect(loadPendingResets()).toEqual({});
+  });
+
+  it('올리는 중에 키를 바꾸면 예전 키의 응답으로 새 키의 올릴 목록을 지우지 않는다', async () => {
+    saveAttempt({
+      id: 'a1',
+      examId: EXAM,
+      finishedAt: 10,
+      itemScores: { q1: 1 },
+    } as unknown as Attempt);
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    const posts: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        const auth = (init?.headers as Record<string, string>).Authorization ?? '';
+        if (url === '/api/attempts') {
+          posts.push(auth);
+          if (auth === 'Bearer cme-TEST') await gate;
+          return ok({ ok: true });
+        }
+        return ok({ attempts: [], resets: [], cursor: 0, more: false });
+      }),
+    );
+    const first = syncNow();
+    await vi.waitFor(() => expect(posts).toEqual(['Bearer cme-TEST']));
+    setKey('cme-B', [EXAM]);
+    const second = syncNow();
+    release();
+    await first;
+    expect(await second).toMatchObject({ state: 'ok', pushed: 1 });
+    expect(posts).toEqual(['Bearer cme-TEST', 'Bearer cme-B']);
+    expect(loadPendingAttempts()).toEqual([]);
   });
 });
