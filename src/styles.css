@@ -854,3 +854,90 @@ select.sel {
     transition: none !important;
   }
 }
+
+/* 시나리오형 시험: 회차 버튼, 시나리오 목록, 문항 위 시나리오 지문 */
+.set-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.set-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+.scen-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.scen-list summary,
+details.scenario > summary {
+  cursor: pointer;
+}
+.scen-list p {
+  margin: 6px 0 4px;
+  color: var(--muted);
+  font-size: 14.5px;
+}
+details.scenario > p {
+  margin: 8px 0 0;
+}
+
+/* 일본어 시험: 가나·한자는 IBM Plex Sans JP, 한글 UI는 IBM Plex Sans KR로 보여 준다. */
+:root[data-lang='ja'] {
+  --f-body:
+    'IBM Plex Sans JP', 'IBM Plex Sans KR', 'Hiragino Sans', 'Yu Gothic', 'Apple SD Gothic Neo',
+    'Malgun Gothic', system-ui, sans-serif;
+}
+
+/*
+ * Claude(vendor: anthropic) 시험 화면 테마.
+ * 색은 Claude 브랜드 색(크림 배경 #faf9f5, 먹색 #141413, 오렌지 #d97757, 보조 회색 #b0aea5·#e8e6dc)을 쓰고,
+ * 링크·강조 글자는 대비 4.5:1을 넘도록 오렌지를 어둡게(#b4532f) 쓴다. 제목은 세리프(Lora).
+ */
+:root[data-vendor='anthropic'] {
+  --bg: #faf9f5;
+  --sheet: #ffffff;
+  --ink: #141413;
+  --muted: #5e5d59;
+  --line: #e8e6dc;
+  --soft: #f0eee6;
+  --accent: #b4532f;
+  --accent-ink: #ffffff;
+  --accent-soft: #f6e4da;
+  --f-head: 'Lora', Georgia, var(--f-body);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-vendor='anthropic']:not([data-theme='light']) {
+    --bg: #262624;
+    --sheet: #30302e;
+    --ink: #faf9f5;
+    --muted: #b0aea5;
+    --line: #45443f;
+    --soft: #3a3936;
+    --accent: #d97757;
+    --accent-ink: #141413;
+    --accent-soft: #4a3227;
+  }
+}
+:root[data-vendor='anthropic'] h1,
+:root[data-vendor='anthropic'] h2 {
+  font-family: var(--f-head);
+  font-weight: 600;
+}
+:root[data-vendor='anthropic'] .btn.primary {
+  background: #d97757;
+  border-color: #d97757;
+  color: #141413;
+}
+
+/* 한국어 UI는 어절 단위(keep-all)로 줄을 바꾸지만, 일본어는 띄어쓰기가 없어 글자 단위로 바꾼다. */
+[lang='ja'] {
+  word-break: normal;
+  line-break: strict;
+}

@@ -31,6 +31,8 @@ export const examSchema = z
       minutes: z.number().positive(),
       passPercent: z.number().min(0).max(100),
       questionChoices: z.array(z.number().int().positive()).nullable().default(null),
+      /** 시나리오형 시험: 실전 모드에서 시나리오를 몇 개 고를지. 문항은 시나리오마다 같은 수로 나눈다. */
+      scenarios: z.number().int().positive().optional(),
     }),
     types: z.array(z.enum(QUESTION_TYPES)).min(1),
     scoring: z.enum(['all-or-nothing', 'partial']).default('all-or-nothing'),
@@ -39,6 +41,22 @@ export const examSchema = z
       .array(z.object({ label: text, url: z.url(), checked: z.iso.date().optional() }))
       .default([]),
     notes: z.string().optional(),
+    /** 문항이 딸린 공통 지문(시나리오). 문항의 scenario가 이 id를 가리킨다. */
+    scenarios: z
+      .array(z.object({ id: z.string().regex(/^\d+$/), name: text, description: text }).strict())
+      .default([]),
+    /** 고정된 문항 묶음(회차). 실전 모드는 회차를 골라 시작한다. scenarios가 없으면 무작위로 고른다. */
+    sets: z
+      .array(
+        z
+          .object({
+            id: z.string().regex(/^\d+$/),
+            name: text,
+            scenarios: z.array(z.string()).optional(),
+          })
+          .strict(),
+      )
+      .default([]),
   })
   .strict();
 export type Exam = z.infer<typeof examSchema>;
@@ -50,6 +68,10 @@ const base = {
   explanation: z.string().optional(),
   origin: z.enum(['claude', 'user']),
   note: z.string().optional(),
+  /** exam.json scenarios의 id(사례 연구의 scenario 지문과는 다름) */
+  scenarioId: z.string().optional(),
+  /** exam.json sets의 id */
+  set: z.string().optional(),
 };
 
 const option = z.object({ text, correct: z.boolean(), why: z.string().optional() }).strict();
@@ -185,5 +207,59 @@ export function crossCheck(exam: Exam, questions: Question[]): string[] {
   for (const d of exam.domains)
     if (!questions.some((q) => q.domain.split('.')[0] === d.id))
       errors.push(`도메인 ${d.id}(${d.name})에 문항이 없습니다`);
+  errors.push(...checkScenarios(exam, questions));
+  return errors;
+}
+
+function checkScenarios(exam: Exam, questions: Question[]): string[] {
+  const errors: string[] = [];
+  const scenIds = new Set(exam.scenarios.map((s) => s.id));
+  const setIds = new Set(exam.sets.map((s) => s.id));
+  if (scenIds.size !== exam.scenarios.length) errors.push('scenarios의 id가 중복됩니다');
+  if (setIds.size !== exam.sets.length) errors.push('sets의 id가 중복됩니다');
+  for (const q of questions) {
+    if (q.scenarioId !== undefined && !scenIds.has(q.scenarioId))
+      errors.push(`${q.id}: 시나리오 ${q.scenarioId}이 exam.json에 없습니다`);
+    if (q.set !== undefined && !setIds.has(q.set))
+      errors.push(`${q.id}: 회차 ${q.set}이 exam.json에 없습니다`);
+    if (exam.sets.length && q.set === undefined) errors.push(`${q.id}: 회차(set)가 없습니다`);
+    if (exam.mock.scenarios && q.scenarioId === undefined)
+      errors.push(`${q.id}: 시나리오(scenarioId)가 없습니다`);
+  }
+  const pick = exam.mock.scenarios;
+  if (!pick) {
+    if (exam.sets.length) errors.push('sets를 쓰려면 mock.scenarios가 필요합니다');
+    return errors;
+  }
+  if (exam.mock.questions % pick !== 0)
+    errors.push(
+      `mock.questions(${exam.mock.questions})가 mock.scenarios(${pick})로 나누어지지 않습니다`,
+    );
+  if (exam.mock.questionChoices)
+    errors.push('mock.scenarios와 questionChoices는 함께 쓸 수 없습니다');
+  const per = exam.mock.questions / pick;
+  // 실전 모드에서 고를 수 있는 시나리오마다 문항이 per개 이상 있어야 한다.
+  const groups = exam.sets.length
+    ? exam.sets.map((s) => ({
+        label: `회차 ${s.id}`,
+        pool: questions.filter((q) => q.set === s.id),
+        fixed: s.scenarios,
+      }))
+    : [{ label: '전체', pool: questions, fixed: undefined }];
+  for (const g of groups) {
+    const ids = g.fixed ?? exam.scenarios.map((s) => s.id);
+    if (g.fixed) {
+      if (g.fixed.length !== pick)
+        errors.push(
+          `${g.label}: 시나리오가 ${g.fixed.length}개입니다(mock.scenarios ${pick}개 필요)`,
+        );
+      for (const id of g.fixed)
+        if (!scenIds.has(id)) errors.push(`${g.label}: 시나리오 ${id}이 exam.json에 없습니다`);
+    } else if (ids.length < pick) errors.push(`${g.label}: 시나리오가 ${pick}개보다 적습니다`);
+    for (const id of ids) {
+      const n = g.pool.filter((q) => q.scenarioId === id).length;
+      if (n < per) errors.push(`${g.label}: 시나리오 ${id}의 문항이 ${n}개입니다(${per}개 필요)`);
+    }
+  }
   return errors;
 }

@@ -23,6 +23,8 @@ export interface Session {
   id: string;
   examId: string;
   mode: Mode;
+  /** 회차·시나리오 등 출제 범위 설명(예: "2회 · 시나리오 1·2·4·6") */
+  label?: string;
   itemKeys: string[];
   views: Record<string, View>;
   answers: Record<string, Answer>;
@@ -127,6 +129,44 @@ export function pickMockQuestions(
   return shuffle(picked, rng);
 }
 
+export function sessionLabel(s: Pick<Session, 'mode' | 'label'>): string {
+  return s.label ? `${MODE_LABEL[s.mode]} · ${s.label}` : MODE_LABEL[s.mode];
+}
+
+/**
+ * 시나리오형 시험의 실전 출제. 회차를 주면 그 회차의 문항만 쓴다.
+ * 회차에 시나리오가 정해져 있으면 그대로, 없으면 mock.scenarios개를 무작위로 고른다.
+ * 시나리오마다 같은 수의 문항을 고르고, 시나리오 순서대로 묶는다(묶음 안에서는 섞는다).
+ */
+export function pickScenarioMock(
+  exam: Exam,
+  questions: Question[],
+  setId?: string,
+  rng: Rng = Math.random,
+): { questions: Question[]; scenarios: string[] } {
+  const pick = exam.mock.scenarios;
+  if (!pick) throw new Error(`${exam.id}: mock.scenarios가 없습니다`);
+  const set = setId === undefined ? undefined : exam.sets.find((s) => s.id === setId);
+  if (setId !== undefined && !set) throw new Error(`${exam.id}: 회차 ${setId}이 없습니다`);
+  const pool = set ? questions.filter((q) => q.set === set.id) : questions;
+  const order = exam.scenarios.map((s) => s.id);
+  const chosen = set?.scenarios
+    ? [...set.scenarios]
+    : shuffle(
+        order.filter((id) => pool.some((q) => q.scenarioId === id)),
+        rng,
+      ).slice(0, pick);
+  chosen.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  const per = Math.floor(exam.mock.questions / pick);
+  const picked = chosen.flatMap((id) =>
+    shuffle(
+      pool.filter((q) => q.scenarioId === id),
+      rng,
+    ).slice(0, per),
+  );
+  return { questions: picked, scenarios: chosen };
+}
+
 /** 문항 수를 고르는 시험은 시간을 문항 수에 비례해 정한다. */
 export function mockMinutes(exam: Exam, n: number): number {
   return Math.round((exam.mock.minutes * n) / exam.mock.questions);
@@ -136,7 +176,13 @@ export function createSession(
   exam: Exam,
   questions: Question[],
   mode: Mode,
-  opts: { now?: number; minutes?: number; rng?: Rng; onlyKeys?: Set<string> } = {},
+  opts: {
+    now?: number;
+    minutes?: number;
+    rng?: Rng;
+    onlyKeys?: Set<string>;
+    label?: string;
+  } = {},
 ): Session {
   const rng = opts.rng ?? Math.random;
   const now = opts.now ?? Date.now();
@@ -154,6 +200,7 @@ export function createSession(
     id: newId(),
     examId: exam.id,
     mode,
+    ...(opts.label ? { label: opts.label } : {}),
     itemKeys: items.map((i) => i.key),
     views,
     answers,

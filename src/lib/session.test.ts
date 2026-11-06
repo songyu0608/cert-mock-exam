@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { examSchema, questionsFileSchema } from '../data/schema.ts';
+import { crossCheck, examSchema, questionsFileSchema } from '../data/schema.ts';
 import { flattenAll } from './items.ts';
 import {
   allocate,
@@ -8,6 +8,8 @@ import {
   finishSession,
   mockMinutes,
   pickMockQuestions,
+  pickScenarioMock,
+  sessionLabel,
 } from './session.ts';
 
 const load = (id: string) => ({
@@ -93,5 +95,51 @@ describe('세션 채점', () => {
       onlyKeys: new Set(['aib-0003', 'aib-0100']),
     });
     expect(s.itemKeys).toEqual(['aib-0003', 'aib-0100']);
+  });
+});
+
+describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
+  const { exam, questions } = load('anthropic-ccar-f');
+  const per = exam.mock.questions / exam.mock.scenarios!;
+
+  it('형식 검사를 통과한다', () => {
+    expect(crossCheck(exam, questions)).toEqual([]);
+  });
+
+  it('고정 회차: 정해진 시나리오에서 시나리오마다 같은 수, 시나리오 순서대로 묶는다', () => {
+    for (const st of exam.sets.filter((s) => s.scenarios)) {
+      const { questions: picked, scenarios } = pickScenarioMock(exam, questions, st.id);
+      expect(scenarios).toEqual(st.scenarios);
+      expect(picked).toHaveLength(exam.mock.questions);
+      expect(picked.every((q) => q.set === st.id)).toBe(true);
+      expect(picked.map((q) => q.scenarioId)).toEqual(
+        st.scenarios!.flatMap((id) => Array<string>(per).fill(id)),
+      );
+      expect(new Set(picked.map((q) => q.id)).size).toBe(picked.length);
+    }
+  });
+
+  it('무작위 회차: 시나리오 수만큼 고르고 매번 달라질 수 있다', () => {
+    const seen = new Set<string>();
+    for (let i = 0; i < 20; i++) {
+      const { questions: picked, scenarios } = pickScenarioMock(exam, questions, '1');
+      expect(scenarios).toHaveLength(exam.mock.scenarios!);
+      expect(scenarios).toEqual([...scenarios].sort((a, b) => Number(a) - Number(b)));
+      expect(picked).toHaveLength(exam.mock.questions);
+      expect(picked.every((q) => q.set === '1' && scenarios.includes(q.scenarioId!))).toBe(true);
+      seen.add(scenarios.join(','));
+    }
+    expect(seen.size).toBeGreaterThan(1);
+  });
+
+  it('세션 이름에 회차와 시나리오를 붙인다', () => {
+    const s = createSession(exam, questions.slice(0, 2), 'mock', { label: '2회 · 시나리오 1·2' });
+    expect(sessionLabel(s)).toBe('실전 모의고사 · 2회 · 시나리오 1·2');
+    expect(sessionLabel({ mode: 'practice' })).toBe('연습');
+  });
+
+  it('시나리오 문항 수가 모자라면 형식 검사가 알려 준다', () => {
+    const broken = questions.filter((q) => !(q.set === '2' && q.scenarioId === '1')).slice();
+    expect(crossCheck(exam, broken).join('\n')).toContain('회차 2: 시나리오 1의 문항이 0개');
   });
 });

@@ -39,6 +39,8 @@ export interface Item {
   };
   /** 답한 뒤 다음으로 넘어가면 돌아갈 수 없는 문항(문제-해결 세트) */
   noReturn?: boolean;
+  /** 문항이 딸린 시나리오 id(exam.json scenarios) */
+  scenarioId?: string;
 }
 
 export function flattenQuestion(q: Question): Item[] {
@@ -47,6 +49,7 @@ export function flattenQuestion(q: Question): Item[] {
     domain: q.domain,
     topDomain: q.domain.split('.')[0] ?? q.domain,
     ...(q.note ? { note: q.note } : {}),
+    ...(q.scenarioId ? { scenarioId: q.scenarioId } : {}),
   };
   if (q.type === 'case') {
     return q.questions.map((sub, i) => ({
@@ -78,7 +81,7 @@ export function flattenQuestion(q: Question): Item[] {
       noReturn: true,
     }));
   }
-  const { id: _id, domain: _d, origin: _o, note: _n, ...body } = q;
+  const { id: _id, domain: _d, origin: _o, note: _n, scenarioId: _s, set: _set, ...body } = q;
   return [{ ...common, key: q.id, body: body as Body }];
 }
 

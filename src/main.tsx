@@ -4,6 +4,10 @@ import { createRoot } from 'react-dom/client';
 import '@fontsource/ibm-plex-sans-kr/400.css';
 import '@fontsource/ibm-plex-sans-kr/600.css';
 import '@fontsource/ibm-plex-mono/600.css';
+// 일본어 시험(lang: ja)용 글꼴과 Claude 시험 제목용 세리프. 쓰는 글자가 있을 때만 내려받는다.
+import '@fontsource/ibm-plex-sans-jp/400.css';
+import '@fontsource/ibm-plex-sans-jp/600.css';
+import '@fontsource/lora/600.css';
 import './styles.css';
 import { App } from './App.tsx';
 
