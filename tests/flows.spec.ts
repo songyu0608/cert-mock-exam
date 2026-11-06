@@ -243,3 +243,25 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await page.goto('/');
   await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
 });
+
+test('가이드 탭: 시험별 가이드를 고르면 문서를 연다', async ({ page }) => {
+  await page.goto('/');
+  await page
+    .getByRole('navigation', { name: '화면' })
+    .getByRole('link', { name: '가이드' })
+    .click();
+  await expect(page).toHaveURL(/\/guides$/);
+  await page.getByRole('link', { name: /견본 가이드/ }).click();
+  await expect(page).toHaveURL(/\/guide\/sample-all-types\/basics$/);
+  const frame = page.frameLocator('iframe.guide-frame');
+  await expect(frame.getByRole('heading', { name: '견본 가이드 본문' })).toBeVisible();
+  await page.getByRole('link', { name: '가이드', exact: true }).click();
+  await expect(page).toHaveURL(/\/guides$/);
+  await page
+    .getByRole('navigation', { name: '화면' })
+    .getByRole('link', { name: '모의고사' })
+    .click();
+  await expect(page.getByRole('link', { name: /SAMPLE-01/ })).toBeVisible();
+  await page.goto('/guide/sample-all-types/nope');
+  await expect(page.getByRole('heading', { name: '가이드를 찾을 수 없습니다' })).toBeVisible();
+});

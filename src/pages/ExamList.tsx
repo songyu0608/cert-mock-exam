@@ -1,3 +1,4 @@
+import { TopTabs } from '../components/TopTabs.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
 import { exams } from '../data/exams.ts';
 import { onLinkClick, paths } from '../router.ts';
@@ -20,6 +21,7 @@ export function ExamList() {
           </a>
         </p>
       </header>
+      <TopTabs current="exams" />
       {vendors.map((v) => (
         <section key={v} className="vendor" aria-labelledby={`v-${v}`}>
           <h2 id={`v-${v}`}>

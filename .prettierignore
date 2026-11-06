@@ -2,3 +2,5 @@ dist
 dist-e2e
 pnpm-lock.yaml
 exams/**/questions.json
+# 가이드 HTML은 별도 도구로 만든 결과물이라 손대지 않는다
+exams/*/guides/

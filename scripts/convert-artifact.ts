@@ -98,6 +98,7 @@ export function convertExam(cfg: ArtifactCfg, examId: string, vendor: string, la
       name: sc.ja,
       description: sc.desc,
     })),
+    guides: [],
     sets: (cfg.sets ?? []).map((st) => ({
       id: String(st.n),
       name: `${st.n}회`,
