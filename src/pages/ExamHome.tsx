@@ -5,10 +5,11 @@ import type { Exam } from '../data/schema.ts';
 import { flattenQuestion } from '../lib/items.ts';
 import { shuffle } from '../lib/scoring.ts';
 import {
-  MODE_LABEL,
   createSession,
   mockMinutes,
   pickMockQuestions,
+  pickScenarioMock,
+  sessionLabel,
   type Mode,
 } from '../lib/session.ts';
 import {
@@ -39,6 +40,10 @@ export function ExamHome({ exam }: { exam: Exam }) {
 
   const [mockN, setMockN] = useState(exam.mock.questions);
   const [domains, setDomains] = useState<string[]>(exam.domains.map((d) => d.id));
+  const [practiceSets, setPracticeSets] = useState<string[]>(exam.sets.map((s) => s.id));
+  const scenarioExam = !!exam.mock.scenarios;
+  const inPracticeSets = (set?: string) =>
+    !exam.sets.length || (set !== undefined && practiceSets.includes(set));
   const [practiceN, setPracticeN] = useState<number | 'all'>(20);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetFailed, setResetFailed] = useState(false);
@@ -63,15 +68,40 @@ export function ExamHome({ exam }: { exam: Exam }) {
     [exam, data, stats],
   );
 
-  const start = (mode: Mode) => {
+  // 회차별 정답률(문항마다 마지막으로 푼 결과)
+  const setRates = useMemo(() => {
+    const out: Record<string, number | null> = {};
+    for (const st of exam.sets) {
+      const keys =
+        data?.questions
+          .filter((q) => q.set === st.id)
+          .flatMap((q) => flattenQuestion(q).map((i) => i.key)) ?? [];
+      const seen = keys.filter((k) => stats[k]);
+      out[st.id] = seen.length
+        ? Math.round((seen.reduce((sum, k) => sum + stats[k]!.last, 0) / seen.length) * 100)
+        : null;
+    }
+    return out;
+  }, [exam, data, stats]);
+
+  const start = (mode: Mode, setId?: string) => {
     if (!data) return;
     let s;
-    if (mode === 'mock') {
+    if (mode === 'mock' && scenarioExam) {
+      const picked = pickScenarioMock(exam, data.questions, setId);
+      const set = exam.sets.find((x) => x.id === setId);
+      const label = [set?.name, `시나리오 ${picked.scenarios.join('·')}`]
+        .filter(Boolean)
+        .join(' · ');
+      s = createSession(exam, picked.questions, 'mock', { minutes: exam.mock.minutes, label });
+    } else if (mode === 'mock') {
       const picked = pickMockQuestions(exam, data.questions, mockN);
       s = createSession(exam, picked, 'mock', { minutes: mockMinutes(exam, mockN) });
     } else if (mode === 'practice') {
       const pool = shuffle(
-        data.questions.filter((q) => domains.includes(q.domain.split('.')[0] ?? '')),
+        data.questions.filter(
+          (q) => domains.includes(q.domain.split('.')[0] ?? '') && inPracticeSets(q.set),
+        ),
       );
       const picked = [];
       let n = 0;
@@ -94,7 +124,9 @@ export function ExamHome({ exam }: { exam: Exam }) {
   };
 
   const practiceAvailable = data
-    ? data.items.filter((i) => domains.includes(i.topDomain)).length
+    ? data.questions
+        .filter((q) => domains.includes(q.domain.split('.')[0] ?? '') && inPracticeSets(q.set))
+        .flatMap(flattenQuestion).length
     : 0;
   const blocked = !!active;
 
@@ -131,8 +163,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
       {active && (
         <div className="banner spread" role="status">
           <span>
-            <b>{MODE_LABEL[active.mode]}</b> 진행 중 · {active.current + 1}/{active.itemKeys.length}
-            번
+            <b>{sessionLabel(active)}</b> 진행 중 · {active.current + 1}/{active.itemKeys.length}번
           </span>
           <span className="row">
             <button
@@ -159,8 +190,42 @@ export function ExamHome({ exam }: { exam: Exam }) {
       <section className="modes" aria-label="풀이 모드">
         <div className="panel mode">
           <h2>실전 모의고사</h2>
-          <p>도메인 비중대로 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에 채점합니다.</p>
-          {exam.mock.questionChoices ? (
+          {scenarioExam ? (
+            <p>
+              시나리오 {exam.mock.scenarios}개 × {exam.mock.questions / exam.mock.scenarios!}
+              문항을 시나리오별로 묶어 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에
+              채점합니다.
+            </p>
+          ) : (
+            <p>도메인 비중대로 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에 채점합니다.</p>
+          )}
+          {scenarioExam && exam.sets.length > 0 ? (
+            <>
+              <p className="small">
+                {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
+              </p>
+              <div className="set-list">
+                {exam.sets.map((st) => (
+                  <div className="set-row" key={st.id}>
+                    <button
+                      type="button"
+                      className="btn primary"
+                      disabled={!data || blocked}
+                      onClick={() => start('mock', st.id)}
+                    >
+                      {st.name} 시작
+                    </button>
+                    <span className="small muted">
+                      {st.scenarios
+                        ? `시나리오 ${st.scenarios.join('·')}`
+                        : `시나리오 ${exam.mock.scenarios}개 무작위`}
+                      {setRates[st.id] != null && ` · 정답률 ${setRates[st.id]}%`}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : exam.mock.questionChoices ? (
             <label className="row small">
               문항 수
               <select
@@ -180,21 +245,47 @@ export function ExamHome({ exam }: { exam: Exam }) {
               {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
             </p>
           )}
-          <div className="row">
-            <button
-              type="button"
-              className="btn primary"
-              disabled={!data || blocked}
-              onClick={() => start('mock')}
-            >
-              시작
-            </button>
-          </div>
+          {!(scenarioExam && exam.sets.length > 0) && (
+            <div className="row">
+              <button
+                type="button"
+                className="btn primary"
+                disabled={!data || blocked}
+                onClick={() => start('mock')}
+              >
+                시작
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="panel mode">
           <h2>연습</h2>
-          <p>문항마다 바로 채점하고 해설을 봅니다. 도메인을 골라 풀 수 있습니다.</p>
+          <p>
+            문항마다 바로 채점하고 해설을 봅니다.{' '}
+            {exam.sets.length ? '회차와 도메인을' : '도메인을'} 골라 풀 수 있습니다.
+          </p>
+          {exam.sets.length > 0 && (
+            <div className="chips" role="group" aria-label="회차">
+              {exam.sets.map((st) => (
+                <button
+                  key={st.id}
+                  type="button"
+                  className="chip"
+                  aria-pressed={practiceSets.includes(st.id)}
+                  onClick={() =>
+                    setPracticeSets((cur) =>
+                      cur.includes(st.id)
+                        ? cur.filter((x) => x !== st.id)
+                        : [...cur, st.id].sort((a, b) => Number(a) - Number(b)),
+                    )
+                  }
+                >
+                  {st.name}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="chips" role="group" aria-label="도메인">
             {exam.domains.map((d) => (
               <button
@@ -270,6 +361,26 @@ export function ExamHome({ exam }: { exam: Exam }) {
         <p className="small muted">정답률은 문항마다 마지막으로 푼 결과로 계산합니다.</p>
       </section>
 
+      {exam.scenarios.length > 0 && (
+        <section className="panel stack" aria-labelledby="scen-h">
+          <h2 id="scen-h">시나리오</h2>
+          <ul className="scen-list" lang={exam.lang}>
+            {exam.scenarios.map((sc) => (
+              <li key={sc.id}>
+                <details>
+                  <summary>
+                    <b>
+                      {sc.id}. {sc.name}
+                    </b>
+                  </summary>
+                  <p>{sc.description}</p>
+                </details>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="panel stack" aria-labelledby="hist-h">
         <h2 id="hist-h">풀이 기록</h2>
         {attempts.length === 0 ? (
@@ -298,7 +409,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
                         })}
                       </a>
                     </td>
-                    <td>{MODE_LABEL[a.mode]}</td>
+                    <td>{sessionLabel(a.session)}</td>
                     <td>
                       {Math.round(a.score * 10) / 10}/{a.total} ({a.percent}%)
                     </td>

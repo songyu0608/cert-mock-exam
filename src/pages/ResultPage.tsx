@@ -4,7 +4,7 @@ import { Markdown } from '../components/Markdown.tsx';
 import { QuestionView, TYPE_LABEL } from '../components/QuestionView.tsx';
 import type { Exam } from '../data/schema.ts';
 import { flattenQuestion } from '../lib/items.ts';
-import { MODE_LABEL, createSession } from '../lib/session.ts';
+import { createSession, sessionLabel } from '../lib/session.ts';
 import { loadActive, loadAttempt, saveActive } from '../lib/storage.ts';
 import { useQuestions } from '../lib/useQuestions.ts';
 import { navigate, onLinkClick, paths } from '../router.ts';
@@ -65,7 +65,8 @@ export function ResultPage({ exam, attemptId }: { exam: Exam; attemptId: string 
       </nav>
       <header>
         <div className="label">
-          {MODE_LABEL[attempt.mode]} 결과 · {new Date(attempt.finishedAt).toLocaleString('ko-KR')}
+          {sessionLabel(attempt.session)} 결과 ·{' '}
+          {new Date(attempt.finishedAt).toLocaleString('ko-KR')}
         </div>
         <h1>{exam.name}</h1>
       </header>
@@ -171,6 +172,7 @@ export function ResultPage({ exam, attemptId }: { exam: Exam; attemptId: string 
                   onChange={() => {}}
                   reveal
                   number={n}
+                  scenarioOpen={false}
                 />
               </details>
             );

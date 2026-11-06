@@ -22,7 +22,7 @@ export function DomainTable({ exam, rows }: { exam: Exam; rows: DomainRow[] }) {
           return (
             <tr key={d.id}>
               <td>
-                {d.id}. {d.name}
+                {d.id}. <span lang={exam.lang}>{d.name}</span>
                 <div className="bar" aria-hidden="true">
                   <i
                     className={pct === null ? '' : barClass(pct)}

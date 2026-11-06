@@ -1,0 +1,133 @@
+{
+  "id": "anthropic-ccar-f",
+  "vendor": "anthropic",
+  "code": "CCAR-F",
+  "name": "Claude Certified Architect – Foundations",
+  "lang": "ja",
+  "level": "Foundations",
+  "domains": [
+    {
+      "id": "1",
+      "name": "エージェントアーキテクチャとオーケストレーション",
+      "weight": 27
+    },
+    {
+      "id": "2",
+      "name": "ツール設計と MCP 統合",
+      "weight": 18
+    },
+    {
+      "id": "3",
+      "name": "Claude Code の構成とワークフロー",
+      "weight": 20
+    },
+    {
+      "id": "4",
+      "name": "プロンプトエンジニアリングと構造化出力",
+      "weight": 20
+    },
+    {
+      "id": "5",
+      "name": "コンテキスト管理と信頼性",
+      "weight": 15
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 120,
+    "passPercent": 72,
+    "questionChoices": null,
+    "scenarios": 4
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "60문항",
+      "label": "단일 선택·복수 선택(고를 개수는 문제에 표시)"
+    },
+    {
+      "value": "120분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "720 / 1,000",
+      "label": "합격 스케일 점수"
+    },
+    {
+      "value": "4 / 6",
+      "label": "시나리오(6개 중 4개 출제)"
+    }
+  ],
+  "sources": [
+    {
+      "label": "CCAR-F 공식 페이지(Exam Guide 영어판 v1.0)",
+      "url": "https://anthropic-partners.skilljar.com/claude-certified-architect-foundations-certification",
+      "checked": "2026-11-06"
+    },
+    {
+      "label": "Certification FAQ",
+      "url": "https://anthropic-partners.skilljar.com/page/faq-certifications",
+      "checked": "2026-11-06"
+    }
+  ],
+  "notes": "60문항 · 120분 · 시나리오 6개 중 4개. 1회는 매번 시나리오 4개를 무작위로 고르고, 2~5회는 시나리오가 정해진 고정 세트입니다. 문항은 공식 Exam Guide(영어판 v1.0)의 태스크를 바탕으로 만든 일본어 연습 문제이며 실제 기출이 아닙니다. 실제 시험은 100~1,000 스케일 점수로 720점 이상이 합격이고 정답률과 1:1로 대응하지 않으므로, 합격선 72%는 대략적인 기준입니다.",
+  "scenarios": [
+    {
+      "id": "1",
+      "name": "カスタマーサポート解決エージェント",
+      "description": "Claude Agent SDK を使ってカスタマーサポート解決エージェントを構築しています。エージェントは返品、請求に関する異議、アカウントの問題など、曖昧さの大きい依頼を扱います。バックエンドシステムには、カスタム MCP ツール（get_customer、lookup_order、process_refund、escalate_to_human）を通じてアクセスします。目標は、エスカレーションすべき場面を見極めながら、初回解決率80%以上を達成することです。"
+    },
+    {
+      "id": "2",
+      "name": "Claude Code によるコード生成",
+      "description": "ソフトウェア開発を加速するために Claude Code を使っています。チームはコード生成、リファクタリング、デバッグ、ドキュメント作成に Claude Code を使用しています。カスタムスラッシュコマンドや CLAUDE.md の構成を開発ワークフローに組み込み、プランモードと直接実行の使い分けを理解する必要があります。"
+    },
+    {
+      "id": "3",
+      "name": "マルチエージェント・リサーチシステム",
+      "description": "Claude Agent SDK を使ってマルチエージェントのリサーチシステムを構築しています。コーディネーターエージェントが専門のサブエージェントに作業を委任します。Web 検索、ドキュメント分析、調査結果の統合、レポート生成をそれぞれ別のサブエージェントが担当します。システムはテーマを調査し、出典を明記した包括的なレポートを作成します。"
+    },
+    {
+      "id": "4",
+      "name": "Claude による開発者の生産性向上",
+      "description": "Claude Agent SDK を使って開発者の生産性を高めるツールを構築しています。エージェントは、エンジニアが不慣れなコードベースを調査し、レガシーシステムを理解し、定型コードを生成し、繰り返し作業を自動化するのを支援します。組み込みツール（Read、Write、Bash、Grep、Glob）を使い、MCP サーバーとも連携します。"
+    },
+    {
+      "id": "5",
+      "name": "継続的インテグレーションでの Claude Code",
+      "description": "Claude Code を CI/CD パイプラインに組み込んでいます。システムは自動コードレビューを実行し、テストケースを生成し、プルリクエストにフィードバックを提供します。実行可能なフィードバックを返し、誤検知を最小限に抑えるプロンプトを設計する必要があります。"
+    },
+    {
+      "id": "6",
+      "name": "構造化データの抽出",
+      "description": "Claude を使って構造化データ抽出システムを構築しています。システムは非構造化文書から情報を抽出し、JSON スキーマで出力を検証し、高い正確性を維持します。エッジケースを適切に処理し、下流のシステムと連携する必要があります。"
+    }
+  ],
+  "sets": [
+    {
+      "id": "1",
+      "name": "1회"
+    },
+    {
+      "id": "2",
+      "name": "2회",
+      "scenarios": ["1", "2", "4", "6"]
+    },
+    {
+      "id": "3",
+      "name": "3회",
+      "scenarios": ["2", "3", "5", "6"]
+    },
+    {
+      "id": "4",
+      "name": "4회",
+      "scenarios": ["1", "3", "4", "5"]
+    },
+    {
+      "id": "5",
+      "name": "5회",
+      "scenarios": ["2", "3", "5", "6"]
+    }
+  ]
+}

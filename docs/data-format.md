@@ -12,19 +12,21 @@ exams/
 
 ## exam.json
 
-| 필드           | 필수   | 의미                                                                                                                                |
-| -------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `id`           | 예     | 폴더 이름과 같아야 함. 소문자·숫자·하이픈                                                                                           |
-| `vendor`       | 예     | 목록에서 묶는 기준(`aws`, `github`, `anthropic` 등)                                                                                 |
-| `code`, `name` | 예     | 시험 코드와 이름                                                                                                                    |
-| `level`        | 아니요 | 예: `Foundational`                                                                                                                  |
-| `domains[]`    | 예     | `{ id: "1", name, weight }`. `weight`는 실전 모드 출제 비율(%)                                                                      |
-| `mock`         | 예     | `{ questions, minutes, passPercent, questionChoices }`. `questionChoices`(예: `[50, 65, 85]`)가 있으면 문항 수를 고르고 시간은 비례 |
-| `types`        | 예     | 이 시험에서 허용하는 문항 유형. 목록에 없는 유형이 있으면 검사 실패                                                                 |
-| `scoring`      | 아니요 | `all-or-nothing`(기본) 또는 `partial`                                                                                               |
-| `facts[]`      | 아니요 | 시험 홈 상단 요약 `{ value, label }`                                                                                                |
-| `sources[]`    | 아니요 | 시험 형식 출처 `{ label, url, checked }`                                                                                            |
-| `notes`        | 아니요 | 시험 홈 설명                                                                                                                        |
+| 필드           | 필수   | 의미                                                                                                                                            |
+| -------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`           | 예     | 폴더 이름과 같아야 함. 소문자·숫자·하이픈                                                                                                       |
+| `vendor`       | 예     | 목록에서 묶는 기준(`aws`, `github`, `anthropic` 등)                                                                                             |
+| `code`, `name` | 예     | 시험 코드와 이름                                                                                                                                |
+| `level`        | 아니요 | 예: `Foundational`                                                                                                                              |
+| `domains[]`    | 예     | `{ id: "1", name, weight }`. `weight`는 실전 모드 출제 비율(%)                                                                                  |
+| `mock`         | 예     | `{ questions, minutes, passPercent, questionChoices, scenarios? }`. `questionChoices`(예: `[50, 65, 85]`)가 있으면 문항 수를 고르고 시간은 비례 |
+| `types`        | 예     | 이 시험에서 허용하는 문항 유형. 목록에 없는 유형이 있으면 검사 실패                                                                             |
+| `scoring`      | 아니요 | `all-or-nothing`(기본) 또는 `partial`                                                                                                           |
+| `facts[]`      | 아니요 | 시험 홈 상단 요약 `{ value, label }`                                                                                                            |
+| `sources[]`    | 아니요 | 시험 형식 출처 `{ label, url, checked }`                                                                                                        |
+| `notes`        | 아니요 | 시험 홈 설명                                                                                                                                    |
+| `scenarios[]`  | 아니요 | 문항이 딸린 공통 지문 `{ id: "1", name, description }`. 문항의 `scenarioId`가 가리킨다                                                          |
+| `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios? }`. 실전 모드는 회차를 골라 시작한다. `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다                  |
 
 ## questions.json
 
@@ -39,6 +41,8 @@ exams/
 | `explanation` | 아니요 | 문항 전체 해설(마크다운)                                                                                |
 | `origin`      | 예     | `claude` 또는 `user`                                                                                    |
 | `note`        | 아니요 | 참고(예: "수치는 연습용 가상 값")                                                                       |
+| `scenarioId`  | 아니요 | `exam.json` `scenarios`의 id. 문항 위에 시나리오 지문을 보여 준다                                       |
+| `set`         | 아니요 | `exam.json` `sets`의 id. `sets`가 있는 시험은 모든 문항에 필요                                          |
 
 유형별 답 부분:
 
@@ -54,6 +58,15 @@ exams/
 
 `shuffle`은 기본 `true`. "모두 해당" 같은 보기가 있으면 `false`로 둔다.
 
+## 시나리오형 시험
+
+`mock.scenarios`가 있으면 실전 모드는 도메인 비중 대신 시나리오로 출제한다(예: CCAR-F는 6개 중 4개 × 15문항).
+
+- 시나리오마다 `mock.questions / mock.scenarios`개를 고르고, 시나리오 순서대로 묶어 낸다. 묶음 안의 순서는 섞는다.
+- `sets`가 있으면 회차를 골라 시작하고, 그 회차의 문항만 쓴다. 회차의 `scenarios`가 있으면 그 시나리오로 고정, 없으면 무작위로 고른다.
+- 연습 모드는 회차와 도메인으로 고른다.
+- `pnpm validate`는 시나리오·회차 id와, 고를 수 있는 시나리오마다 문항이 충분한지 검사한다.
+
 ## 채점
 
 - `all-or-nothing`: 문항의 모든 부분이 맞아야 1점(AWS 공식 규칙과 같음).
@@ -63,8 +76,9 @@ exams/
 ## 기존 아티팩트 옮기기
 
 ```
-pnpm convert <아티팩트.html> <시험 id> <문항 id 접두어> [vendor]
+pnpm convert <아티팩트.html> <시험 id> <문항 id 접두어> [vendor] [lang]
 pnpm convert ~/Downloads/aif-c01.html aws-aif-c01 aif aws
 ```
 
 아티팩트의 `<script id="cfg">`와 `<script id="data">`를 읽어 `exams/<시험 id>/`에 쓴다. 정답 규칙은 아티팩트 채점 코드와 같다(단일은 첫 보기, 복수는 앞에서 `k`개, 순서는 원래 순서, 연결은 `pr[i]`의 답이 `o[i]`).
+시나리오형 아티팩트는 `cfg.scenarios`·`cfg.sets`·`examScen`·`perScen`과 문항의 `sc`·`set`을 시나리오·회차로 옮긴다.

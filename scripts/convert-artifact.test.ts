@@ -59,3 +59,44 @@ describe('convertArtifact', () => {
     });
   });
 });
+
+describe('convertArtifact: 시나리오형', () => {
+  const cfg2 = {
+    code: 'SCN-01',
+    name: '시나리오 시험',
+    domains: [{ ja: 'ドメイン', w: 100 }],
+    examScen: 1,
+    perScen: 2,
+    examMin: 4,
+    passPct: 70,
+    scenarios: [
+      { ja: 'シナリオA', desc: '説明A' },
+      { ja: 'シナリオB', desc: '説明B' },
+    ],
+    sets: [
+      { n: 1, sc: null },
+      { n: 2, sc: [2] },
+    ],
+    sourceNote: '<a href="https://example.com/g">ガイド</a>。2026-11-06 確認。',
+  };
+  const q = (sc: number, set: number) => ({ t: '1.1', y: 's', q: '問', o: ['正', '誤'], sc, set });
+  const data2 = [q(1, 1), q(1, 1), q(2, 1), q(2, 1), q(2, 2), q(2, 2)];
+  const html2 = `<script type="application/json" id="cfg">${JSON.stringify(cfg2)}</script>
+<script type="application/json" id="data">${JSON.stringify(data2)}</script>`;
+  const { exam, questions } = convertArtifact(html2, 'scn-01', 'scn', 'anthropic', 'ja');
+
+  it('시나리오·회차·문항 수를 옮긴다', () => {
+    expect(exam.lang).toBe('ja');
+    expect(exam.mock).toMatchObject({ questions: 2, scenarios: 1 });
+    expect(exam.scenarios).toEqual([
+      { id: '1', name: 'シナリオA', description: '説明A' },
+      { id: '2', name: 'シナリオB', description: '説明B' },
+    ]);
+    expect(exam.sets).toEqual([
+      { id: '1', name: '1회' },
+      { id: '2', name: '2회', scenarios: ['2'] },
+    ]);
+    expect(exam.sources[0]?.checked).toBe('2026-11-06');
+    expect(questions[4]).toMatchObject({ scenarioId: '2', set: '2' });
+  });
+});

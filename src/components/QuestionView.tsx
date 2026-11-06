@@ -56,6 +56,8 @@ interface Props {
   disabled?: boolean;
   /** 화면에 보이는 문항 번호 */
   number: number;
+  /** 시나리오 지문을 펼쳐 둘지(새 시나리오의 첫 문항) */
+  scenarioOpen?: boolean;
 }
 
 export function QuestionView({
@@ -67,14 +69,18 @@ export function QuestionView({
   reveal,
   disabled,
   number,
+  scenarioOpen = true,
 }: Props) {
   const body = item.body;
   const lock = reveal || !!disabled;
   const domain = exam.domains.find((d) => d.id === item.topDomain);
+  const scenario = item.scenarioId
+    ? exam.scenarios.find((sc) => sc.id === item.scenarioId)
+    : undefined;
   const score = reveal ? scoreItem(item, answer, exam.scoring) : 0;
 
   return (
-    <article className="panel stack" aria-labelledby={`q-${item.key}`}>
+    <article className="panel stack" aria-labelledby={`q-${item.key}`} lang={exam.lang}>
       <div className="q-head">
         <span className="label">문항 {number}</span>
         <span className="tag type">{TYPE_LABEL[body.type]}</span>
@@ -82,6 +88,15 @@ export function QuestionView({
           {item.domain} {domain?.name}
         </span>
       </div>
+
+      {scenario && (
+        <details className="scenario" open={scenarioOpen}>
+          <summary className="label">
+            시나리오 {scenario.id} · {scenario.name}
+          </summary>
+          <p>{scenario.description}</p>
+        </details>
+      )}
 
       {item.context && (
         <section className="scenario" aria-label="지문">

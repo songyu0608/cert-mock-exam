@@ -3,7 +3,7 @@ import { QuestionView } from '../components/QuestionView.tsx';
 import type { Exam } from '../data/schema.ts';
 import type { Item } from '../lib/items.ts';
 import { isComplete, isTouched, type Answer } from '../lib/scoring.ts';
-import { MODE_LABEL, finishSession, type Session } from '../lib/session.ts';
+import { finishSession, sessionLabel, type Session } from '../lib/session.ts';
 import { clearActive, loadActive, saveActive, saveAttempt } from '../lib/storage.ts';
 import { syncNow } from '../lib/sync.ts';
 import { useQuestions } from '../lib/useQuestions.ts';
@@ -154,7 +154,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
         <div className="bar-in">
           <span className="code">{exam.code}</span>
           <span className="bar-title">
-            <span className="bar-mode">{MODE_LABEL[session.mode]} · </span>
+            <span className="bar-mode">{sessionLabel(session)} · </span>
             {session.current + 1}/{total}
           </span>
           {isMock && session.deadline && (
@@ -194,6 +194,10 @@ export function SessionPage({ exam }: { exam: Exam }) {
           reveal={!isMock && checked}
           disabled={!!session.locked[key]}
           number={session.current + 1}
+          scenarioOpen={
+            data.itemsByKey.get(session.itemKeys[session.current - 1] ?? '')?.scenarioId !==
+            item.scenarioId
+          }
         />
 
         {isMock && item.noReturn && !session.locked[key] && (

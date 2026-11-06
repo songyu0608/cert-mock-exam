@@ -216,3 +216,30 @@ test('AIB-C01 실전은 문항 수를 고르고 시간이 비례한다', async (
   ).toHaveCount(50);
   await expect(page.getByRole('timer')).toHaveText(/^1:(40:00|39:5\d)$/);
 });
+
+test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오별로 묶어 출제하고 지문을 보여 준다', async ({
+  page,
+}) => {
+  await openExam(page, 'CCAR-F');
+  await expect(page.locator('html')).toHaveAttribute('data-vendor', 'anthropic');
+  await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
+  const card = modeCard(page, '실전 모의고사');
+  await expect(card.getByRole('button', { name: /회 시작$/ })).toHaveCount(5);
+  await card.getByRole('button', { name: '2회 시작' }).click();
+
+  await expect(page.locator('.bar-title')).toContainText('1/60');
+  await expect(page.locator('.bar-mode')).toContainText('2회 · 시나리오 1·2·4·6');
+  // 새 시나리오의 첫 문항은 지문을 펼치고, 같은 시나리오의 다음 문항은 접어 둔다.
+  const scen = page.locator('article details.scenario');
+  await expect(scen.locator('summary')).toHaveText(/시나리오 1 · /);
+  await expect(scen).toHaveAttribute('open', '');
+  await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
+  await page.getByRole('button', { name: '다음' }).click();
+  await expect(page.locator('.bar-title')).toContainText('2/60');
+  await expect(scen).not.toHaveAttribute('open', '');
+  await expect(scen.locator('summary')).toHaveText(/시나리오 1 · /);
+
+  // 시험 목록으로 돌아가면 업체 테마를 지운다.
+  await page.goto('/');
+  await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
+});
