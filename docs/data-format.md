@@ -8,6 +8,10 @@ exams/
   aws-aib-c01/
     exam.json
     questions.json
+  anthropic-ccar-f/
+    exam.json
+    questions.json
+    guides/official-guide.html   # 선택: 읽기 자료
 ```
 
 ## exam.json
@@ -27,6 +31,7 @@ exams/
 | `notes`        | 아니요 | 시험 홈 설명                                                                                                                                    |
 | `scenarios[]`  | 아니요 | 문항이 딸린 공통 지문 `{ id: "1", name, description }`. 문항의 `scenarioId`가 가리킨다                                                          |
 | `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios? }`. 실전 모드는 회차를 골라 시작한다. `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다                  |
+| `guides[]`     | 아니요 | 읽기 자료 `{ id, title, description? }`. 파일은 `guides/<id>.html`(완결된 HTML 한 장). 첫 화면 "가이드" 탭과 시험 홈에 링크가 생긴다            |
 
 ## questions.json
 

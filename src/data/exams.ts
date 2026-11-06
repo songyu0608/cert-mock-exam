@@ -15,7 +15,29 @@ const questionFiles: Record<string, () => Promise<Json>> = {
   ...(fixtures ? import.meta.glob<Json>('../../tests/fixtures/exams/*/questions.json') : {}),
 };
 
+// 가이드 HTML은 그대로 정적 파일로 내보내고 주소만 받는다(iframe으로 연다).
+const guideFiles: Record<string, string> = {
+  ...import.meta.glob<string>('../../exams/*/guides/*.html', {
+    query: '?url',
+    import: 'default',
+    eager: true,
+  }),
+  ...(fixtures
+    ? import.meta.glob<string>('../../tests/fixtures/exams/*/guides/*.html', {
+        query: '?url',
+        import: 'default',
+        eager: true,
+      })
+    : {}),
+};
+
 const idOf = (path: string) => path.split('/').at(-2) ?? '';
+
+/** 가이드 HTML 주소. 파일이 없으면 undefined */
+export function guideUrl(examId: string, guideId: string): string | undefined {
+  const suffix = `/${examId}/guides/${guideId}.html`;
+  return Object.entries(guideFiles).find(([path]) => path.endsWith(suffix))?.[1];
+}
 
 export const exams: Exam[] = Object.entries(examFiles)
   .map(([, mod]) => examSchema.parse(mod.default))

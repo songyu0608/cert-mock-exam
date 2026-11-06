@@ -145,6 +145,15 @@ export function ExamHome({ exam }: { exam: Exam }) {
         </div>
         <h1>{exam.name}</h1>
         {exam.notes && <p className="lede">{exam.notes}</p>}
+        {exam.guides.length > 0 && (
+          <p className="row small" style={{ margin: 0 }}>
+            {exam.guides.map((g) => (
+              <a key={g.id} href={paths.guide(exam.id, g.id)} onClick={onLinkClick}>
+                {g.title} 읽기
+              </a>
+            ))}
+          </p>
+        )}
       </header>
 
       {exam.facts.length > 0 && (

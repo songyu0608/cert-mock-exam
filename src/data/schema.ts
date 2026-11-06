@@ -45,6 +45,18 @@ export const examSchema = z
     scenarios: z
       .array(z.object({ id: z.string().regex(/^\d+$/), name: text, description: text }).strict())
       .default([]),
+    /** 읽기 자료(공식 시험 가이드, 이론 정리). 파일은 exams/<시험 id>/guides/<id>.html */
+    guides: z
+      .array(
+        z
+          .object({
+            id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, '소문자, 숫자, 하이픈만 씁니다'),
+            title: text,
+            description: z.string().optional(),
+          })
+          .strict(),
+      )
+      .default([]),
     /** 고정된 문항 묶음(회차). 실전 모드는 회차를 골라 시작한다. scenarios가 없으면 무작위로 고른다. */
     sets: z
       .array(

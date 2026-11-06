@@ -4,6 +4,8 @@ import { useEffect, useState, type MouseEvent } from 'react';
 export type Route =
   | { name: 'list' }
   | { name: 'settings' }
+  | { name: 'guides' }
+  | { name: 'guide'; examId: string; guideId: string }
   | { name: 'exam'; examId: string }
   | { name: 'play'; examId: string }
   | { name: 'result'; examId: string; attemptId: string }
@@ -13,6 +15,9 @@ export function parse(pathname: string): Route {
   const p = pathname.replace(/\/+$/, '').split('/').filter(Boolean).map(decodeURIComponent);
   if (p.length === 0) return { name: 'list' };
   if (p.length === 1 && p[0] === 'settings') return { name: 'settings' };
+  if (p.length === 1 && p[0] === 'guides') return { name: 'guides' };
+  if (p.length === 3 && p[0] === 'guide' && p[1] && p[2])
+    return { name: 'guide', examId: p[1], guideId: p[2] };
   if (p[0] === 'exam' && p[1]) {
     if (p.length === 2) return { name: 'exam', examId: p[1] };
     if (p.length === 3 && p[2] === 'play') return { name: 'play', examId: p[1] };
@@ -25,6 +30,9 @@ export function parse(pathname: string): Route {
 export const paths = {
   list: () => '/',
   settings: () => '/settings',
+  guides: () => '/guides',
+  guide: (examId: string, guideId: string) =>
+    `/guide/${encodeURIComponent(examId)}/${encodeURIComponent(guideId)}`,
   exam: (id: string) => `/exam/${encodeURIComponent(id)}`,
   play: (id: string) => `/exam/${encodeURIComponent(id)}/play`,
   result: (id: string, attemptId: string) =>
