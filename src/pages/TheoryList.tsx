@@ -4,7 +4,7 @@ import { exams } from '../data/exams.ts';
 import { onLinkClick, paths } from '../router.ts';
 
 export function TheoryList() {
-  const withTheory = exams.filter((e) => e.theory);
+  const withTheory = exams.filter((e) => e.theories.length);
   const vendors = [...new Set(withTheory.map((e) => e.vendor))];
   return (
     <main className="wrap stack">
@@ -22,15 +22,24 @@ export function TheoryList() {
           <div className="cards">
             {withTheory
               .filter((e) => e.vendor === v)
-              .map((e) => (
-                <a key={e.id} className="card" href={paths.theory(e.id)} onClick={onLinkClick}>
-                  <span>
-                    <span className="code">{e.code}</span>
-                  </span>
-                  <h2>{e.theory?.title}</h2>
-                  <span className="meta">{e.theory?.description ?? e.name}</span>
-                </a>
-              ))}
+              .flatMap((e) =>
+                e.theories.map((t) => (
+                  <a
+                    key={`${e.id}/${t.id}`}
+                    className="card"
+                    href={paths.theory(e.id, t.id)}
+                    onClick={onLinkClick}
+                  >
+                    <span>
+                      <span className="code">{e.code}</span>
+                    </span>
+                    <h2 lang={t.lang}>{t.title}</h2>
+                    <span className="meta" lang={t.lang}>
+                      {t.description ?? e.name}
+                    </span>
+                  </a>
+                )),
+              )}
           </div>
         </section>
       ))}

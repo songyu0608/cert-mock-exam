@@ -145,18 +145,18 @@ export function ExamHome({ exam }: { exam: Exam }) {
         </div>
         <h1>{exam.name}</h1>
         {exam.notes && <p className="lede">{exam.notes}</p>}
-        {(exam.guides.length > 0 || exam.theory) && (
+        {(exam.guides.length > 0 || exam.theories.length > 0) && (
           <p className="row small" style={{ margin: 0 }}>
             {exam.guides.map((g) => (
               <a key={g.id} href={paths.guide(exam.id, g.id)} onClick={onLinkClick}>
                 {g.title} 읽기
               </a>
             ))}
-            {exam.theory && (
-              <a href={paths.theory(exam.id)} onClick={onLinkClick}>
-                {exam.theory.title} 읽기
+            {exam.theories.map((t) => (
+              <a key={t.id} href={paths.theory(exam.id, t.id)} onClick={onLinkClick}>
+                {t.title} 읽기
               </a>
-            )}
+            ))}
           </p>
         )}
       </header>

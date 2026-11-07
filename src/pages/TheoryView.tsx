@@ -2,33 +2,32 @@ import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { loadTheory, type Note } from '../data/theory.ts';
-import type { Exam } from '../data/schema.ts';
+import type { Exam, Theory } from '../data/schema.ts';
 import { byName, folderLabel, remarkObsidian, toMarkdown } from '../lib/theory.ts';
 import { onLinkClick, paths } from '../router.ts';
 
 const plugins = [[remarkGfm, { singleTilde: false }], remarkObsidian] as const;
 const PROP_LABEL: Record<string, string> = { aliases: '별칭', tags: '태그' };
 
-function useTheory(examId: string): { notes?: Note[]; error?: string } {
+function useTheory(examId: string, theoryId: string): { notes?: Note[]; error?: string } {
   const [notes, setNotes] = useState<Note[]>();
   const [error, setError] = useState<string>();
   useEffect(() => {
     let alive = true;
-    loadTheory(examId).then(
+    loadTheory(examId, theoryId).then(
       (n) => alive && setNotes(n),
       (e: unknown) => alive && setError(e instanceof Error ? e.message : String(e)),
     );
     return () => {
       alive = false;
     };
-  }, [examId]);
+  }, [examId, theoryId]);
   return { notes, error };
 }
 
 /** 이론 노트 읽기: 왼쪽(좁은 화면은 위) 노트 목록과 검색, 오른쪽 노트 본문 */
-export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
-  const theory = exam.theory!;
-  const { notes, error } = useTheory(exam.id);
+export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory; note?: string }) {
+  const { notes, error } = useTheory(exam.id, theory.id);
   const [query, setQuery] = useState('');
   const [navOpen, setNavOpen] = useState(false);
 
@@ -36,16 +35,21 @@ export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
   const current = index.get((note ?? theory.home).toLowerCase());
   const hrefOf = (name: string) =>
     name.toLowerCase() === theory.home.toLowerCase()
-      ? paths.theory(exam.id)
-      : paths.theory(exam.id, name);
+      ? paths.theory(exam.id, theory.id)
+      : paths.theory(exam.id, theory.id, name);
 
+  // 폴더별 노트 목록. 첫 화면 노트는 자기 폴더 맨 위에 둔다.
   const folders = useMemo(() => {
     const map = new Map<string, Note[]>();
     for (const n of notes ?? []) map.set(n.folder, [...(map.get(n.folder) ?? []), n]);
+    const isHome = (n: Note) => (n.name.toLowerCase() === theory.home.toLowerCase() ? 0 : 1);
     return [...map.entries()]
       .sort(([a], [b]) => byName(a, b))
-      .map(([f, list]) => [f, list.sort((a, b) => byName(a.name, b.name))] as const);
-  }, [notes]);
+      .map(
+        ([f, list]) =>
+          [f, list.sort((a, b) => isHome(a) - isHome(b) || byName(a.name, b.name))] as const,
+      );
+  }, [notes, theory.home]);
 
   const q = query.trim().toLowerCase();
   const found = q
@@ -77,14 +81,21 @@ export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
             이론
           </a>{' '}
           /{' '}
-          <a href={paths.theory(exam.id)} onClick={onLinkClick}>
-            <span className="code">{exam.code}</span> {theory.title}
+          <a href={paths.theory(exam.id, theory.id)} onClick={onLinkClick}>
+            <span className="code">{exam.code}</span> <span lang={theory.lang}>{theory.title}</span>
           </a>
         </nav>
         <span className="row small">
           <a href={paths.exam(exam.id)} onClick={onLinkClick}>
             모의고사 풀기
           </a>
+          {exam.theories
+            .filter((t) => t.id !== theory.id)
+            .map((t) => (
+              <a key={t.id} href={paths.theory(exam.id, t.id)} onClick={onLinkClick} lang={t.lang}>
+                {t.title}
+              </a>
+            ))}
           {exam.guides.map((g) => (
             <a key={g.id} href={paths.guide(exam.id, g.id)} onClick={onLinkClick}>
               {g.title}
@@ -154,7 +165,7 @@ export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
           <main className="theory-main stack">
             <h1>노트를 찾을 수 없습니다</h1>
             <p>
-              <a href={paths.theory(exam.id)} onClick={onLinkClick}>
+              <a href={paths.theory(exam.id, theory.id)} onClick={onLinkClick}>
                 {theory.home}(으)로
               </a>
             </p>
@@ -162,6 +173,7 @@ export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
         ) : (
           <NoteArticle
             key={current.name}
+            lang={theory.lang}
             note={current}
             notes={notes}
             resolve={(name) => {
@@ -177,11 +189,13 @@ export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
 }
 
 function NoteArticle({
+  lang,
   note,
   notes,
   resolve,
   hrefOf,
 }: {
+  lang: string;
   note: Note;
   notes: Note[];
   resolve: (name: string) => string | undefined;
@@ -196,6 +210,22 @@ function NoteArticle({
     .filter((n) => n !== note && n.links.some((l) => l.toLowerCase() === self))
     .sort((a, b) => byName(a.name, b.name));
 
+  // [[노트#제목]] 링크: 주소의 #제목으로 스크롤한다. navigate()가 맨 위로 올린 다음에 움직이도록 한 박자 늦춘다.
+  useEffect(() => {
+    const go = () =>
+      setTimeout(() => {
+        const id = decodeURIComponent(location.hash.slice(1));
+        if (id) document.getElementById(id)?.scrollIntoView();
+      });
+    go();
+    window.addEventListener('cme:navigate', go);
+    window.addEventListener('popstate', go);
+    return () => {
+      window.removeEventListener('cme:navigate', go);
+      window.removeEventListener('popstate', go);
+    };
+  }, [md]);
+
   const toggleCards = () => {
     const open = !cardsOpen;
     ref.current
@@ -205,7 +235,7 @@ function NoteArticle({
   };
 
   return (
-    <main ref={ref} className="theory-main theory-note">
+    <main ref={ref} className="theory-main theory-note" lang={lang}>
       {note.props.length > 0 && (
         <dl className="theory-props">
           {note.props.map(([k, v]) => (

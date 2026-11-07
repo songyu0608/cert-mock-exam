@@ -1231,3 +1231,9 @@ details.callout[open] > summary.callout-title {
   margin-bottom: 8px;
   font-weight: 600;
 }
+/* 일본어 보관함(lang: ja): 가나·한자를 IBM Plex Sans JP로 */
+.theory [lang='ja'] {
+  font-family:
+    'IBM Plex Sans JP', 'IBM Plex Sans KR', 'Hiragino Sans', 'Yu Gothic', 'Apple SD Gothic Neo',
+    'Malgun Gothic', system-ui, sans-serif;
+}

@@ -9,6 +9,9 @@
   ],
   "mock": { "questions": 10, "minutes": 10, "passPercent": 70 },
   "guides": [{ "id": "basics", "title": "견본 가이드", "description": "가이드 탭 확인용 문서" }],
-  "theory": { "title": "견본 이론", "description": "이론 탭 확인용 노트", "home": "홈" },
+  "theories": [
+    { "id": "ko", "title": "견본 이론", "description": "이론 탭 확인용 노트", "home": "홈" },
+    { "id": "ja", "title": "見本ノート", "home": "ホーム", "lang": "ja" }
+  ],
   "types": ["single", "multi", "ordering", "matching", "case", "yesno", "problem-solution"]
 }
