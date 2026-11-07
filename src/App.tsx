@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { getExam } from './data/exams.ts';
+import { getExam, hasQuestions } from './data/exams.ts';
 import { ExamHome } from './pages/ExamHome.tsx';
 import { ExamList } from './pages/ExamList.tsx';
 import { GuideList } from './pages/GuideList.tsx';
@@ -77,6 +77,8 @@ export function App() {
         />
       </Suspense>
     );
+  // 문항이 없는 시험(읽기 자료만)은 시험·풀이·결과 화면 대신 읽기 자료로 안내한다.
+  if (exam && !hasQuestions(exam.id)) return <ReadingOnly exam={exam} />;
   if (exam && route.name === 'exam') return <ExamHome key={exam.id} exam={exam} />;
   if (exam && route.name === 'play') return <SessionPage key={exam.id} exam={exam} />;
   if (exam && route.name === 'result')
@@ -84,6 +86,38 @@ export function App() {
   return (
     <main className="wrap stack">
       <h1>페이지를 찾을 수 없습니다</h1>
+      <p>
+        <a href={paths.list()} onClick={onLinkClick}>
+          시험 목록으로
+        </a>
+      </p>
+    </main>
+  );
+}
+
+function ReadingOnly({ exam }: { exam: Exam }) {
+  return (
+    <main className="wrap stack">
+      <h1>
+        <span className="code">{exam.code}</span> {exam.name}
+      </h1>
+      <p>이 시험은 아직 모의고사 문항이 없습니다. 읽기 자료만 있습니다.</p>
+      <ul>
+        {exam.theories.map((t) => (
+          <li key={t.id}>
+            <a href={paths.theory(exam.id, t.id)} onClick={onLinkClick} lang={t.lang}>
+              {t.title}
+            </a>
+          </li>
+        ))}
+        {exam.guides.map((g) => (
+          <li key={g.id}>
+            <a href={paths.guide(exam.id, g.id)} onClick={onLinkClick}>
+              {g.title}
+            </a>
+          </li>
+        ))}
+      </ul>
       <p>
         <a href={paths.list()} onClick={onLinkClick}>
           시험 목록으로

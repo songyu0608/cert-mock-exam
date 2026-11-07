@@ -1,6 +1,6 @@
 import { TopTabs } from '../components/TopTabs.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
-import { exams } from '../data/exams.ts';
+import { exams as all, hasQuestions } from '../data/exams.ts';
 import { onLinkClick, paths } from '../router.ts';
 import { loadActive, loadAttempts } from '../lib/storage.ts';
 import { useRecordsVersion } from '../lib/useRecords.ts';
@@ -9,6 +9,8 @@ import { getKey } from '../lib/sync.ts';
 export function ExamList() {
   // 다른 기기에서 기록을 받으면 다시 그린다.
   useRecordsVersion();
+  // 문항 없이 읽기 자료만 있는 시험은 가이드·이론 탭에만 보인다.
+  const exams = all.filter((e) => hasQuestions(e.id));
   const vendors = [...new Set(exams.map((e) => e.vendor))];
   return (
     <main className="wrap stack">

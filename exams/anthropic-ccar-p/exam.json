@@ -1,0 +1,45 @@
+{
+  "id": "anthropic-ccar-p",
+  "vendor": "anthropic",
+  "code": "CCAR-P",
+  "name": "Claude Certified Architect – Professional",
+  "lang": "ko",
+  "level": "Professional",
+  "domains": [
+    { "id": "1", "name": "솔루션 설계와 아키텍처", "weight": 17 },
+    { "id": "2", "name": "Claude 모델, 프롬프팅, 컨텍스트 엔지니어링", "weight": 13 },
+    { "id": "3", "name": "통합", "weight": 19 },
+    { "id": "4", "name": "평가, 테스트, 최적화", "weight": 16 },
+    { "id": "5", "name": "거버넌스, 안전, 리스크 관리", "weight": 14 },
+    { "id": "6", "name": "이해관계자 커뮤니케이션과 라이프사이클 관리", "weight": 14 },
+    { "id": "7", "name": "개발자 생산성과 운영 지원", "weight": 7 }
+  ],
+  "mock": {
+    "questions": 63,
+    "minutes": 120,
+    "passPercent": 72
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    { "value": "63문항", "label": "단일 선택·복수 응답(고를 개수는 문제에 표시)" },
+    { "value": "120분", "label": "시험 시간" },
+    { "value": "720 / 1,000", "label": "합격 환산 점수" },
+    { "value": "7 / 38", "label": "도메인 / 목표" }
+  ],
+  "notes": "아직 모의고사 문항은 없고 이론 노트만 있습니다. 시험 정보는 이론 노트(영어 공식 시험 가이드 v1.0, 2026년 7월)를 따릅니다.",
+  "theories": [
+    {
+      "id": "ko",
+      "title": "이론 정리(한국어)",
+      "home": "CCAR-P 대시보드",
+      "lang": "ko"
+    },
+    {
+      "id": "ja",
+      "title": "理論ノート(日本語)",
+      "home": "CCAR-P ダッシュボード",
+      "lang": "ja"
+    }
+  ]
+}

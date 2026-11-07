@@ -7,12 +7,16 @@ export function validateExamDir(dir: string): string[] {
   const read = (f: string): unknown => JSON.parse(readFileSync(join(dir, f), 'utf8'));
   const errors: string[] = [];
   const exam = examSchema.safeParse(read('exam.json'));
-  const questions = questionsFileSchema.safeParse(read('questions.json'));
   const fmt = (file: string, issues: { path: PropertyKey[]; message: string }[]) =>
     issues.map((i) => `${file} ${i.path.map(String).join('.')}: ${i.message}`);
   if (!exam.success) errors.push(...fmt('exam.json', exam.error.issues));
-  if (!questions.success) errors.push(...fmt('questions.json', questions.error.issues));
-  if (exam.success && questions.success) errors.push(...crossCheck(exam.data, questions.data));
+  // questions.json이 없으면 읽기 자료(가이드·이론)만 있는 시험이다. 그때는 읽기 자료가 하나는 있어야 한다.
+  if (existsSync(join(dir, 'questions.json'))) {
+    const questions = questionsFileSchema.safeParse(read('questions.json'));
+    if (!questions.success) errors.push(...fmt('questions.json', questions.error.issues));
+    if (exam.success && questions.success) errors.push(...crossCheck(exam.data, questions.data));
+  } else if (exam.success && !exam.data.guides.length && !exam.data.theories.length)
+    errors.push('questions.json이 없습니다(문항 없이 두려면 guides나 theories가 있어야 합니다)');
   if (exam.success && exam.data.id !== dir.split(/[\\/]/).pop())
     errors.push(`exam.json id(${exam.data.id})가 폴더 이름과 다릅니다`);
   if (exam.success) {

@@ -13,7 +13,12 @@ exams/
     questions.json
     guides/official-guide.html   # 선택: 읽기 자료
     theory/ko/01 이론/1.1 ….md   # 선택: 이론 노트(Obsidian 보관함, 보관함 id별 폴더)
+  anthropic-ccar-p/
+    exam.json                    # questions.json 없음: 읽기 자료만 있는 시험
+    theory/ko/…, theory/ja/…
 ```
+
+`questions.json`이 없는 시험은 읽기 자료(가이드·이론)만 있는 시험으로 본다. `guides`나 `theories`가 하나는 있어야 하고, 모의고사 목록에는 나오지 않으며 시험 주소(`/exam/<id>`)로 들어오면 읽기 자료로 안내한다. `exam.json`의 다른 필드(도메인, `mock` 등)는 그대로 채워 둔다.
 
 ## exam.json
 
