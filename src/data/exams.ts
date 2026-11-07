@@ -43,6 +43,11 @@ export const exams: Exam[] = Object.entries(examFiles)
   .map(([, mod]) => examSchema.parse(mod.default))
   .sort((a, b) => a.vendor.localeCompare(b.vendor) || a.code.localeCompare(b.code));
 
+const withQuestions = new Set(Object.keys(questionFiles).map(idOf));
+
+/** 문항이 있는 시험인지. 없으면 읽기 자료(가이드·이론)만 있는 시험으로, 모의고사 목록과 시험 화면에서 뺀다. */
+export const hasQuestions = (id: string) => withQuestions.has(id);
+
 export function getExam(id: string): Exam | undefined {
   return exams.find((e) => e.id === id);
 }

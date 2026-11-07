@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { hasQuestions } from '../data/exams.ts';
 import { loadTheory, type Note } from '../data/theory.ts';
 import type { Exam, Theory } from '../data/schema.ts';
 import { byName, folderLabel, remarkObsidian, toMarkdown } from '../lib/theory.ts';
@@ -86,9 +87,11 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
           </a>
         </nav>
         <span className="row small">
-          <a href={paths.exam(exam.id)} onClick={onLinkClick}>
-            모의고사 풀기
-          </a>
+          {hasQuestions(exam.id) && (
+            <a href={paths.exam(exam.id)} onClick={onLinkClick}>
+              모의고사 풀기
+            </a>
+          )}
           {exam.theories
             .filter((t) => t.id !== theory.id)
             .map((t) => (

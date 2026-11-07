@@ -1,4 +1,4 @@
-import { guideUrl } from '../data/exams.ts';
+import { guideUrl, hasQuestions } from '../data/exams.ts';
 import type { Exam } from '../data/schema.ts';
 import { onLinkClick, paths } from '../router.ts';
 
@@ -27,9 +27,11 @@ export function GuideView({ exam, guideId }: { exam: Exam; guideId: string }) {
           / <span className="code">{exam.code}</span> {guide.title}
         </nav>
         <span className="row small">
-          <a href={paths.exam(exam.id)} onClick={onLinkClick}>
-            모의고사 풀기
-          </a>
+          {hasQuestions(exam.id) && (
+            <a href={paths.exam(exam.id)} onClick={onLinkClick}>
+              모의고사 풀기
+            </a>
+          )}
           <a href={url} target="_blank" rel="noopener">
             새 탭에서 열기
           </a>
