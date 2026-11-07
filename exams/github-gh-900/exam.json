@@ -1,0 +1,89 @@
+{
+  "id": "github-gh-900",
+  "vendor": "github",
+  "code": "GH-900",
+  "name": "GitHub Foundations",
+  "lang": "ko",
+  "level": "Fundamentals",
+  "domains": [
+    {
+      "id": "1",
+      "name": "Git 및 GitHub 기초 이해",
+      "weight": 27.5
+    },
+    {
+      "id": "2",
+      "name": "GitHub 리포지토리 작업",
+      "weight": 12.5
+    },
+    {
+      "id": "3",
+      "name": "GitHub를 활용한 협업",
+      "weight": 12.5
+    },
+    {
+      "id": "4",
+      "name": "최신 개발 방식 적용",
+      "weight": 12.5
+    },
+    {
+      "id": "5",
+      "name": "GitHub로 프로젝트 관리",
+      "weight": 7.5
+    },
+    {
+      "id": "6",
+      "name": "개인정보 보호, 보안, 관리",
+      "weight": 12.5
+    },
+    {
+      "id": "7",
+      "name": "GitHub 커뮤니티 탐색",
+      "weight": 7.5
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 100,
+    "passPercent": 70,
+    "questionChoices": null
+  },
+  "types": ["single", "multi", "ordering", "matching"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "100분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "700 / 1000",
+      "label": "합격 환산 점수"
+    },
+    {
+      "value": "비공개",
+      "label": "문제 유형(샌드박스 제공)"
+    },
+    {
+      "value": "미기재",
+      "label": "공식 문항 수"
+    }
+  ],
+  "sources": [
+    {
+      "label": "GH-900 스터디 가이드",
+      "url": "https://learn.microsoft.com/credentials/certifications/resources/study-guides/gh-900",
+      "checked": "2026-11-07"
+    },
+    {
+      "label": "GitHub Foundations 자격증 페이지",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/github-foundations",
+      "checked": "2026-11-07"
+    },
+    {
+      "label": "Microsoft 시험 채점 안내",
+      "url": "https://learn.microsoft.com/en-us/certifications/exam-scoring-reports",
+      "checked": "2026-11-07"
+    }
+  ],
+  "notes": "60문항 · 100분. 도메인 비중 범위의 중간값(27.5/12.5/12.5/12.5/7.5/12.5/7.5%)대로 출제합니다. 공식 문항 수는 공개되지 않았고, Microsoft 안내상 대부분의 시험이 40~60문항이라 60문항으로 정했습니다. 문제는 제1회~제3회(각 60문항, 계 180문항)를 합친 것입니다."
+}
