@@ -1225,3 +1225,9 @@ details.callout[open] > summary.callout-title {
 .callout-card > summary.callout-title {
   font-weight: 500;
 }
+.theory-list.theory-root {
+  padding: 0;
+  border: 0;
+  margin-bottom: 8px;
+  font-weight: 600;
+}

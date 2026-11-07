@@ -20,9 +20,11 @@ function propValue(raw: string): PropValue {
     if (Array.isArray(j)) return j.map(String);
     if (typeof j === 'string' || typeof j === 'number' || typeof j === 'boolean') return String(j);
   } catch {
-    // 따옴표 없는 YAML 값
+    // 따옴표 없는 YAML 값. [a, b] 같은 흐름 목록은 쉼표로 나눈다.
   }
-  return v.replace(/^(["'])(.*)\1$/, '$2');
+  const unquote = (x: string) => x.trim().replace(/^(["'])(.*)\1$/, '$2');
+  if (/^\[.*\]$/.test(v)) return v.slice(1, -1).split(',').map(unquote).filter(Boolean);
+  return unquote(v);
 }
 
 /** 머리말을 떼어 속성과 본문으로 나눈다. 닫는 줄이 `---# 제목`처럼 붙어 있어도 뒤는 본문으로 둔다. */
@@ -57,7 +59,7 @@ function splitLink(inner: string): { name: string; heading?: string; alias?: str
 /** 본문이 가리키는 노트 이름 목록(겹침 없음) */
 export function linkTargets(body: string): string[] {
   const out = new Set<string>();
-  for (const m of body.matchAll(WIKILINK)) {
+  for (const m of body.replace(/`[^`\n]*`/g, '').matchAll(WIKILINK)) {
     const { name } = splitLink(m[1] ?? '');
     if (name) out.add(name);
   }
@@ -79,12 +81,20 @@ export function toMarkdown(body: string, resolve: (name: string) => string | und
       out.push(line);
       continue;
     }
-    const linked = line.replace(WIKILINK, (_all, inner: string) => {
-      const { name, heading, alias } = splitLink(inner);
-      const text = escapeMd(alias ?? (heading ? `${name} > ${heading}` : name));
-      const href = name ? resolve(name) : undefined;
-      return href ? `[${text}](<${href}>)` : text;
-    });
+    // `[[링크]]`처럼 인라인 코드 안에 있는 것은 글자 그대로 둔다.
+    const linked = line
+      .split(/(`[^`]*`)/)
+      .map((part, i) =>
+        i % 2
+          ? part
+          : part.replace(WIKILINK, (_all, inner: string) => {
+              const { name, heading, alias } = splitLink(inner);
+              const text = escapeMd(alias ?? (heading ? `${name} > ${heading}` : name));
+              const href = name ? resolve(name) : undefined;
+              return href ? `[${text}](<${href}>)` : text;
+            }),
+      )
+      .join('');
     // 플래시카드 한 줄: 질문::답. 인용·표·제목·목록 줄과 `코드`가 든 줄(형식 설명)은 건드리지 않는다.
     const card = /^(?![\s>|#*-])([^`]*?\S)::(\S[^`]*)$/.exec(linked);
     if (card?.[1] && card[2]) {
@@ -112,6 +122,7 @@ const CALLOUT_LABEL: Record<string, string> = {
   tip: '팁',
   important: '중요',
   summary: '요약',
+  abstract: '개요',
   quote: '인용',
   question: '질문',
   warning: '주의',
@@ -196,7 +207,11 @@ export function remarkObsidian() {
   };
 }
 
-/** 폴더 이름 앞의 정렬용 번호(예: "01 이론")를 떼고 보여 준다. */
-export const folderLabel = (folder: string) => folder.replace(/^\d+\s+/, '') || '노트';
+/** 폴더 이름 앞의 정렬용 번호(예: "01 이론")를 떼고 보여 준다. 하위 폴더는 "암기 › 플래시카드" */
+export const folderLabel = (folder: string) =>
+  folder
+    .split('/')
+    .map((s) => s.replace(/^\d+\s+/, ''))
+    .join(' › ') || '노트';
 
 export const byName = (a: string, b: string) => a.localeCompare(b, 'ko', { numeric: true });

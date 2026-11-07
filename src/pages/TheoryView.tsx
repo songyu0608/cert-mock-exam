@@ -120,18 +120,27 @@ export function TheoryView({ exam, note }: { exam: Exam; note?: string }) {
                 {!found.length && <li className="muted small">찾는 노트가 없습니다.</li>}
               </ul>
             ) : (
-              folders.map(([folder, list]) => (
-                <details key={folder} open={list.includes(current!)}>
-                  <summary>
-                    {folderLabel(folder)} <span className="muted small">{list.length}</span>
-                  </summary>
-                  <ul className="theory-list">
+              folders.map(([folder, list]) =>
+                // 보관함 맨 위에 있는 노트(폴더 없음)는 묶지 않고 바로 보여 준다.
+                folder === '' ? (
+                  <ul key="" className="theory-list theory-root">
                     {list.map((n) => (
                       <li key={n.name}>{link(n)}</li>
                     ))}
                   </ul>
-                </details>
-              ))
+                ) : (
+                  <details key={folder} open={list.includes(current!)}>
+                    <summary>
+                      {folderLabel(folder)} <span className="muted small">{list.length}</span>
+                    </summary>
+                    <ul className="theory-list">
+                      {list.map((n) => (
+                        <li key={n.name}>{link(n)}</li>
+                      ))}
+                    </ul>
+                  </details>
+                ),
+              )
             )}
           </div>
         </aside>
