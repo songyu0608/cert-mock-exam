@@ -1,6 +1,6 @@
 // exams/ 아래 모든 시험을 형식 검사한다. 하나라도 틀리면 종료 코드 1(빌드 실패).
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { crossCheck, examSchema, questionsFileSchema } from '../src/data/schema.ts';
 
 export function validateExamDir(dir: string): string[] {
@@ -23,7 +23,25 @@ export function validateExamDir(dir: string): string[] {
       if (!existsSync(join(dir, 'guides', `${g.id}.html`)))
         errors.push(`exam.json guides: guides/${g.id}.html 파일이 없습니다`);
     }
+    if (exam.data.theory) errors.push(...checkTheory(join(dir, 'theory'), exam.data.theory.home));
   }
+  return errors;
+}
+
+/** 이론 노트: 폴더가 있고, 노트 이름([[링크]] 대상)이 겹치지 않고, 첫 화면 노트가 있어야 한다. */
+function checkTheory(dir: string, home: string): string[] {
+  if (!existsSync(dir)) return ['exam.json theory: theory 폴더가 없습니다'];
+  const errors: string[] = [];
+  const names = new Map<string, string>();
+  for (const f of readdirSync(dir, { recursive: true, encoding: 'utf8' })) {
+    if (!f.endsWith('.md')) continue;
+    const name = basename(f, '.md').toLowerCase();
+    const prev = names.get(name);
+    if (prev) errors.push(`theory: 노트 이름이 겹칩니다(${prev}, ${f})`);
+    names.set(name, f);
+  }
+  if (!names.has(home.toLowerCase()))
+    errors.push(`exam.json theory: 첫 화면 노트(${home}.md)가 없습니다`);
   return errors;
 }
 

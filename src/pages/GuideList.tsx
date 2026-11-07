@@ -10,7 +10,7 @@ export function GuideList() {
     <main className="wrap stack">
       <header>
         <h1>자격증 모의고사</h1>
-        <p className="lede">시험별 공식 가이드와 이론 정리를 읽습니다.</p>
+        <p className="lede">시험별 공식 가이드를 읽습니다.</p>
       </header>
       <TopTabs current="guides" />
       {!withGuides.length && <p className="muted">아직 등록된 가이드가 없습니다.</p>}

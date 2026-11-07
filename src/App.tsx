@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { getExam } from './data/exams.ts';
 import { ExamHome } from './pages/ExamHome.tsx';
 import { ExamList } from './pages/ExamList.tsx';
@@ -7,8 +7,14 @@ import { GuideView } from './pages/GuideView.tsx';
 import { ResultPage } from './pages/ResultPage.tsx';
 import { SessionPage } from './pages/SessionPage.tsx';
 import { SettingsPage } from './pages/SettingsPage.tsx';
+import { TheoryList } from './pages/TheoryList.tsx';
 import { startAutoSync } from './lib/sync.ts';
 import { onLinkClick, paths, useRoute } from './router.ts';
+
+// 이론 화면(마크다운 노트 읽기)은 열 때만 내려받는다.
+const TheoryView = lazy(() =>
+  import('./pages/TheoryView.tsx').then((m) => ({ default: m.TheoryView })),
+);
 
 export function App() {
   const route = useRoute();
@@ -19,11 +25,14 @@ export function App() {
   useEffect(() => {
     const guide =
       route.name === 'guide' ? exam?.guides.find((g) => g.id === route.guideId) : undefined;
+    const theory = route.name === 'theory' ? exam?.theory : undefined;
     document.title = guide
       ? `${exam?.code} ${guide.title} · 자격증 모의고사`
-      : exam
-        ? `${exam.code} · 자격증 모의고사`
-        : '자격증 모의고사';
+      : theory && route.name === 'theory'
+        ? `${route.note ?? theory.title} · ${exam?.code} 이론 · 자격증 모의고사`
+        : exam
+          ? `${exam.code} · 자격증 모의고사`
+          : '자격증 모의고사';
   }, [exam, route]);
 
   // 시험 화면은 업체별 테마(styles.css의 [data-vendor])와 문항 언어별 글꼴([data-lang])을 쓴다.
@@ -43,6 +52,13 @@ export function App() {
   if (route.name === 'guides') return <GuideList />;
   if (exam && route.name === 'guide')
     return <GuideView key={`${exam.id}/${route.guideId}`} exam={exam} guideId={route.guideId} />;
+  if (route.name === 'theories') return <TheoryList />;
+  if (exam?.theory && route.name === 'theory')
+    return (
+      <Suspense fallback={<main className="wrap muted">불러오는 중…</main>}>
+        <TheoryView key={exam.id} exam={exam} note={route.note} />
+      </Suspense>
+    );
   if (exam && route.name === 'exam') return <ExamHome key={exam.id} exam={exam} />;
   if (exam && route.name === 'play') return <SessionPage key={exam.id} exam={exam} />;
   if (exam && route.name === 'result')

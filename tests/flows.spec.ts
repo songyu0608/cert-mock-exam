@@ -250,6 +250,45 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
 });
 
+test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동작한다', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('navigation', { name: '화면' }).getByRole('link', { name: '이론' }).click();
+  await expect(page).toHaveURL(/\/theory$/);
+  await page.getByRole('link', { name: /견본 이론/ }).click();
+  await expect(page).toHaveURL(/\/theory\/sample-all-types$/);
+  const note = page.locator('.theory-note');
+  await expect(note.getByRole('heading', { name: '견본 이론 홈' })).toBeVisible();
+  await expect(note.locator('.callout-info .callout-title')).toHaveText('이 보관함');
+  const quote = note.locator('details.callout-quote');
+  await expect(quote.getByText('접혀 있는 본문')).toBeHidden();
+  await quote.locator('summary').click();
+  await expect(quote.getByText('접혀 있는 본문')).toBeVisible();
+
+  // 표 안의 [[노트|별칭]] 링크로 이동하고, 역링크로 돌아온다.
+  await note.getByRole('link', { name: 'A 개념 보기' }).click();
+  await expect(page).toHaveURL(/\/theory\/sample-all-types\/%EA%B0%9C%EB%85%90%20A$/);
+  await expect(note.getByRole('heading', { name: '개념 A' })).toBeVisible();
+  await expect(note.locator('.theory-props')).toContainText('Concept A');
+  const card = note.locator('details.callout-card');
+  await expect(card.locator('summary')).toHaveText('견본 질문은?');
+  await expect(card.getByText('견본 답')).toBeHidden();
+  await note.getByRole('button', { name: '답 모두 보기' }).click();
+  await expect(card.getByText('견본 답')).toBeVisible();
+  await note.locator('.theory-backlinks').getByRole('link', { name: '홈' }).click();
+  await expect(page).toHaveURL(/\/theory\/sample-all-types$/);
+
+  // 별칭으로 찾기, 새로고침해도 같은 노트, 없는 노트. 좁은 화면은 목록을 펼쳐야 보인다.
+  const toggle = page.getByRole('button', { name: /^노트 목록/ });
+  if (await toggle.isVisible()) await toggle.click();
+  await page.getByRole('searchbox', { name: '노트 찾기' }).fill('ガイネン');
+  await page.locator('.theory-nav').getByRole('link', { name: '개념 A' }).click();
+  await expect(note.getByRole('heading', { name: '개념 A' })).toBeVisible();
+  await page.reload();
+  await expect(page.locator('.theory-note').getByRole('heading', { name: '개념 A' })).toBeVisible();
+  await page.goto('/theory/sample-all-types/nope');
+  await expect(page.getByRole('heading', { name: '노트를 찾을 수 없습니다' })).toBeVisible();
+});
+
 test('가이드 탭: 시험별 가이드를 고르면 문서를 연다', async ({ page }) => {
   await page.goto('/');
   await page

@@ -20,7 +20,11 @@ function dropFixtureAssets(mode: string): Plugin {
 export default defineConfig(({ mode }) => ({
   plugins: [react(), dropFixtureAssets(mode)],
   // react-dom, 마크다운, zod(형식 검사)를 합친 기본 번들이 500kB를 조금 넘는다(gzip 약 160kB).
-  build: { chunkSizeWarningLimit: 600 },
+  build: {
+    chunkSizeWarningLimit: 600,
+    // 이론 노트(.md)는 작은 파일도 data: URL로 코드에 넣지 않고 따로 내보낸다.
+    assetsInlineLimit: (file: string) => (file.endsWith('.md') ? false : undefined),
+  },
   test: {
     include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
   },
