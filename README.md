@@ -2,8 +2,8 @@
 
 자격증 모의고사를 풀고 채점하는 개인용 사이트. 시험을 고르고 실전 모의고사, 연습, 오답 다시 풀기 중 하나로 푼다.
 
-- 시험: AWS AIB-C01(183문항), AIF-C01(229문항), Claude CCAR-F(330문항, 일본어, 5회분)
-- 가이드: CCAR-F 공식 시험 가이드 v1.0(한국어 번역 / 日本語 공식판 / 한·日 대조 / English)
+- 시험: AWS AIB-C01(183문항, 일본어판 313문항), AIF-C01(229문항), SAA-C03(205문항), DEA-C01(219문항), Claude CCAR-F(330문항, 일본어, 5회분)
+- 가이드: CCAR-F 공식 시험 가이드 v1.0(한국어 번역 / 日本語 공식판 / 한·日 대조 / English), AIB-C01·AIF-C01 공식 시험 가이드(한국어·日本語·English, AWS 공식 원문)
 - 사이트: https://cert-mock-exam.songyu0608.workers.dev
 - 기록: 브라우저(localStorage)에 저장. 설정(`/settings`)에서 비밀키를 넣으면 같은 키의 기기끼리 Cloudflare D1로 주고받는다
 - 배포: Cloudflare Workers(정적 파일 + `/api/*` 동기화 API, `worker/`). `main`에 push하면 GitHub Actions가 배포

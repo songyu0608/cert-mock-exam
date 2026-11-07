@@ -51,9 +51,11 @@ export async function answerSampleCorrectly(page: Page): Promise<void> {
   }
 }
 
-export async function openExam(page: Page, code: string): Promise<void> {
+export async function openExam(page: Page, code: string | RegExp): Promise<void> {
   await page.goto('/');
-  await page.getByRole('link', { name: new RegExp(code) }).click();
+  await page
+    .getByRole('link', { name: typeof code === 'string' ? new RegExp(code) : code })
+    .click();
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 }
 
