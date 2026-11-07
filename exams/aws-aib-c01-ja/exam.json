@@ -1,0 +1,71 @@
+{
+  "id": "aws-aib-c01-ja",
+  "vendor": "aws",
+  "code": "AIB-C01",
+  "name": "AWS Certified AI Business Strategist (日本語)",
+  "lang": "ja",
+  "level": "Business",
+  "domains": [
+    {
+      "id": "1",
+      "name": "AI の基礎とリテラシー",
+      "weight": 24
+    },
+    {
+      "id": "2",
+      "name": "AI 戦略とビジネス価値の創造",
+      "weight": 28
+    },
+    {
+      "id": "3",
+      "name": "AI ガバナンスと責任ある AI リーダーシップ",
+      "weight": 24
+    },
+    {
+      "id": "4",
+      "name": "ビジネス準備状況、リーダーシップ、AI トランスフォーメーション",
+      "weight": 24
+    }
+  ],
+  "mock": {
+    "questions": 65,
+    "minutes": 130,
+    "passPercent": 72,
+    "questionChoices": [50, 65, 85]
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "130 分",
+      "label": "試験時間"
+    },
+    {
+      "value": "700 / 1000",
+      "label": "合格スコア(換算)"
+    },
+    {
+      "value": "2 種類",
+      "label": "択一選択・複数選択"
+    },
+    {
+      "value": "記載なし",
+      "label": "公式の問題数"
+    }
+  ],
+  "sources": [
+    {
+      "label": "AIB-C01 公式試験ガイド(日本語版)",
+      "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html",
+      "checked": "2026-11-07"
+    }
+  ],
+  "notes": "公式試験ガイドに問題数の記載がないため、問題数を選べるようにしました(既定 65 問、時間は 130 分を基準に比例)。ドメイン比率(24/28/24/24%)どおりに出題します。問題は第1回〜第3回(183・65・65 問、計 313 問)を合わせたものです。",
+  "guides": [
+    {
+      "id": "official-guide",
+      "title": "公式試験ガイド",
+      "description": "日本語・한국어 公式版 / 한·日 対照 / English(AWS 公式原文)"
+    }
+  ]
+}

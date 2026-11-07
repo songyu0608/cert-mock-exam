@@ -12,10 +12,16 @@ test.afterEach(async ({ page }) => {
   expect(pageErrors.get(page)).toEqual([]);
 });
 
-test('시험 목록에 AWS 두 시험이 보이고, 주소로 바로 들어가도 열린다', async ({ page }) => {
+// 같은 코드의 한국어판과 일본어판이 함께 있어 이름까지 맞춘다.
+const AIB_KO = /AIB-C01 AWS Certified AI Business Strategist(?! \(日本語\))/;
+
+test('시험 목록에 AWS 시험이 모두 보이고, 주소로 바로 들어가도 열린다', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('link', { name: /AIB-C01/ })).toBeVisible();
-  await expect(page.getByRole('link', { name: /AIF-C01/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /AIB-C01/ })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: AIB_KO })).toBeVisible();
+  await expect(page.getByRole('link', { name: /AIB-C01 .*\(日本語\)/ })).toBeVisible();
+  for (const code of ['AIF-C01', 'SAA-C03', 'DEA-C01'])
+    await expect(page.getByRole('link', { name: new RegExp(code) })).toBeVisible();
   await page.goto('/exam/aws-aib-c01');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'AWS Certified AI Business Strategist',
@@ -207,7 +213,7 @@ test('나가기 후 시험 홈에서 이어 풀기와 버리기', async ({ page 
 });
 
 test('AIB-C01 실전은 문항 수를 고르고 시간이 비례한다', async ({ page }) => {
-  await openExam(page, 'AIB-C01');
+  await openExam(page, AIB_KO);
   const card = modeCard(page, '실전 모의고사');
   await card.getByRole('combobox').selectOption('50');
   await card.getByRole('button', { name: '시작' }).click();

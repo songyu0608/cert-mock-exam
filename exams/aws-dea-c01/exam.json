@@ -1,0 +1,69 @@
+{
+  "id": "aws-dea-c01",
+  "vendor": "aws",
+  "code": "DEA-C01",
+  "name": "AWS Certified Data Engineer – Associate",
+  "lang": "ko",
+  "level": "Associate",
+  "domains": [
+    {
+      "id": "1",
+      "name": "데이터 수집 및 변환",
+      "weight": 34
+    },
+    {
+      "id": "2",
+      "name": "데이터 저장소 관리",
+      "weight": 26
+    },
+    {
+      "id": "3",
+      "name": "데이터 운영 및 지원",
+      "weight": 22
+    },
+    {
+      "id": "4",
+      "name": "데이터 보안 및 거버넌스",
+      "weight": 18
+    }
+  ],
+  "mock": {
+    "questions": 65,
+    "minutes": 130,
+    "passPercent": 72,
+    "questionChoices": null
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "65문항",
+      "label": "채점 50 + 비채점 15"
+    },
+    {
+      "value": "130분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "720 / 1000",
+      "label": "합격 환산 점수"
+    },
+    {
+      "value": "2가지",
+      "label": "선다형·복수 응답"
+    }
+  ],
+  "sources": [
+    {
+      "label": "DEA-C01 공식 시험 안내서",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/data-engineer-associate-01/data-engineer-associate-01.html",
+      "checked": "2026-11-06"
+    },
+    {
+      "label": "AWS 자격증 페이지",
+      "url": "https://aws.amazon.com/certification/certified-data-engineer-associate/",
+      "checked": "2026-11-06"
+    }
+  ],
+  "notes": "65문항 · 130분. 도메인 비중(34/26/22/18%)대로 출제하고, 제출 후 채점과 해설을 보여 줍니다. 실제 시험의 비채점 15문항은 구분할 수 없으므로 모두 채점합니다."
+}
