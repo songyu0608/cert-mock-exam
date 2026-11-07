@@ -20,7 +20,7 @@ test('시험 목록에 AWS 시험이 모두 보이고, 주소로 바로 들어�
   await expect(page.getByRole('link', { name: /AIB-C01/ })).toHaveCount(2);
   await expect(page.getByRole('link', { name: AIB_KO })).toBeVisible();
   await expect(page.getByRole('link', { name: /AIB-C01 .*\(日本語\)/ })).toBeVisible();
-  for (const code of ['AIF-C01', 'SAA-C03', 'DEA-C01', 'GH-900'])
+  for (const code of ['AIF-C01', 'SAA-C03', 'DEA-C01', 'GH-900', 'GH-300'])
     await expect(page.getByRole('link', { name: new RegExp(code) })).toBeVisible();
   await page.goto('/exam/aws-aib-c01');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(

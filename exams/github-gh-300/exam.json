@@ -1,0 +1,91 @@
+{
+  "id": "github-gh-300",
+  "vendor": "github",
+  "code": "GH-300",
+  "name": "GitHub Copilot",
+  "lang": "ko",
+  "level": "Intermediate",
+  "domains": [
+    {
+      "id": "1",
+      "name": "책임감 있게 GitHub Copilot 사용",
+      "weight": 17.5
+    },
+    {
+      "id": "2",
+      "name": "GitHub Copilot 기능 사용",
+      "weight": 27.5
+    },
+    {
+      "id": "3",
+      "name": "GitHub Copilot 데이터 및 아키텍처 이해",
+      "weight": 12.5
+    },
+    {
+      "id": "4",
+      "name": "프롬프트 엔지니어링 및 컨텍스트 구성 적용",
+      "weight": 12.5
+    },
+    {
+      "id": "5",
+      "name": "GitHub Copilot으로 개발자 생산성 향상",
+      "weight": 12.5
+    },
+    {
+      "id": "6",
+      "name": "개인 정보 보호, 콘텐츠 제외, 보호 장치 구성",
+      "weight": 12.5
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 100,
+    "passPercent": 70,
+    "questionChoices": null
+  },
+  "types": ["single", "multi", "ordering", "matching"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "100분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "700 / 1000",
+      "label": "합격 환산 점수"
+    },
+    {
+      "value": "비공개",
+      "label": "문제 유형(샌드박스 제공)"
+    },
+    {
+      "value": "미기재",
+      "label": "공식 문항 수"
+    }
+  ],
+  "sources": [
+    {
+      "label": "GH-300 스터디 가이드(한국어)",
+      "url": "https://learn.microsoft.com/ko-kr/credentials/certifications/resources/study-guides/gh-300",
+      "checked": "2026-11-07"
+    },
+    {
+      "label": "GitHub Copilot 자격증 페이지",
+      "url": "https://learn.microsoft.com/credentials/certifications/github-copilot",
+      "checked": "2026-11-07"
+    },
+    {
+      "label": "Microsoft 시험 채점 안내",
+      "url": "https://learn.microsoft.com/en-us/certifications/exam-scoring-reports",
+      "checked": "2026-11-07"
+    }
+  ],
+  "notes": "60문항 · 100분. 도메인 비중 범위의 중간값(17.5/27.5/12.5/12.5/12.5/12.5%)대로 출제합니다. 공식 문항 수는 공개되지 않았고, Microsoft 안내상 대부분의 시험이 40~60문항이라 60문항으로 정했습니다. 문제는 제1회~제3회(각 60문항, 계 180문항)를 합친 것입니다.",
+  "guides": [
+    {
+      "id": "official-guide",
+      "title": "공식 스터디 가이드",
+      "description": "한국어·日本語(기계 번역)·English 공식판 / 한·日 대조 (Microsoft Learn 공식 원문)"
+    }
+  ]
+}
