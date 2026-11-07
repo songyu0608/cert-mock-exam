@@ -29,6 +29,13 @@ describe('parseNote', () => {
     expect(n.body).toBe('# 비교 노트 목록\n\n- 항목');
   });
 
+  it('따옴표 없는 [a, b] 목록도 나눈다', () => {
+    expect(parseNote('---\naliases: [Bedrock, 베드록]\ntags: []\n---\n본문').props).toEqual([
+      ['aliases', ['Bedrock', '베드록']],
+      ['tags', []],
+    ]);
+  });
+
   it('머리말이 없으면 전체가 본문', () => {
     expect(parseNote('# 제목')).toEqual({ props: [], body: '# 제목' });
   });
@@ -53,8 +60,14 @@ describe('toMarkdown', () => {
     );
   });
 
-  it('링크 대상 목록', () => {
-    expect(linkTargets('[[a]] [[b|별칭]] [[a#제목]]')).toEqual(['a', 'b']);
+  it('인라인 코드 안의 [[링크]]는 글자 그대로 둔다', () => {
+    expect(toMarkdown('| `[[링크]]` | [[개념 A]] |', resolve)).toBe(
+      '| `[[링크]]` | [개념 A](</theory/x/%EA%B0%9C%EB%85%90%20A>) |',
+    );
+  });
+
+  it('링크 대상 목록(인라인 코드 안은 뺀다)', () => {
+    expect(linkTargets('[[a]] [[b|별칭]] [[a#제목]] `[[c]]`')).toEqual(['a', 'b']);
   });
 });
 
@@ -81,5 +94,6 @@ describe('remarkObsidian', () => {
 
 it('folderLabel은 정렬용 번호를 뗀다', () => {
   expect(folderLabel('01 이론')).toBe('이론');
+  expect(folderLabel('04 암기/플래시카드')).toBe('암기 › 플래시카드');
   expect(folderLabel('')).toBe('노트');
 });
