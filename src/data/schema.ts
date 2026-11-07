@@ -57,6 +57,11 @@ export const examSchema = z
           .strict(),
       )
       .default([]),
+    /** 이론 정리 노트(Obsidian 보관함). 파일은 exams/<시험 id>/theory/<폴더>/<노트>.md, home은 첫 화면 노트 이름 */
+    theory: z
+      .object({ title: text, description: z.string().optional(), home: text })
+      .strict()
+      .optional(),
     /** 고정된 문항 묶음(회차). 실전 모드는 회차를 골라 시작한다. scenarios가 없으면 무작위로 고른다. */
     sets: z
       .array(

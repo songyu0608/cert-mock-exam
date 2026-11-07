@@ -990,3 +990,238 @@ details.scenario > p {
   word-break: normal;
   line-break: strict;
 }
+
+/* 이론 노트: 위 한 줄 + 노트 목록(넓은 화면은 왼쪽 고정, 좁은 화면은 버튼으로 펼침) + 본문 */
+.theory {
+  --f-body:
+    'IBM Plex Sans KR', 'IBM Plex Sans JP', 'Apple SD Gothic Neo', 'Hiragino Sans', 'Malgun Gothic',
+    'Yu Gothic', system-ui, sans-serif;
+  font-family: var(--f-body);
+}
+.theory-body {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 28px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-right)) 72px max(16px, env(safe-area-inset-left));
+}
+.theory-nav {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  max-height: 100dvh;
+  overflow-y: auto;
+  padding: 16px 0;
+  font-size: 14px;
+}
+.theory-nav-toggle {
+  display: none;
+}
+.theory-search {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--sheet);
+  padding: 6px 10px;
+  margin-bottom: 10px;
+}
+.theory-nav details {
+  margin-bottom: 4px;
+}
+.theory-nav summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 3px 0;
+}
+.theory-list {
+  list-style: none;
+  margin: 0 0 6px;
+  padding: 0 0 0 12px;
+  border-left: 1px solid var(--line);
+}
+.theory-list a {
+  display: block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: var(--ink);
+  text-decoration: none;
+  line-height: 1.45;
+}
+.theory-list a:hover {
+  color: var(--accent);
+}
+.theory-list a[aria-current='page'] {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.theory-main {
+  min-width: 0;
+  padding-top: 20px;
+}
+@media (max-width: 860px) {
+  .theory-body {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .theory-nav {
+    position: static;
+    max-height: none;
+    padding: 12px 0 0;
+  }
+  .theory-nav-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .theory-nav-in {
+    display: none;
+    padding-top: 12px;
+  }
+  .theory-nav.open .theory-nav-in {
+    display: block;
+  }
+}
+
+/* 노트 본문 */
+.theory-note h1 {
+  margin: 4px 0 12px;
+}
+.theory-note h2 {
+  margin: 28px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+.theory-note h3 {
+  font-size: 16px;
+  margin: 20px 0 6px;
+}
+.theory-note table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 14px;
+}
+.theory-note th,
+.theory-note td {
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.theory-note th {
+  background: var(--soft);
+}
+.theory-note blockquote {
+  margin: 12px 0;
+  padding: 2px 14px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+.theory-note ul,
+.theory-note ol {
+  padding-left: 22px;
+}
+.theory-note li.task-list-item {
+  list-style: none;
+  margin-left: -22px;
+}
+.theory-props {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 18px;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.theory-props div {
+  display: flex;
+  gap: 6px;
+}
+.theory-props dt {
+  font-weight: 600;
+}
+.theory-props dd {
+  margin: 0;
+}
+.theory-backlinks {
+  margin-top: 36px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+.theory-backlinks h2 {
+  font-size: 14px;
+  border: 0;
+  margin: 0 0 4px;
+  color: var(--muted);
+}
+
+/* Obsidian callout */
+.callout {
+  --c: var(--muted);
+  --c-soft: var(--soft);
+  margin: 12px 0;
+  padding: 8px 14px;
+  border-left: 3px solid var(--c);
+  border-radius: 0 8px 8px 0;
+  background: var(--c-soft);
+}
+.callout > :last-child {
+  margin-bottom: 0;
+}
+.callout-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--c);
+}
+details.callout > summary.callout-title {
+  cursor: pointer;
+}
+details.callout[open] > summary.callout-title {
+  margin-bottom: 6px;
+}
+.callout > p:not(.callout-title) {
+  margin: 0 0 6px;
+}
+.callout-summary,
+.callout-info,
+.callout-note {
+  --c: var(--accent);
+  --c-soft: var(--accent-soft);
+}
+.callout-important,
+.callout-warning {
+  --c: var(--warn);
+  --c-soft: var(--warn-soft);
+}
+.callout-success,
+.callout-tip {
+  --c: var(--ok);
+  --c-soft: var(--ok-soft);
+}
+.callout-quote {
+  --c: var(--muted);
+  --c-soft: var(--sheet);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--c);
+}
+.callout-question,
+.callout-card {
+  --c: var(--ink);
+  --c-soft: var(--sheet);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+}
+.callout-card {
+  margin: 6px 0;
+  padding: 6px 12px;
+}
+.callout-card > summary.callout-title {
+  font-weight: 500;
+}
