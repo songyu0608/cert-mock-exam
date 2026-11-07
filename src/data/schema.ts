@@ -57,11 +57,23 @@ export const examSchema = z
           .strict(),
       )
       .default([]),
-    /** 이론 정리 노트(Obsidian 보관함). 파일은 exams/<시험 id>/theory/<폴더>/<노트>.md, home은 첫 화면 노트 이름 */
-    theory: z
-      .object({ title: text, description: z.string().optional(), home: text })
-      .strict()
-      .optional(),
+    /**
+     * 이론 정리 노트(Obsidian 보관함). 한 시험에 여러 개(예: 한국어판·일본어판)를 둘 수 있다.
+     * 파일은 exams/<시험 id>/theory/<id>/<폴더>/<노트>.md, home은 첫 화면 노트 이름, lang은 노트 본문 언어
+     */
+    theories: z
+      .array(
+        z
+          .object({
+            id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, '소문자, 숫자, 하이픈만 씁니다'),
+            title: text,
+            description: z.string().optional(),
+            home: text,
+            lang: z.enum(['ko', 'ja', 'en']).default('ko'),
+          })
+          .strict(),
+      )
+      .default([]),
     /** 고정된 문항 묶음(회차). 실전 모드는 회차를 골라 시작한다. scenarios가 없으면 무작위로 고른다. */
     sets: z
       .array(
@@ -77,6 +89,7 @@ export const examSchema = z
   })
   .strict();
 export type Exam = z.infer<typeof examSchema>;
+export type Theory = Exam['theories'][number];
 
 const base = {
   id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),

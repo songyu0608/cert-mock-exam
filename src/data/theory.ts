@@ -1,4 +1,4 @@
-// 이론 정리 노트: exams/<시험 id>/theory/<폴더>/<노트>.md
+// 이론 정리 노트: exams/<시험 id>/theory/<보관함 id>/<폴더>/<노트>.md
 // 파일은 정적 자산으로 내보내고, 이론 화면을 열 때 그 시험의 노트를 모두 받는다(검색·역링크에 전체가 필요).
 import { linkTargets, parseNote, type PropValue } from '../lib/theory.ts';
 
@@ -28,16 +28,19 @@ export interface Note {
 }
 
 const entries = Object.entries(files).flatMap(([path, url]) => {
-  const m = /\/exams\/([^/]+)\/theory\/(?:(.+)\/)?([^/]+)\.md$/.exec(path);
-  return m?.[1] && m[3] ? [{ examId: m[1], folder: m[2] ?? '', name: m[3], url }] : [];
+  const m = /\/exams\/([^/]+)\/theory\/([^/]+)\/(?:(.+)\/)?([^/]+)\.md$/.exec(path);
+  return m?.[1] && m[2] && m[4]
+    ? [{ examId: m[1], theoryId: m[2], folder: m[3] ?? '', name: m[4], url }]
+    : [];
 });
 
 const cache = new Map<string, Promise<Note[]>>();
 
-export function loadTheory(examId: string): Promise<Note[]> {
-  let p = cache.get(examId);
+export function loadTheory(examId: string, theoryId: string): Promise<Note[]> {
+  const key = `${examId}/${theoryId}`;
+  let p = cache.get(key);
   if (!p) {
-    const mine = entries.filter((e) => e.examId === examId);
+    const mine = entries.filter((e) => e.examId === examId && e.theoryId === theoryId);
     p = mine.length
       ? Promise.all(
           mine.map(async (e) => {
@@ -55,9 +58,9 @@ export function loadTheory(examId: string): Promise<Note[]> {
             };
           }),
         )
-      : Promise.reject(new Error(`이론 노트가 없습니다: ${examId}`));
-    p.catch(() => cache.delete(examId));
-    cache.set(examId, p);
+      : Promise.reject(new Error(`이론 노트가 없습니다: ${key}`));
+    p.catch(() => cache.delete(key));
+    cache.set(key, p);
   }
   return p;
 }

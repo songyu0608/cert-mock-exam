@@ -23,25 +23,30 @@ export function validateExamDir(dir: string): string[] {
       if (!existsSync(join(dir, 'guides', `${g.id}.html`)))
         errors.push(`exam.json guides: guides/${g.id}.html 파일이 없습니다`);
     }
-    if (exam.data.theory) errors.push(...checkTheory(join(dir, 'theory'), exam.data.theory.home));
+    const tids = new Set<string>();
+    for (const t of exam.data.theories) {
+      if (tids.has(t.id)) errors.push(`exam.json theories: id(${t.id})가 겹칩니다`);
+      tids.add(t.id);
+      errors.push(...checkTheory(join(dir, 'theory', t.id), t.home, t.id));
+    }
   }
   return errors;
 }
 
-/** 이론 노트: 폴더가 있고, 노트 이름([[링크]] 대상)이 겹치지 않고, 첫 화면 노트가 있어야 한다. */
-function checkTheory(dir: string, home: string): string[] {
-  if (!existsSync(dir)) return ['exam.json theory: theory 폴더가 없습니다'];
+/** 이론 노트(보관함 하나): 폴더가 있고, 노트 이름([[링크]] 대상)이 겹치지 않고, 첫 화면 노트가 있어야 한다. */
+function checkTheory(dir: string, home: string, id: string): string[] {
+  if (!existsSync(dir)) return [`exam.json theories: theory/${id} 폴더가 없습니다`];
   const errors: string[] = [];
   const names = new Map<string, string>();
   for (const f of readdirSync(dir, { recursive: true, encoding: 'utf8' })) {
     if (!f.endsWith('.md')) continue;
     const name = basename(f, '.md').toLowerCase();
     const prev = names.get(name);
-    if (prev) errors.push(`theory: 노트 이름이 겹칩니다(${prev}, ${f})`);
+    if (prev) errors.push(`theory/${id}: 노트 이름이 겹칩니다(${prev}, ${f})`);
     names.set(name, f);
   }
   if (!names.has(home.toLowerCase()))
-    errors.push(`exam.json theory: 첫 화면 노트(${home}.md)가 없습니다`);
+    errors.push(`exam.json theories: theory/${id}에 첫 화면 노트(${home}.md)가 없습니다`);
   return errors;
 }
 

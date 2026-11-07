@@ -12,28 +12,28 @@ exams/
     exam.json
     questions.json
     guides/official-guide.html   # 선택: 읽기 자료
-    theory/01 이론/1.1 ….md      # 선택: 이론 노트(Obsidian 보관함)
+    theory/ko/01 이론/1.1 ….md   # 선택: 이론 노트(Obsidian 보관함, 보관함 id별 폴더)
 ```
 
 ## exam.json
 
-| 필드           | 필수   | 의미                                                                                                                                                                         |
-| -------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`           | 예     | 폴더 이름과 같아야 함. 소문자·숫자·하이픈                                                                                                                                    |
-| `vendor`       | 예     | 목록에서 묶는 기준(`aws`, `github`, `anthropic` 등)                                                                                                                          |
-| `code`, `name` | 예     | 시험 코드와 이름                                                                                                                                                             |
-| `level`        | 아니요 | 예: `Foundational`                                                                                                                                                           |
-| `domains[]`    | 예     | `{ id: "1", name, weight }`. `weight`는 실전 모드 출제 비율(%)                                                                                                               |
-| `mock`         | 예     | `{ questions, minutes, passPercent, questionChoices, scenarios? }`. `questionChoices`(예: `[50, 65, 85]`)가 있으면 문항 수를 고르고 시간은 비례                              |
-| `types`        | 예     | 이 시험에서 허용하는 문항 유형. 목록에 없는 유형이 있으면 검사 실패                                                                                                          |
-| `scoring`      | 아니요 | `all-or-nothing`(기본) 또는 `partial`                                                                                                                                        |
-| `facts[]`      | 아니요 | 시험 홈 상단 요약 `{ value, label }`                                                                                                                                         |
-| `sources[]`    | 아니요 | 시험 형식 출처 `{ label, url, checked }`                                                                                                                                     |
-| `notes`        | 아니요 | 시험 홈 설명                                                                                                                                                                 |
-| `scenarios[]`  | 아니요 | 문항이 딸린 공통 지문 `{ id: "1", name, description }`. 문항의 `scenarioId`가 가리킨다                                                                                       |
-| `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios? }`. 실전 모드는 회차를 골라 시작한다. `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다                                               |
-| `guides[]`     | 아니요 | 읽기 자료 `{ id, title, description? }`. 파일은 `guides/<id>.html`(완결된 HTML 한 장). 첫 화면 "가이드" 탭과 시험 홈에 링크가 생긴다                                         |
-| `theory`       | 아니요 | 이론 노트 `{ title, description?, home }`. 파일은 `theory/<폴더>/<노트>.md`(Obsidian 보관함 그대로), `home`은 첫 화면 노트 이름. 첫 화면 "이론" 탭과 시험 홈에 링크가 생긴다 |
+| 필드           | 필수   | 의미                                                                                                                                                                                                                                                                                                  |
+| -------------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`           | 예     | 폴더 이름과 같아야 함. 소문자·숫자·하이픈                                                                                                                                                                                                                                                             |
+| `vendor`       | 예     | 목록에서 묶는 기준(`aws`, `github`, `anthropic` 등)                                                                                                                                                                                                                                                   |
+| `code`, `name` | 예     | 시험 코드와 이름                                                                                                                                                                                                                                                                                      |
+| `level`        | 아니요 | 예: `Foundational`                                                                                                                                                                                                                                                                                    |
+| `domains[]`    | 예     | `{ id: "1", name, weight }`. `weight`는 실전 모드 출제 비율(%)                                                                                                                                                                                                                                        |
+| `mock`         | 예     | `{ questions, minutes, passPercent, questionChoices, scenarios? }`. `questionChoices`(예: `[50, 65, 85]`)가 있으면 문항 수를 고르고 시간은 비례                                                                                                                                                       |
+| `types`        | 예     | 이 시험에서 허용하는 문항 유형. 목록에 없는 유형이 있으면 검사 실패                                                                                                                                                                                                                                   |
+| `scoring`      | 아니요 | `all-or-nothing`(기본) 또는 `partial`                                                                                                                                                                                                                                                                 |
+| `facts[]`      | 아니요 | 시험 홈 상단 요약 `{ value, label }`                                                                                                                                                                                                                                                                  |
+| `sources[]`    | 아니요 | 시험 형식 출처 `{ label, url, checked }`                                                                                                                                                                                                                                                              |
+| `notes`        | 아니요 | 시험 홈 설명                                                                                                                                                                                                                                                                                          |
+| `scenarios[]`  | 아니요 | 문항이 딸린 공통 지문 `{ id: "1", name, description }`. 문항의 `scenarioId`가 가리킨다                                                                                                                                                                                                                |
+| `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios? }`. 실전 모드는 회차를 골라 시작한다. `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다                                                                                                                                                                        |
+| `guides[]`     | 아니요 | 읽기 자료 `{ id, title, description? }`. 파일은 `guides/<id>.html`(완결된 HTML 한 장). 첫 화면 "가이드" 탭과 시험 홈에 링크가 생긴다                                                                                                                                                                  |
+| `theories[]`   | 아니요 | 이론 노트 보관함 `{ id, title, description?, home, lang? }`. 파일은 `theory/<id>/<폴더>/<노트>.md`(Obsidian 보관함 그대로), `home`은 첫 화면 노트 이름, `lang`(`ko` 기본, `ja`, `en`)은 본문 언어. 한 시험에 여러 개(예: 한국어판·일본어판)를 둘 수 있다. 첫 화면 "이론" 탭과 시험 홈에 링크가 생긴다 |
 
 ## questions.json
 
@@ -70,7 +70,8 @@ exams/
 `theory/` 아래 마크다운은 Obsidian 보관함을 그대로 넣는다(Prettier도 건드리지 않는다). 화면에 그릴 때만 다음을 바꾼다. 코드는 `src/lib/theory.ts`.
 
 - 머리말(`aliases`, `tags` 등) → 본문 위 속성 줄. `aliases`는 노트 찾기에도 쓴다
-- `[[노트]]`, `[[노트|보일 글자]]` → 사이트 안 링크(`/theory/<시험 id>/<노트>`). 노트 이름은 폴더와 상관없이 겹치면 안 된다(`pnpm validate`가 검사)
+- `[[노트]]`, `[[노트|보일 글자]]` → 사이트 안 링크(`/theory/<시험 id>/<보관함 id>/<노트>`). 노트 이름은 한 보관함 안에서 폴더와 상관없이 겹치면 안 된다(`pnpm validate`가 검사). 예전 주소 `/theory/<시험 id>/<노트>`는 첫 보관함의 노트로 연다
+- `[[노트#제목]]` → 그 노트의 제목 위치로 가는 링크. 제목 id는 제목 글자의 공백을 `-`로 바꾼 것
 - `> [!type]` callout → 상자, `> [!type]-`는 접는 상자
 - `질문::답` 한 줄(Spaced Repetition 플래시카드) → 눌러서 답을 보는 카드
 - 문단 안 줄바꿈 → 줄바꿈 그대로(Obsidian 기본값)

@@ -66,6 +66,9 @@ export function linkTargets(body: string): string[] {
   return [...out];
 }
 
+/** 제목의 id(= [[노트#제목]] 링크의 # 뒤). 공백을 하이픈으로 바꾼다. */
+export const headingId = (text: string) => text.trim().replace(/\s+/g, '-');
+
 const escapeMd = (s: string) => s.replace(/([\\[\]*_`<>])/g, '\\$1');
 
 /**
@@ -90,7 +93,9 @@ export function toMarkdown(body: string, resolve: (name: string) => string | und
           : part.replace(WIKILINK, (_all, inner: string) => {
               const { name, heading, alias } = splitLink(inner);
               const text = escapeMd(alias ?? (heading ? `${name} > ${heading}` : name));
-              const href = name ? resolve(name) : undefined;
+              const base = name ? resolve(name) : undefined;
+              const href =
+                base && heading ? `${base}#${encodeURIComponent(headingId(heading))}` : base;
               return href ? `[${text}](<${href}>)` : text;
             }),
       )
@@ -200,9 +205,30 @@ function breaks(node: MdNode): void {
   node.children = next;
 }
 
+const textOf = (n: MdNode): string => n.value ?? (n.children ?? []).map(textOf).join('');
+
+/** 제목마다 id를 붙인다. 같은 제목이 또 나오면 -1, -2를 붙인다. */
+function headingIds(tree: MdNode): void {
+  const seen = new Map<string, number>();
+  const visit = (n: MdNode) => {
+    if (n.type === 'heading') {
+      const base = headingId(textOf(n));
+      const k = seen.get(base) ?? 0;
+      seen.set(base, k + 1);
+      n.data = {
+        ...n.data,
+        hProperties: { ...n.data?.hProperties, id: k ? `${base}-${k}` : base },
+      };
+    }
+    n.children?.forEach(visit);
+  };
+  visit(tree);
+}
+
 export function remarkObsidian() {
   return (tree: MdNode) => {
     walk(tree);
+    headingIds(tree);
     breaks(tree);
   };
 }

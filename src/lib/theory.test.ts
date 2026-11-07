@@ -48,6 +48,12 @@ describe('toMarkdown', () => {
     );
   });
 
+  it('[[노트#제목]]은 제목 id로 가는 링크', () => {
+    expect(toMarkdown('[[개념 A#문제 1|1번]] [[개념 A#문제 2]]', resolve)).toBe(
+      '[1번](</theory/x/%EA%B0%9C%EB%85%90%20A#%EB%AC%B8%EC%A0%9C-1>) [개념 A \\> 문제 2](</theory/x/%EA%B0%9C%EB%85%90%20A#%EB%AC%B8%EC%A0%9C-2>)',
+    );
+  });
+
   it('표 안의 [[노트|별칭]]도 칸을 나누지 않는다', () => {
     const html = render(toMarkdown('| a | b |\n|---|---|\n| 1 | [[1.1 핵심|1.1]], x |', resolve));
     expect(html).toContain('<td><a href="/theory/x/1.1%20%ED%95%B5%EC%8B%AC">1.1</a>, x</td>');
@@ -84,6 +90,12 @@ describe('remarkObsidian', () => {
       '<div class="callout callout-warning"><p class="callout-title"><strong>함정</strong></p></div>',
     );
     expect(render('> [!tip]\n> 본문')).toContain('<p class="callout-title">팁</p>');
+  });
+
+  it('제목에 id를 붙이고, 겹치면 번호를 붙인다', () => {
+    expect(render('## 문제 1\n### **굵은** 제목\n## 문제 1')).toBe(
+      '<h2 id="문제-1">문제 1</h2><h3 id="굵은-제목"><strong>굵은</strong> 제목</h3><h2 id="문제-1-1">문제 1</h2>',
+    );
   });
 
   it('일반 인용과 문단 안 줄바꿈', () => {

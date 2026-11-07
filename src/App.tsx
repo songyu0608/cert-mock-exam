@@ -9,12 +9,24 @@ import { SessionPage } from './pages/SessionPage.tsx';
 import { SettingsPage } from './pages/SettingsPage.tsx';
 import { TheoryList } from './pages/TheoryList.tsx';
 import { startAutoSync } from './lib/sync.ts';
-import { onLinkClick, paths, useRoute } from './router.ts';
+import type { Exam } from './data/schema.ts';
+import { onLinkClick, paths, useRoute, type Route } from './router.ts';
 
 // 이론 화면(마크다운 노트 읽기)은 열 때만 내려받는다.
 const TheoryView = lazy(() =>
   import('./pages/TheoryView.tsx').then((m) => ({ default: m.TheoryView })),
 );
+
+/**
+ * 이론 주소에서 보관함과 노트를 고른다. 보관함 id가 없거나 모르는 값이면 첫 보관함으로 보고,
+ * 모르는 값은 예전 주소(/theory/<시험>/<노트>)의 노트 이름으로 쓴다.
+ */
+function theoryOf(exam: Exam | undefined, route: Route) {
+  if (!exam || route.name !== 'theory' || !exam.theories.length) return undefined;
+  const found = exam.theories.find((t) => t.id === route.theoryId);
+  if (found) return { theory: found, note: route.note };
+  return { theory: exam.theories[0]!, note: route.theoryId };
+}
 
 export function App() {
   const route = useRoute();
@@ -25,11 +37,11 @@ export function App() {
   useEffect(() => {
     const guide =
       route.name === 'guide' ? exam?.guides.find((g) => g.id === route.guideId) : undefined;
-    const theory = route.name === 'theory' ? exam?.theory : undefined;
+    const theory = theoryOf(exam, route);
     document.title = guide
       ? `${exam?.code} ${guide.title} · 자격증 모의고사`
-      : theory && route.name === 'theory'
-        ? `${route.note ?? theory.title} · ${exam?.code} 이론 · 자격증 모의고사`
+      : theory
+        ? `${theory.note ?? theory.theory.title} · ${exam?.code} 이론 · 자격증 모의고사`
         : exam
           ? `${exam.code} · 자격증 모의고사`
           : '자격증 모의고사';
@@ -53,10 +65,16 @@ export function App() {
   if (exam && route.name === 'guide')
     return <GuideView key={`${exam.id}/${route.guideId}`} exam={exam} guideId={route.guideId} />;
   if (route.name === 'theories') return <TheoryList />;
-  if (exam?.theory && route.name === 'theory')
+  const theory = theoryOf(exam, route);
+  if (exam && theory)
     return (
       <Suspense fallback={<main className="wrap muted">불러오는 중…</main>}>
-        <TheoryView key={exam.id} exam={exam} note={route.note} />
+        <TheoryView
+          key={`${exam.id}/${theory.theory.id}`}
+          exam={exam}
+          theory={theory.theory}
+          note={theory.note}
+        />
       </Suspense>
     );
   if (exam && route.name === 'exam') return <ExamHome key={exam.id} exam={exam} />;
