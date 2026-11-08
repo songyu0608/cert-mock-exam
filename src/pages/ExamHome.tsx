@@ -9,6 +9,7 @@ import {
   mockMinutes,
   pickMockQuestions,
   pickScenarioMock,
+  pickSetMock,
   sessionLabel,
   type Mode,
 } from '../lib/session.ts';
@@ -68,6 +69,14 @@ export function ExamHome({ exam }: { exam: Exam }) {
     [exam, data, stats],
   );
 
+  // 회차별 문항 수(하위 문항까지 센다)
+  const setSizes = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const q of data?.questions ?? [])
+      if (q.set !== undefined) out[q.set] = (out[q.set] ?? 0) + flattenQuestion(q).length;
+    return out;
+  }, [data]);
+
   // 회차별 정답률(문항마다 마지막으로 푼 결과)
   const setRates = useMemo(() => {
     const out: Record<string, number | null> = {};
@@ -94,6 +103,11 @@ export function ExamHome({ exam }: { exam: Exam }) {
         .filter(Boolean)
         .join(' · ');
       s = createSession(exam, picked.questions, 'mock', { minutes: exam.mock.minutes, label });
+    } else if (mode === 'mock' && setId !== undefined) {
+      const picked = pickSetMock(exam, data.questions, setId);
+      const n = picked.flatMap(flattenQuestion).length;
+      const label = exam.sets.find((x) => x.id === setId)?.name;
+      s = createSession(exam, picked, 'mock', { minutes: mockMinutes(exam, n), label });
     } else if (mode === 'mock') {
       const picked = pickMockQuestions(exam, data.questions, mockN);
       s = createSession(exam, picked, 'mock', { minutes: mockMinutes(exam, mockN) });
@@ -210,10 +224,15 @@ export function ExamHome({ exam }: { exam: Exam }) {
               문항을 시나리오별로 묶어 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에
               채점합니다.
             </p>
+          ) : exam.sets.length > 0 ? (
+            <p>
+              회차마다 정해진 문항을 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에
+              채점합니다.
+            </p>
           ) : (
             <p>도메인 비중대로 출제하고 시간을 잽니다. 끝까지 풀고 제출하면 한꺼번에 채점합니다.</p>
           )}
-          {scenarioExam && exam.sets.length > 0 ? (
+          {exam.sets.length > 0 ? (
             <>
               <p className="small">
                 {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
@@ -230,9 +249,11 @@ export function ExamHome({ exam }: { exam: Exam }) {
                       {st.name} 시작
                     </button>
                     <span className="small muted">
-                      {st.scenarios
-                        ? `시나리오 ${st.scenarios.join('·')}`
-                        : `시나리오 ${exam.mock.scenarios}개 무작위`}
+                      {!scenarioExam
+                        ? `${setSizes[st.id] ?? 0}문항 고정`
+                        : st.scenarios
+                          ? `시나리오 ${st.scenarios.join('·')}`
+                          : `시나리오 ${exam.mock.scenarios}개 무작위`}
                       {setRates[st.id] != null && ` · 정답률 ${setRates[st.id]}%`}
                     </span>
                   </div>
@@ -259,7 +280,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
               {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
             </p>
           )}
-          {!(scenarioExam && exam.sets.length > 0) && (
+          {!exam.sets.length && (
             <div className="row">
               <button
                 type="button"

@@ -13,9 +13,9 @@ exams/
     questions.json
     guides/official-guide.html   # 선택: 읽기 자료
     theory/ko/01 이론/1.1 ….md   # 선택: 이론 노트(Obsidian 보관함, 보관함 id별 폴더)
-  anthropic-ccar-p/
+  github-gh-200/
     exam.json                    # questions.json 없음: 읽기 자료만 있는 시험
-    theory/ko/…, theory/ja/…
+    theory/ko/…
 ```
 
 `questions.json`이 없는 시험은 읽기 자료(가이드·이론)만 있는 시험으로 본다. `guides`나 `theories`가 하나는 있어야 하고, 모의고사 목록에는 나오지 않으며 시험 주소(`/exam/<id>`)로 들어오면 읽기 자료로 안내한다. `exam.json`의 다른 필드(도메인, `mock` 등)는 그대로 채워 둔다.
@@ -36,7 +36,7 @@ exams/
 | `sources[]`    | 아니요 | 시험 형식 출처 `{ label, url, checked }`                                                                                                                                                                                                                                                              |
 | `notes`        | 아니요 | 시험 홈 설명                                                                                                                                                                                                                                                                                          |
 | `scenarios[]`  | 아니요 | 문항이 딸린 공통 지문 `{ id: "1", name, description }`. 문항의 `scenarioId`가 가리킨다                                                                                                                                                                                                                |
-| `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios? }`. 실전 모드는 회차를 골라 시작한다. `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다                                                                                                                                                                        |
+| `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios? }`. 실전 모드는 회차를 골라 시작한다. 시나리오형 시험에서 `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다. 시나리오가 없는 시험의 회차는 고정 세트                                                                                                           |
 | `guides[]`     | 아니요 | 읽기 자료 `{ id, title, description? }`. 파일은 `guides/<id>.html`(완결된 HTML 한 장). 첫 화면 "가이드" 탭과 시험 홈에 링크가 생긴다                                                                                                                                                                  |
 | `theories[]`   | 아니요 | 이론 노트 보관함 `{ id, title, description?, home, lang? }`. 파일은 `theory/<id>/<폴더>/<노트>.md`(Obsidian 보관함 그대로), `home`은 첫 화면 노트 이름, `lang`(`ko` 기본, `ja`, `en`)은 본문 언어. 한 시험에 여러 개(예: 한국어판·일본어판)를 둘 수 있다. 첫 화면 "이론" 탭과 시험 홈에 링크가 생긴다 |
 
@@ -89,6 +89,8 @@ exams/
 - `sets`가 있으면 회차를 골라 시작하고, 그 회차의 문항만 쓴다. 회차의 `scenarios`가 있으면 그 시나리오로 고정, 없으면 무작위로 고른다.
 - 연습 모드는 회차와 도메인으로 고른다.
 - `pnpm validate`는 시나리오·회차 id와, 고를 수 있는 시나리오마다 문항이 충분한지 검사한다.
+
+`mock.scenarios` 없이 `sets`만 있으면 회차는 고정 세트다(예: CCAR-P 1~5회 × 63문항). 실전은 고른 회차의 문항을 모두 섞어서 내고, 시간은 `mock.minutes`를 문항 수에 비례해 정한다. 회차에 `scenarios`를 쓸 수 없고, 회차마다 문항이 하나 이상 있어야 한다.
 
 ## 채점
 

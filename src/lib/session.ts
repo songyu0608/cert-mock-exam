@@ -167,6 +167,21 @@ export function pickScenarioMock(
   return { questions: picked, scenarios: chosen };
 }
 
+/** 시나리오 없는 시험의 고정 회차: 그 회차의 문항을 모두 섞어서 낸다. */
+export function pickSetMock(
+  exam: Exam,
+  questions: Question[],
+  setId: string,
+  rng: Rng = Math.random,
+): Question[] {
+  if (!exam.sets.some((s) => s.id === setId))
+    throw new Error(`${exam.id}: 회차 ${setId}이 없습니다`);
+  return shuffle(
+    questions.filter((q) => q.set === setId),
+    rng,
+  );
+}
+
 /** 문항 수를 고르는 시험은 시간을 문항 수에 비례해 정한다. */
 export function mockMinutes(exam: Exam, n: number): number {
   return Math.round((exam.mock.minutes * n) / exam.mock.questions);
