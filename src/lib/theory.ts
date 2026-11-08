@@ -72,6 +72,28 @@ export const headingId = (text: string) => text.trim().replace(/\s+/g, '-');
 const escapeMd = (s: string) => s.replace(/([\\[\]*_`<>])/g, '\\$1');
 
 /**
+ * 플래시카드 한 줄(질문::답)을 질문과 답으로 나눈다. 카드가 아니면 undefined.
+ * - 인용·표·제목·목록 줄은 카드가 아니다.
+ * - 구분자는 인라인 코드 밖의 첫 `::`. `질문::답`처럼 코드 안에만 있으면(형식 설명) 카드가 아니다.
+ * - 그 `::` 바로 앞뒤가 공백이거나 줄 처음이면 본문이다(예: `::error::·::debug:: 명령으로`).
+ */
+function splitCard(line: string): [string, string] | undefined {
+  if (/^[\s>|#*-]/.test(line)) return undefined;
+  let pos = 0;
+  for (const [i, part] of line.split(/(`[^`]*`)/).entries()) {
+    const k = i % 2 ? -1 : part.indexOf('::');
+    if (k >= 0) {
+      const q = line.slice(0, pos + k);
+      const a = line.slice(pos + k + 2);
+      // 답이 `> [!WARNING]`처럼 >로 시작하면 인용·상자가 되지 않게 글자로 둔다.
+      return /\S$/.test(q) && /^\S/.test(a) ? [q, a.replace(/^>/, '\\>')] : undefined;
+    }
+    pos += part.length;
+  }
+  return undefined;
+}
+
+/**
  * Obsidian 본문을 react-markdown에 넘길 마크다운으로 바꾼다.
  * resolve는 노트 이름을 받아 사이트 주소를 돌려준다. 없는 노트면 글자만 남긴다.
  */
@@ -100,11 +122,10 @@ export function toMarkdown(body: string, resolve: (name: string) => string | und
             }),
       )
       .join('');
-    // 플래시카드 한 줄: 질문::답. 인용·표·제목·목록 줄과 `코드`가 든 줄(형식 설명)은 건드리지 않는다.
-    const card = /^(?![\s>|#*-])([^`]*?\S)::(\S[^`]*)$/.exec(linked);
-    if (card?.[1] && card[2]) {
+    const card = splitCard(linked);
+    if (card) {
       if (out.length && out.at(-1)?.trim()) out.push('');
-      out.push(`> [!card]- ${card[1]}`, `> ${card[2]}`, '');
+      out.push(`> [!card]- ${card[0]}`, `> ${card[1]}`, '');
       continue;
     }
     out.push(linked);

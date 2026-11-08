@@ -92,5 +92,13 @@
       "title": "공식 스터디 가이드",
       "description": "한국어(기계 번역)·日本語·English 공식판 / 한·日 대조 (Microsoft Learn 공식 원문)"
     }
+  ],
+  "theories": [
+    {
+      "id": "ko",
+      "title": "이론 정리",
+      "home": "GH-900 대시보드",
+      "lang": "ko"
+    }
   ]
 }
