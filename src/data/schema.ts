@@ -258,7 +258,14 @@ function checkScenarios(exam: Exam, questions: Question[]): string[] {
   }
   const pick = exam.mock.scenarios;
   if (!pick) {
-    if (exam.sets.length) errors.push('sets를 쓰려면 mock.scenarios가 필요합니다');
+    // 시나리오 없는 시험의 회차는 고정 세트다. 실전은 그 회차의 문항을 모두 낸다.
+    if (exam.sets.length && exam.mock.questionChoices)
+      errors.push('sets와 questionChoices는 함께 쓸 수 없습니다');
+    for (const s of exam.sets) {
+      if (s.scenarios)
+        errors.push(`회차 ${s.id}: mock.scenarios가 없는 시험은 scenarios를 쓸 수 없습니다`);
+      if (!questions.some((q) => q.set === s.id)) errors.push(`회차 ${s.id}에 문항이 없습니다`);
+    }
     return errors;
   }
   if (exam.mock.questions % pick !== 0)

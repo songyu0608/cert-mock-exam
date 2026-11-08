@@ -9,6 +9,7 @@ import {
   mockMinutes,
   pickMockQuestions,
   pickScenarioMock,
+  pickSetMock,
   sessionLabel,
 } from './session.ts';
 
@@ -141,5 +142,36 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
   it('시나리오 문항 수가 모자라면 형식 검사가 알려 준다', () => {
     const broken = questions.filter((q) => !(q.set === '2' && q.scenarioId === '1')).slice();
     expect(crossCheck(exam, broken).join('\n')).toContain('회차 2: 시나리오 1의 문항이 0개');
+  });
+});
+
+describe('고정 회차 실전 출제(anthropic-ccar-p, 시나리오 없음)', () => {
+  const { exam, questions } = load('anthropic-ccar-p');
+
+  it('형식 검사를 통과하고, 회차마다 실전 문항 수만큼 있다', () => {
+    expect(crossCheck(exam, questions)).toEqual([]);
+    for (const st of exam.sets)
+      expect(questions.filter((q) => q.set === st.id)).toHaveLength(exam.mock.questions);
+  });
+
+  it('그 회차의 문항을 모두 섞어서 낸다', () => {
+    for (const st of exam.sets) {
+      const picked = pickSetMock(exam, questions, st.id);
+      expect(picked).toHaveLength(exam.mock.questions);
+      expect(picked.every((q) => q.set === st.id)).toBe(true);
+      expect(new Set(picked.map((q) => q.id)).size).toBe(picked.length);
+    }
+    expect(mockMinutes(exam, exam.mock.questions)).toBe(exam.mock.minutes);
+    expect(() => pickSetMock(exam, questions, '9')).toThrow();
+  });
+
+  it('시나리오 없는 시험의 회차에 scenarios를 쓰면 검사에서 걸린다', () => {
+    const bad = { ...exam, sets: [{ id: '1', name: '1회', scenarios: ['1'] }] };
+    expect(
+      crossCheck(
+        bad,
+        questions.filter((q) => q.set === '1'),
+      ),
+    ).toContain('회차 1: mock.scenarios가 없는 시험은 scenarios를 쓸 수 없습니다');
   });
 });
