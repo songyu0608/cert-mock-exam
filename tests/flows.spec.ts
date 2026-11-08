@@ -301,12 +301,15 @@ test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동�
   await expect(page.locator('#問題-2')).toBeInViewport();
 });
 
-test('문항 없이 이론만 있는 시험(CCAR-P)은 이론 탭에만 보인다', async ({ page }) => {
+test('문항 없이 이론만 있는 시험(CCAR-P, GH-200)은 이론 탭에만 보인다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('link', { name: /CCAR-F/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /CCAR-P/ })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /GH-200/ })).toHaveCount(0);
   await page.goto('/theory');
   await expect(page.getByRole('link', { name: /CCAR-P/ })).toHaveCount(2);
+  for (const code of ['GH-200', 'GH-300', 'GH-900'])
+    await expect(page.getByRole('link', { name: new RegExp(code) })).toHaveCount(1);
   // 시험 주소로 들어오면 읽기 자료로 안내한다.
   await page.goto('/exam/anthropic-ccar-p');
   await expect(page.getByText('아직 모의고사 문항이 없습니다', { exact: false })).toBeVisible();

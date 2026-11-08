@@ -66,6 +66,17 @@ describe('toMarkdown', () => {
     );
   });
 
+  it('카드 답에 `코드`가 있어도 카드, 본문의 ::명령::은 카드가 아니다', () => {
+    expect(toMarkdown('터미널?::Copilot CLI(`copilot`)', resolve)).toBe(
+      '> [!card]- 터미널?\n> Copilot CLI(`copilot`)\n',
+    );
+    expect(toMarkdown('경고 문법?::> [!WARNING] 등', resolve)).toBe(
+      '> [!card]- 경고 문법?\n> \\> [!WARNING] 등\n',
+    );
+    for (const line of ['::warning::·::error:: 명령을 쓴다.', '파일과 ::error::·::debug:: 명령'])
+      expect(toMarkdown(line, resolve)).toBe(line);
+  });
+
   it('인라인 코드 안의 [[링크]]는 글자 그대로 둔다', () => {
     expect(toMarkdown('| `[[링크]]` | [[개념 A]] |', resolve)).toBe(
       '| `[[링크]]` | [개념 A](</theory/x/%EA%B0%9C%EB%85%90%20A>) |',

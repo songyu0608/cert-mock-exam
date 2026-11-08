@@ -1,0 +1,32 @@
+{
+  "id": "github-gh-200",
+  "vendor": "github",
+  "code": "GH-200",
+  "name": "GitHub Actions",
+  "lang": "ko",
+  "level": "Intermediate",
+  "domains": [
+    { "id": "1", "name": "워크플로 작성과 관리", "weight": 22.5 },
+    { "id": "2", "name": "워크플로 사용과 문제 해결", "weight": 17.5 },
+    { "id": "3", "name": "액션 작성과 유지 관리", "weight": 17.5 },
+    { "id": "4", "name": "엔터프라이즈의 GitHub Actions 관리", "weight": 22.5 },
+    { "id": "5", "name": "자동화 보안과 최적화", "weight": 12.5 }
+  ],
+  "mock": { "questions": 60, "minutes": 100, "passPercent": 70 },
+  "types": ["single", "multi"],
+  "facts": [
+    { "value": "100분", "label": "시험 시간" },
+    { "value": "700 / 1000", "label": "합격 환산 점수" },
+    { "value": "미기재", "label": "공식 문항 수" },
+    { "value": "5 / 53", "label": "도메인 / 목표" }
+  ],
+  "sources": [
+    {
+      "label": "GH-200 스터디 가이드",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/gh-200",
+      "checked": "2026-11-08"
+    }
+  ],
+  "notes": "아직 모의고사 문항은 없고 이론 노트만 있습니다. 시험 정보는 이론 노트(Microsoft Learn 스터디 가이드, 2026-11-08 확인)를 따릅니다. 도메인 비중은 공식 범위의 중간값이고, mock 문항 수 60은 공식 값이 없어 넣은 자리 값입니다.",
+  "theories": [{ "id": "ko", "title": "이론 정리", "home": "GH-200 대시보드", "lang": "ko" }]
+}
