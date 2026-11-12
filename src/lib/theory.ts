@@ -2,6 +2,7 @@
 // 원본 파일은 고치지 않고, 화면에 그릴 때만 Obsidian 문법을 일반 마크다운·HTML 요소로 옮긴다.
 //   - 머리말(YAML frontmatter) → 속성 목록
 //   - [[노트]], [[노트|보일 글자]] → 사이트 안 링크
+//   - ![[그림.svg]] → 같은 보관함 assets 폴더의 그림
 //   - 질문::답 (Spaced Repetition 플래시카드) → 눌러서 답을 보는 카드
 //   - > [!type]- 제목 (callout) → 상자, '-'/'+'가 붙으면 접는 상자(details)
 //   - 문단 안 줄바꿈 → 줄바꿈 그대로(Obsidian 기본 설정과 같게)
@@ -56,14 +57,46 @@ function splitLink(inner: string): { name: string; heading?: string; alias?: str
   return { name, heading, alias };
 }
 
-/** 본문이 가리키는 노트 이름 목록(겹침 없음) */
-export function linkTargets(body: string): string[] {
-  const out = new Set<string>();
-  for (const m of body.replace(/`[^`\n]*`/g, '').matchAll(WIKILINK)) {
-    const { name } = splitLink(m[1] ?? '');
-    if (name) out.add(name);
+/** 코드 예시 안의 링크는 렌더링·역링크·그림 검사에서 모두 무시한다. */
+function* noteLines(body: string) {
+  let fence = '';
+  for (const line of body.split('\n')) {
+    const marker = /^\s*(`{3,}|~{3,})/.exec(line)?.[1];
+    const code = !!(fence || marker);
+    if (!fence) fence = marker ?? '';
+    else if (marker?.startsWith(fence) && line.trim() === marker) fence = '';
+    yield { line, code };
   }
-  return [...out];
+}
+
+function mapLinks(
+  line: string,
+  visit: (link: ReturnType<typeof splitLink>, image: boolean) => string,
+) {
+  return line
+    .split(/(`[^`]*`)/)
+    .map((part, i) =>
+      i % 2
+        ? part
+        : part.replace(WIKILINK, (all, inner: string) => {
+            const link = splitLink(inner);
+            return visit(link, all.startsWith('!') && link.name.endsWith('.svg'));
+          }),
+    )
+    .join('');
+}
+
+export function noteTargets(body: string) {
+  const notes = new Set<string>();
+  const images = new Set<string>();
+  for (const { line, code } of noteLines(body)) {
+    if (!code && line.includes('[['))
+      mapLinks(line, ({ name }, image) => {
+        if (name) (image ? images : notes).add(name);
+        return '';
+      });
+  }
+  return { notes: [...notes], images: [...images] };
 }
 
 /** 제목의 id(= [[노트#제목]] 링크의 # 뒤). 공백을 하이픈으로 바꾼다. */
@@ -97,31 +130,27 @@ function splitCard(line: string): [string, string] | undefined {
  * Obsidian 본문을 react-markdown에 넘길 마크다운으로 바꾼다.
  * resolve는 노트 이름을 받아 사이트 주소를 돌려준다. 없는 노트면 글자만 남긴다.
  */
-export function toMarkdown(body: string, resolve: (name: string) => string | undefined): string {
+export function toMarkdown(
+  body: string,
+  resolve: (name: string) => string | undefined,
+  resolveImage?: (name: string) => { url: string; alt: string } | undefined,
+): string {
   const out: string[] = [];
-  let fence = false;
-  for (const line of body.split('\n')) {
-    if (/^\s*(```|~~~)/.test(line)) fence = !fence;
-    if (fence) {
+  for (const { line, code } of noteLines(body)) {
+    if (code) {
       out.push(line);
       continue;
     }
-    // `[[링크]]`처럼 인라인 코드 안에 있는 것은 글자 그대로 둔다.
-    const linked = line
-      .split(/(`[^`]*`)/)
-      .map((part, i) =>
-        i % 2
-          ? part
-          : part.replace(WIKILINK, (_all, inner: string) => {
-              const { name, heading, alias } = splitLink(inner);
-              const text = escapeMd(alias ?? (heading ? `${name} > ${heading}` : name));
-              const base = name ? resolve(name) : undefined;
-              const href =
-                base && heading ? `${base}#${encodeURIComponent(headingId(heading))}` : base;
-              return href ? `[${text}](<${href}>)` : text;
-            }),
-      )
-      .join('');
+    const linked = mapLinks(line, ({ name, heading, alias }, image) => {
+      if (image) {
+        const asset = resolveImage?.(name);
+        return asset ? `![${escapeMd(asset.alt)}](<${asset.url}>)` : escapeMd(name);
+      }
+      const text = escapeMd(alias ?? (heading ? `${name} > ${heading}` : name));
+      const base = name ? resolve(name) : undefined;
+      const href = base && heading ? `${base}#${encodeURIComponent(headingId(heading))}` : base;
+      return href ? `[${text}](<${href}>)` : text;
+    });
     const card = splitCard(linked);
     if (card) {
       if (out.length && out.at(-1)?.trim()) out.push('');

@@ -206,7 +206,7 @@ function NoteArticle({
 }) {
   const ref = useRef<HTMLElement>(null);
   const [cardsOpen, setCardsOpen] = useState(false);
-  const md = useMemo(() => toMarkdown(note.body, resolve), [note, resolve]);
+  const md = useMemo(() => toMarkdown(note.body, resolve, note.resolveImage), [note, resolve]);
   const hasCards = md.includes('> [!card]-');
   const self = note.name.toLowerCase();
   const backlinks = notes
@@ -260,6 +260,7 @@ function NoteArticle({
       <ReactMarkdown
         remarkPlugins={plugins as never}
         components={{
+          img: ({ node: _node, alt, ...props }) => <img {...props} alt={alt} loading="lazy" />,
           a: ({ node: _node, href, ...props }) =>
             href?.startsWith('/') ? (
               <a {...props} href={href} onClick={onLinkClick} />

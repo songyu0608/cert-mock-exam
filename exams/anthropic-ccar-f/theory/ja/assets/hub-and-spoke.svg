@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="558" viewBox="0 0 380 558" lang="ja" role="img" aria-labelledby="title desc">
+  <title id="title">ハブアンドスポーク型オーケストレーション</title>
+  <desc id="desc">コーディネーターは分離されたサブエージェントと個別に通信し、単純なクエリでは必要なサブエージェントだけを呼ぶ。</desc>
+  <style>
+    svg { --ink:#172f40; --muted:#435b68; --edge:#23626b; --node:#f1f7f7; --hub:#d4ece9; --line:#738890; --soft:#edf3f4; --bad:#ac353c; }
+    @media (prefers-color-scheme: dark) {
+      svg { --ink:#ebf5fa; --muted:#bdced6; --edge:#87d4ce; --node:#24363d; --hub:#214846; --line:#91a8b0; --soft:#203137; --bad:#ff9a9d; }
+    }
+    text { font:18px "IBM Plex Sans JP", sans-serif; fill:var(--ink); }
+    .center { text-anchor:middle; font-weight:600; }
+    .head { font-weight:700; }
+    .agent,.hub,.panel,.mini-node { stroke-width:2; }
+    .agent,.mini-node { fill:var(--node); stroke:var(--edge); }
+    .hub { fill:var(--hub); stroke:var(--edge); }
+    .panel { fill:var(--soft); stroke:var(--line); }
+    .route,.blocked,.faint,.rule { fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .route { stroke:var(--edge); marker-start:url(#arrow); marker-end:url(#arrow); }
+    .arrow { fill:var(--edge); }
+    .blocked { stroke:var(--bad); stroke-dasharray:4 5; }
+    .bad { fill:var(--bad); font-weight:700; text-anchor:middle; }
+    .rule,.faint { stroke:var(--line); }
+    .faint { opacity:.43; marker-end:url(#pale); }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path class="arrow" d="M0 0 8 4 0 8Z"/></marker>
+    <marker id="pale" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="4" markerHeight="4" orient="auto"><path fill="var(--line)" d="M0 0 8 4 0 8Z"/></marker>
+  </defs>
+  <g class="route">
+    <path d="M112 80V52"/>
+    <path d="M74 222 49 265"/>
+    <path d="M150 222 175 265"/>
+  </g>
+  <rect class="agent" x="51" y="7" width="122" height="43" rx="9"/>
+  <text x="112" y="35" class="center">ウェブ検索</text>
+  <circle class="hub" cx="112" cy="154" r="72"/>
+  <text x="112" y="161" class="center" textLength="125" lengthAdjust="spacingAndGlyphs">コーディネーター</text>
+  <rect class="agent" x="2" y="267" width="100" height="43" rx="9"/>
+  <rect class="agent" x="129" y="267" width="92" height="43" rx="9"/>
+  <text x="52" y="295" class="center">文書分析</text>
+  <text x="175" y="295" class="center">統合</text>
+  <path class="blocked" d="M52 312v20h49m25 0h49v-20"/>
+  <text class="bad" x="114" y="339">✕</text>
+  <text x="114" y="362" class="bad">直接通信なし</text>
+  <g>
+    <text x="190" y="41" class="head">主な役割</text>
+    <path class="rule" d="M190 52h180"/>
+    <circle cx="192" cy="74" r="2.5" class="arrow"/><text x="202" y="80">タスク分解</text>
+    <circle cx="192" cy="103" r="2.5" class="arrow"/><text x="202" y="109">委任</text>
+    <circle cx="192" cy="132" r="2.5" class="arrow"/><text x="202" y="138">結果の集約</text>
+    <circle cx="192" cy="161" r="2.5" class="arrow"/><text x="202" y="167">エラー処理</text>
+    <circle cx="192" cy="190" r="2.5" class="arrow"/>
+    <text x="202" y="196">クエリの複雑さに</text>
+    <text x="202" y="217">応じて呼び出す</text>
+    <text x="202" y="238">サブエージェントを</text>
+    <text x="202" y="259">選ぶ</text>
+  </g>
+  <rect x="5" y="382" width="22" height="18" rx="5" class="agent"/>
+  <text x="37" y="399" class="head">分離されたコンテキスト</text>
+  <text x="5" y="426">サブトピック・情報源の種類ごとに</text>
+  <text x="5" y="450">リサーチ範囲を重複しないように分割</text>
+  <rect class="panel" x="36" y="465" width="340" height="90" rx="9"/>
+  <g>
+    <path class="faint" d="M67 502l22-22m-22 38 22 21"/>
+    <path class="route" style="marker-start:none" d="M72 510h25"/>
+    <circle cx="62" cy="510" r="9" class="hub"/>
+    <rect x="92" y="473" width="14" height="12" rx="3" class="mini-node" opacity=".45"/>
+    <rect x="100" y="504" width="14" height="12" rx="3" class="mini-node"/>
+    <rect x="92" y="535" width="14" height="12" rx="3" class="mini-node" opacity=".45"/>
+  </g>
+  <text x="141" y="489" class="head">単純なクエリ</text>
+  <text x="141" y="519">必要なサブエージェント</text>
+  <text x="141" y="542">だけを呼ぶ</text>
+</svg>
