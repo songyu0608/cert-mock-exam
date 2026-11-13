@@ -6,6 +6,7 @@ import {
   allocate,
   createSession,
   finishSession,
+  minutesLabel,
   mockMinutes,
   pickMockQuestions,
   pickScenarioMock,
@@ -127,6 +128,13 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
     const { questions: picked } = pickScenarioMock(exam, questions, short.id);
     expect(picked).toHaveLength(per);
     expect(mockMinutes(exam, picked.length)).toBe(exam.mock.minutes / exam.mock.scenarios!);
+    // 시간이 아주 짧은 시험에서도 0분으로 반올림되지 않고 마감 시각이 생긴다.
+    const tiny = { ...exam, mock: { ...exam.mock, minutes: 1 } };
+    const minutes = mockMinutes(tiny, picked.length);
+    expect(minutes).toBe(0.25);
+    expect(minutesLabel(minutes)).toBe('1분');
+    const s = createSession(tiny, picked, 'mock', { minutes, now: 1000 });
+    expect(s.deadline).toBe(1000 + 15_000);
     const over = {
       ...exam,
       sets: exam.sets.map((s) =>
