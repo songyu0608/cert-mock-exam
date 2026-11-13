@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="380" height="585" viewBox="0 0 380 585" lang="ja" role="img" aria-labelledby="title desc">
+  <title id="title">エージェントループ</title>
+  <desc id="desc">stop_reasonがtool_useならツールの結果を会話履歴に追加して再リクエストし、end_turnなら終了する。</desc>
+  <style>
+    svg { --ink:#172f40; --edge:#23626b; --node:#f1f7f7; --hub:#d4ece9; --line:#738890; --gray:#f0f2f3; --bad:#ac353c; }
+    @media (prefers-color-scheme: dark) {
+      svg { --ink:#ebf5fa; --edge:#87d4ce; --node:#24363d; --hub:#214846; --line:#91a8b0; --gray:#282f34; --bad:#ff9a9d; }
+    }
+    text { font:18px "IBM Plex Sans JP", sans-serif; fill:var(--ink); }
+    .head,.bad { font-weight:700; }
+    .mid { text-anchor:middle; font-weight:600; }
+    .bad { fill:var(--bad); }
+    .box,.hub,.panel { stroke-width:2; stroke:var(--edge); fill:var(--node); }
+    .hub { fill:var(--hub); }
+    .panel { fill:var(--gray); stroke:var(--line); }
+    path { stroke-linecap:round; stroke-linejoin:round; }
+    .route,.back,.guide,.brace { fill:none; stroke:var(--edge); stroke-width:2; }
+    .route,.back { marker-end:url(#arrow); }
+    .back { stroke-width:4; }
+    .guide { stroke:var(--line); stroke-dasharray:3 5; }
+  </style>
+  <defs><marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto"><path fill="var(--edge)" d="M0 0 8 4 0 8Z"/></marker></defs>
+  <rect x="33" y="7" width="221" height="52" rx="9" class="box"/>
+  <text x="143" y="40" class="mid">① Claudeへのリクエスト</text>
+  <path d="M143 60v24" class="route"/>
+  <rect x="33" y="88" width="221" height="52" rx="9" class="hub"/>
+  <text x="143" y="121" class="mid">② stop_reasonの確認</text>
+  <path d="M255 114h66v42" class="route"/>
+  <text x="318" y="100" class="mid">end_turn</text>
+  <rect x="277" y="161" width="88" height="44" rx="9" class="box"/>
+  <text x="321" y="190" class="mid">終了</text>
+  <path d="M143 142v75" class="route"/>
+  <text x="90" y="183" class="mid">tool_use</text>
+  <rect x="33" y="222" width="183" height="72" rx="9" class="box"/>
+  <text x="124" y="251" class="mid">③ 要求された</text>
+  <text x="124" y="277" class="mid">ツールを実行</text>
+  <path d="M218 258h7" class="guide"/>
+  <text x="229" y="233" class="head">モデル主導</text>
+  <text x="229" y="258">次のツールは</text>
+  <text x="229" y="281">コンテキストを</text>
+  <text x="229" y="304">見てモデルが判断</text>
+  <path d="M124 296v29" class="route"/>
+  <rect x="33" y="331" width="210" height="70" rx="9" class="box"/>
+  <text x="138" y="360" class="mid">④ ツールの結果を</text>
+  <text x="138" y="385" class="mid">会話履歴に追加</text>
+  <path d="M32 366H17Q8 366 8 357V42Q8 33 17 33h12" class="back"/>
+  <rect x="4" y="422" width="372" height="158" rx="9" class="panel"/>
+  <text x="16" y="451" class="head">誤った終了シグナル</text>
+  <text x="17" y="480" class="bad">✕</text>
+  <text x="44" y="480">自然言語の「完了しました」を解析</text>
+  <text x="17" y="507" class="bad">✕</text>
+  <text x="44" y="507">反復回数上限を主要な終了手段にする</text>
+  <text x="17" y="534" class="bad">✕</text>
+  <text x="44" y="534">アシスタントのテキストの有無で</text>
+  <text x="44" y="561">完了と判定</text>
+</svg>

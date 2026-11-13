@@ -353,6 +353,11 @@ test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동�
   await expect(page).toHaveURL(/\/theory\/sample-all-types\/ko\/%EA%B0%9C%EB%85%90%20A$/);
   await expect(note.getByRole('heading', { name: '개념 A' })).toBeVisible();
   await expect(note.locator('.theory-props')).toContainText('Concept A');
+  const image = note.getByRole('img', { name: '개념 A: 원 하나가 있다.' });
+  await expect(image).toHaveAttribute('loading', 'lazy');
+  await expect(image).toHaveAttribute('src', /^\/assets\/.*\.svg$/);
+  await image.scrollIntoViewIfNeeded();
+  await expect.poll(() => image.evaluate((el) => (el as HTMLImageElement).naturalWidth)).toBe(32);
   const card = note.locator('details.callout-card');
   await expect(card.locator('summary')).toHaveText('견본 질문은?');
   await expect(card.getByText('견본 답')).toBeHidden();

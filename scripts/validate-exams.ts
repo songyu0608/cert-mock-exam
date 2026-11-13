@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { crossCheck, examSchema, questionsFileSchema } from '../src/data/schema.ts';
+import { noteTargets, parseNote } from '../src/lib/theory.ts';
 
 export function validateExamDir(dir: string): string[] {
   const read = (f: string): unknown => JSON.parse(readFileSync(join(dir, f), 'utf8'));
@@ -42,12 +43,25 @@ function checkTheory(dir: string, home: string, id: string): string[] {
   if (!existsSync(dir)) return [`exam.json theories: theory/${id} 폴더가 없습니다`];
   const errors: string[] = [];
   const names = new Map<string, string>();
+  const assetDir = join(dir, 'assets');
+  const assets = new Set(
+    existsSync(assetDir)
+      ? readdirSync(assetDir, { withFileTypes: true })
+          .filter((e) => e.isFile())
+          .map((e) => e.name)
+      : [],
+  );
   for (const f of readdirSync(dir, { recursive: true, encoding: 'utf8' })) {
     if (!f.endsWith('.md')) continue;
     const name = basename(f, '.md').toLowerCase();
     const prev = names.get(name);
     if (prev) errors.push(`theory/${id}: 노트 이름이 겹칩니다(${prev}, ${f})`);
     names.set(name, f);
+    const raw = readFileSync(join(dir, f), 'utf8');
+    if (!raw.includes('![[')) continue;
+    for (const image of noteTargets(parseNote(raw).body).images) {
+      if (!assets.has(image)) errors.push(`theory/${id}/${f}: assets/${image} 파일이 없습니다`);
+    }
   }
   if (!names.has(home.toLowerCase()))
     errors.push(`exam.json theories: theory/${id}에 첫 화면 노트(${home}.md)가 없습니다`);
