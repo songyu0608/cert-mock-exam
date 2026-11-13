@@ -6,10 +6,12 @@ import { flattenQuestion } from '../lib/items.ts';
 import { shuffle } from '../lib/scoring.ts';
 import {
   createSession,
+  minutesLabel,
   mockMinutes,
   pickMockQuestions,
   pickScenarioMock,
   pickSetMock,
+  scenarioPer,
   sessionLabel,
   type Mode,
 } from '../lib/session.ts';
@@ -109,6 +111,14 @@ export function ExamHome({ exam }: { exam: Exam }) {
     return out;
   }, [sets, data, stats]);
 
+  // 시나리오를 적게 고정한 회차는 실제로 내는 문항 수와 제한 시간을 함께 보인다.
+  // 회차에 등록된 문항 수가 아니라 출제 수(시나리오 수 × 시나리오당 출제 수)를 쓴다.
+  const shortSetNote = (fixed: number) => {
+    if (fixed >= (exam.mock.scenarios ?? 0)) return '';
+    const n = scenarioPer(exam) * fixed;
+    return ` · ${n}문항 · ${minutesLabel(mockMinutes(exam, n))}`;
+  };
+
   const start = (mode: Mode, setId?: string) => {
     if (!data) return;
     let s;
@@ -118,7 +128,9 @@ export function ExamHome({ exam }: { exam: Exam }) {
       const label = [set?.name, `시나리오 ${picked.scenarios.join('·')}`]
         .filter(Boolean)
         .join(' · ');
-      s = createSession(exam, picked.questions, 'mock', { minutes: exam.mock.minutes, label });
+      // 시나리오를 적게 고정한 회차는 문항 수에 비례해 시간을 줄인다.
+      const n = picked.questions.flatMap(flattenQuestion).length;
+      s = createSession(exam, picked.questions, 'mock', { minutes: mockMinutes(exam, n), label });
     } else if (mode === 'mock' && setId !== undefined) {
       const picked = pickSetMock(exam, data.questions, setId);
       const n = picked.flatMap(flattenQuestion).length;
@@ -268,7 +280,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
                       {!scenarioExam
                         ? `${setSizes[st.id] ?? 0}문항 고정`
                         : st.scenarios
-                          ? `시나리오 ${st.scenarios.join('·')}`
+                          ? `시나리오 ${st.scenarios.join('·')}${shortSetNote(st.scenarios.length)}`
                           : `시나리오 ${exam.mock.scenarios}개 무작위`}
                       {setRates[st.id] != null && ` · 정답률 ${setRates[st.id]}%`}
                     </span>
@@ -286,7 +298,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
               >
                 {exam.mock.questionChoices.map((n) => (
                   <option key={n} value={n}>
-                    {n}문항 · {mockMinutes(exam, n)}분
+                    {n}문항 · {minutesLabel(mockMinutes(exam, n))}
                   </option>
                 ))}
               </select>

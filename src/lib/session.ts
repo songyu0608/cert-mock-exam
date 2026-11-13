@@ -139,7 +139,8 @@ export function sessionLabel(s: Pick<Session, 'mode' | 'label'>): string {
 
 /**
  * 시나리오형 시험의 실전 출제. 회차를 주면 그 회차의 문항만 쓴다.
- * 회차에 시나리오가 정해져 있으면 그대로, 없으면 mock.scenarios개를 무작위로 고른다.
+ * 회차에 시나리오가 정해져 있으면 그대로(mock.scenarios개보다 적으면 그만큼 짧은 세트),
+ * 없으면 mock.scenarios개를 무작위로 고른다.
  * 시나리오마다 같은 수의 문항을 고르고, 시나리오 순서대로 묶는다(묶음 안에서는 섞는다).
  */
 export function pickScenarioMock(
@@ -161,7 +162,7 @@ export function pickScenarioMock(
         rng,
       ).slice(0, pick);
   chosen.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-  const per = Math.floor(exam.mock.questions / pick);
+  const per = scenarioPer(exam);
   const picked = chosen.flatMap((id) =>
     shuffle(
       pool.filter((q) => q.scenarioId === id),
@@ -186,9 +187,23 @@ export function pickSetMock(
   );
 }
 
-/** 문항 수를 고르는 시험은 시간을 문항 수에 비례해 정한다. */
+/** 시나리오형 시험에서 시나리오 하나당 내는 문항 수. */
+export function scenarioPer(exam: Exam): number {
+  return Math.floor(exam.mock.questions / (exam.mock.scenarios ?? 1));
+}
+
+/**
+ * 문항 수를 고르는 시험과 짧은 회차는 시간을 문항 수에 비례해 정한다.
+ * 반올림하면 짧은 세트의 시간이 0분이 되어 제한 시간이 사라질 수 있으므로 소수 분을 그대로 돌려준다.
+ * 화면에 보일 때는 minutesLabel을 쓴다.
+ */
 export function mockMinutes(exam: Exam, n: number): number {
-  return Math.round((exam.mock.minutes * n) / exam.mock.questions);
+  return (exam.mock.minutes * n) / exam.mock.questions;
+}
+
+/** 분 표시. 1분 미만은 0분이 아니라 1분으로 보인다. */
+export function minutesLabel(minutes: number): string {
+  return `${Math.max(1, Math.round(minutes))}분`;
 }
 
 export function createSession(
@@ -228,7 +243,9 @@ export function createSession(
     locked: {},
     current: 0,
     startedAt: now,
-    ...(mode === 'mock' && opts.minutes ? { deadline: now + opts.minutes * 60_000 } : {}),
+    ...(mode === 'mock' && opts.minutes
+      ? { deadline: now + Math.round(opts.minutes * 60_000) }
+      : {}),
   };
 }
 

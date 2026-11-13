@@ -6,6 +6,7 @@ import {
   allocate,
   createSession,
   finishSession,
+  minutesLabel,
   mockMinutes,
   pickMockQuestions,
   pickScenarioMock,
@@ -112,13 +113,40 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
     for (const st of exam.sets.filter((s) => s.scenarios)) {
       const { questions: picked, scenarios } = pickScenarioMock(exam, questions, st.id);
       expect(scenarios).toEqual(st.scenarios);
-      expect(picked).toHaveLength(exam.mock.questions);
+      // 시나리오를 적게 고정한 회차(S1 · A 등)는 그만큼 짧다.
+      expect(picked).toHaveLength(per * st.scenarios!.length);
       expect(picked.every((q) => q.set === st.id)).toBe(true);
       expect(picked.map((q) => q.scenarioId)).toEqual(
         st.scenarios!.flatMap((id) => Array<string>(per).fill(id)),
       );
       expect(new Set(picked.map((q) => q.id)).size).toBe(picked.length);
     }
+  });
+
+  it('시나리오를 적게 고정한 회차: 문항 수에 비례한 시간, 범위를 벗어나면 검사에서 걸린다', () => {
+    const short = exam.sets.find((s) => s.scenarios?.length === 1)!;
+    const { questions: picked } = pickScenarioMock(exam, questions, short.id);
+    expect(picked).toHaveLength(per);
+    expect(mockMinutes(exam, picked.length)).toBe(exam.mock.minutes / exam.mock.scenarios!);
+    // 시간이 아주 짧은 시험에서도 0분으로 반올림되지 않고 마감 시각이 생긴다.
+    const tiny = { ...exam, mock: { ...exam.mock, minutes: 1 } };
+    const minutes = mockMinutes(tiny, picked.length);
+    expect(minutes).toBe(0.25);
+    expect(minutesLabel(minutes)).toBe('1분');
+    const s = createSession(tiny, picked, 'mock', { minutes, now: 1000 });
+    expect(s.deadline).toBe(1000 + 15_000);
+    const over = {
+      ...exam,
+      sets: exam.sets.map((s) =>
+        s.id === short.id ? { ...s, scenarios: ['1', '2', '3', '4', '5'] } : s,
+      ),
+    };
+    expect(crossCheck(over, questions).some((e) => e.includes('시나리오가 5개입니다'))).toBe(true);
+    const dup = {
+      ...exam,
+      sets: exam.sets.map((s) => (s.id === short.id ? { ...s, scenarios: ['1', '1'] } : s)),
+    };
+    expect(crossCheck(dup, questions)).toContain(`회차 ${short.id}: 시나리오가 중복됩니다`);
   });
 
   it('무작위 회차: 시나리오 수만큼 고르고 매번 달라질 수 있다', () => {
