@@ -230,9 +230,10 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('html')).toHaveAttribute('data-vendor', 'anthropic');
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
   const card = modeCard(page, '실전 모의고사');
-  // 1~5회는 숨긴 회차(hidden)라 목록에 없다.
-  await expect(card.getByRole('button', { name: /시작$/ })).toHaveCount(1);
+  // 1~5회는 숨긴 회차(hidden)라 목록에 없다. 보이는 회차는 6회와 축적.
+  await expect(card.getByRole('button', { name: /시작$/ })).toHaveCount(2);
   await expect(card.getByRole('button', { name: '2회 시작' })).toHaveCount(0);
+  await expect(card.getByRole('button', { name: '축적 시작' })).toHaveCount(1);
   await card.getByRole('button', { name: '6회 · 장문 시작' }).click();
 
   // 위: 진행 위치, フラグ, 남은 시간(표시/비표시 한 버튼). 나가기 버튼은 없다.
