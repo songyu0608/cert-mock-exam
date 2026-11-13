@@ -223,7 +223,7 @@ test('AIB-C01 실전은 문항 수를 고르고 시간이 비례한다', async (
   await expect(page.getByRole('timer')).toHaveText(/^1:(40:00|39:5\d)$/);
 });
 
-test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오별로 묶어 출제하고 지문을 보여 준다', async ({
+test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오별로 묶어 출제하고 2단 화면으로 푼다', async ({
   page,
 }) => {
   await openExam(page, 'CCAR-F');
@@ -233,17 +233,87 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(card.getByRole('button', { name: /회 시작$/ })).toHaveCount(5);
   await card.getByRole('button', { name: '2회 시작' }).click();
 
-  await expect(page.locator('.bar-title')).toContainText('1/60');
+  // 위: 진행 위치, フラグ, 남은 시간(표시/비표시 한 버튼). 나가기 버튼은 없다.
+  await expect(page.locator('.bar-title')).toContainText('問題 1 / 60');
   await expect(page.locator('.bar-mode')).toContainText('2회 · 시나리오 1·2·4·6');
-  // 새 시나리오의 첫 문항은 지문을 펼치고, 같은 시나리오의 다음 문항은 접어 둔다.
-  const scen = page.locator('article details.scenario');
-  await expect(scen.locator('summary')).toHaveText(/시나리오 1 · /);
-  await expect(scen).toHaveAttribute('open', '');
-  await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
-  await page.getByRole('button', { name: '다음' }).click();
-  await expect(page.locator('.bar-title')).toContainText('2/60');
-  await expect(scen).not.toHaveAttribute('open', '');
-  await expect(scen.locator('summary')).toHaveText(/시나리오 1 · /);
+  await expect(page.getByRole('link', { name: '나가기' })).toHaveCount(0);
+  // 숨기면 화면 읽기 프로그램에서도 빠지므로(aria-hidden) 역할 대신 위치로 찾는다.
+  const timer = page.locator('.sv-clock .timer');
+  await expect(timer).toHaveText(/^(2:00:00|1:59:5\d)$/);
+  await page.getByRole('button', { name: '非表示' }).click();
+  await expect(timer).toHaveClass(/\boff\b/);
+  await page.getByRole('button', { name: '表示', exact: true }).click();
+  await expect(timer).not.toHaveClass(/\boff\b/);
+
+  // 왼쪽: 문항 번호와 시나리오 1의 지문(제목 없이 본문만). 오른쪽: 문제와 보기.
+  const left = page.locator('.sv-sc');
+  await expect(left.getByRole('heading', { name: '問題 1' })).toBeVisible();
+  await expect(left.locator('.sv-sc-text')).toContainText('カスタマーサポート解決エージェント');
+  await expect(left).not.toContainText('シナリオ 1');
+  const right = page.locator('.sv-q');
+  await expect(right.locator('[lang="ja"] .q-text')).toBeVisible();
+  await expect(right.locator('.q-inst')).toHaveText('1つ選択してください。');
+
+  // 보기에 취소선을 그으면 고를 수 없고, 다시 누르면 돌아온다. 오른쪽 클릭으로도 된다.
+  const radios = right.getByRole('radio');
+  await radios.first().check();
+  await right.getByRole('button', { name: '選択肢 A に取り消し線を引く' }).click();
+  await expect(radios.first()).toBeDisabled();
+  await expect(radios.first()).not.toBeChecked();
+  await right.getByRole('button', { name: '選択肢 A の取り消し線を外す' }).click();
+  await expect(radios.first()).toBeEnabled();
+  await right.locator('.sv-opt').nth(1).click({ button: 'right' });
+  await expect(radios.nth(1)).toBeDisabled();
+  await radios.nth(2).check();
+
+  // フラグ, 次の問題 / 前の問題
+  await page.getByRole('button', { name: 'フラグ', exact: true }).click();
+  await expect(page.locator('.sv-flag')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.sv-flag')).toHaveText('✓ フラグ');
+  await expect(page.getByRole('button', { name: '前の問題' })).toBeDisabled();
+  await page.getByRole('button', { name: '次の問題' }).click();
+  await expect(page.locator('.bar-title')).toContainText('問題 2 / 60');
+  await expect(left.getByRole('heading', { name: '問題 2' })).toBeVisible();
+  await page.getByRole('button', { name: '前の問題' }).click();
+  await expect(radios.nth(2)).toBeChecked();
+  await expect(radios.nth(1)).toBeDisabled();
+
+  // 새로고침해도 취소선·フラグ·시간 숨김이 남는다.
+  await page.getByRole('button', { name: '非表示' }).click();
+  await page.reload();
+  await expect(page.locator('.bar-title')).toContainText('問題 1 / 60');
+  await expect(page.locator('.sv-q').getByRole('radio').nth(1)).toBeDisabled();
+  await expect(timer).toHaveClass(/\boff\b/);
+
+  // レビュー: No·問題·フラグ 60줄, 1번부터. 줄을 누르면 그 문제로 간다.
+  await page.getByRole('button', { name: /^レビュー/ }).click();
+  const rows = page.locator('.sv-table tbody tr');
+  await expect(rows).toHaveCount(60);
+  await expect(page.locator('.sv-review')).toHaveJSProperty('scrollTop', 0);
+  await expect(rows.first().locator('td').nth(2)).toHaveText('✓');
+  await expect(rows.nth(1).locator('td').nth(2)).toHaveText('');
+  await expect(rows.first().locator('td').nth(1)).not.toHaveText('');
+  await expect(page.getByRole('button', { name: '問題に戻る' })).toHaveCount(0);
+  await expect(page.locator('.sv-flag')).toHaveCount(0);
+  await rows.nth(59).click();
+  await expect(page.locator('.bar-title')).toContainText('問題 60 / 60');
+  await expect(left.locator('.sv-sc-text')).toContainText('構造化データ抽出');
+  // 60번에서 次の問題를 누르면 レビュー로 가고, 다시 열어도 맨 위부터 보인다.
+  await page.getByRole('button', { name: '次の問題' }).click();
+  await expect(page.getByRole('heading', { name: 'レビュー' })).toBeVisible();
+  await expect(page.locator('.sv-review')).toHaveJSProperty('scrollTop', 0);
+
+  // 問題提出 → 팝업에서 いいえ면 그대로, はい면 채점 결과로 간다.
+  await page.getByRole('button', { name: '問題提出' }).click();
+  const dialog = page.getByRole('alertdialog');
+  await expect(dialog).toContainText('問題を提出しますか？');
+  await expect(dialog).toContainText('未回答が 59 問あります。');
+  await dialog.getByRole('button', { name: 'いいえ' }).click();
+  await expect(dialog).toHaveCount(0);
+  await page.getByRole('button', { name: '問題提出' }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'はい' }).click();
+  await expect(page).toHaveURL(/\/result\//);
+  await expect(page.locator('.score .big')).toBeVisible();
 
   // 시험 목록으로 돌아가면 업체 테마를 지운다.
   await page.goto('/');

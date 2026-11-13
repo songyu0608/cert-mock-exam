@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { crossCheck, examSchema, questionsFileSchema } from '../data/schema.ts';
-import { flattenAll } from './items.ts';
+import { flattenAll, flattenQuestion, itemSummary } from './items.ts';
 import {
   allocate,
   createSession,
@@ -11,6 +11,7 @@ import {
   pickScenarioMock,
   pickSetMock,
   sessionLabel,
+  toggleStrike,
 } from './session.ts';
 
 const load = (id: string) => ({
@@ -173,5 +174,47 @@ describe('고정 회차 실전 출제(anthropic-ccar-p, 시나리오 없음)', (
         questions.filter((q) => q.set === '1'),
       ),
     ).toContain('회차 1: mock.scenarios가 없는 시험은 scenarios를 쓸 수 없습니다');
+  });
+});
+
+describe('시나리오형 실전 화면(SplitSession)의 보조 기능', () => {
+  const { exam, questions } = load('anthropic-ccar-f');
+
+  it('CCAR-F는 모든 문항에 レビュー용 한 줄 요약이 있다', () => {
+    expect(questions.every((q) => q.summary && q.summary.length <= 60)).toBe(true);
+    const item = flattenQuestion(questions[0]!)[0]!;
+    expect(itemSummary(item)).toBe(questions[0]!.summary);
+  });
+
+  it('요약이 없으면 본문의 첫 문장을 쓰고, 길면 자른다', () => {
+    const q = { ...questions[0]!, summary: undefined };
+    const item = flattenQuestion(q)[0]!;
+    expect(itemSummary(item)).toBe(
+      '監査の結果、エージェントが会話の約2%で get_customer による本人確認を行わずに process_refu…',
+    );
+    expect(itemSummary({ ...item, body: { ...item.body, stem: '**짧은** 문장. 다음 문장' } })).toBe(
+      '짧은 문장.',
+    );
+  });
+
+  it('취소선을 그으면 그 보기의 선택을 풀고, 다시 누르면 걷는다', () => {
+    const multi = questions.find((q) => q.type === 'multi')!;
+    const s0 = createSession(exam, [questions[0]!, multi], 'mock', { minutes: 120 });
+    const [k1, k2] = s0.itemKeys as [string, string];
+    let s = { ...s0, answers: { ...s0.answers, [k1]: { type: 'single' as const, choice: 2 } } };
+    s = toggleStrike(s, k1, 2);
+    expect(s.struck).toEqual({ [k1]: [2] });
+    expect(s.answers[k1]).toEqual({ type: 'single', choice: null });
+    s = toggleStrike(s, k1, 0);
+    expect(s.struck![k1]).toEqual([0, 2]);
+    s = toggleStrike(toggleStrike(s, k1, 0), k1, 2);
+    expect(s.struck).toEqual({});
+
+    s = { ...s, answers: { ...s.answers, [k2]: { type: 'multi' as const, choices: [0, 1] } } };
+    s = toggleStrike(s, k2, 1);
+    expect(s.answers[k2]).toEqual({ type: 'multi', choices: [0] });
+    // 고르지 않은 보기에 그으면 답은 그대로
+    s = toggleStrike(s, k2, 3);
+    expect(s.answers[k2]).toEqual({ type: 'multi', choices: [0] });
   });
 });
