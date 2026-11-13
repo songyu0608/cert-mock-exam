@@ -1329,7 +1329,8 @@ details.callout[open] > summary.callout-title {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  /* 지문과 문제를 반반으로 나누고, 각 칸의 글은 칸 폭을 끝까지 쓴다 */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 .sv-pane {
   min-width: 0;
@@ -1338,7 +1339,7 @@ details.callout[open] > summary.callout-title {
   padding-bottom: 40px;
 }
 .sv-pane-in {
-  max-width: 62ch;
+  max-width: none;
 }
 .sv-sc {
   background: var(--soft);
