@@ -186,6 +186,26 @@
       "id": "11",
       "name": "S1 · D",
       "scenarios": ["1"]
+    },
+    {
+      "id": "12",
+      "name": "S2 · A",
+      "scenarios": ["2"]
+    },
+    {
+      "id": "13",
+      "name": "S2 · B",
+      "scenarios": ["2"]
+    },
+    {
+      "id": "14",
+      "name": "S2 · C",
+      "scenarios": ["2"]
+    },
+    {
+      "id": "15",
+      "name": "S2 · D",
+      "scenarios": ["2"]
     }
   ]
 }

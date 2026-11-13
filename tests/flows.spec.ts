@@ -230,8 +230,8 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('html')).toHaveAttribute('data-vendor', 'anthropic');
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
   const card = modeCard(page, '실전 모의고사');
-  // 1~5회는 숨긴 회차(hidden)라 목록에 없다. 보이는 회차는 6회, 축적, S1 · A~D.
-  await expect(card.getByRole('button', { name: /시작$/ })).toHaveCount(6);
+  // 1~5회는 숨긴 회차(hidden)라 목록에 없다. 보이는 회차는 6회, 축적, 시나리오별 세트(S1 · A 등).
+  // 시나리오별 세트는 계속 늘어나므로 개수는 세지 않고 대표 회차만 확인한다.
   await expect(card.getByRole('button', { name: 'S1 · A 시작' })).toHaveCount(1);
   // 짧은 회차는 실제 출제 수와 제한 시간을 보인다.
   await expect(card.locator('.set-row', { hasText: 'S1 · A' })).toContainText(
