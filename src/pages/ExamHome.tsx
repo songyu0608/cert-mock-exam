@@ -118,7 +118,9 @@ export function ExamHome({ exam }: { exam: Exam }) {
       const label = [set?.name, `시나리오 ${picked.scenarios.join('·')}`]
         .filter(Boolean)
         .join(' · ');
-      s = createSession(exam, picked.questions, 'mock', { minutes: exam.mock.minutes, label });
+      // 시나리오를 적게 고정한 회차는 문항 수에 비례해 시간을 줄인다.
+      const n = picked.questions.flatMap(flattenQuestion).length;
+      s = createSession(exam, picked.questions, 'mock', { minutes: mockMinutes(exam, n), label });
     } else if (mode === 'mock' && setId !== undefined) {
       const picked = pickSetMock(exam, data.questions, setId);
       const n = picked.flatMap(flattenQuestion).length;
@@ -268,7 +270,11 @@ export function ExamHome({ exam }: { exam: Exam }) {
                       {!scenarioExam
                         ? `${setSizes[st.id] ?? 0}문항 고정`
                         : st.scenarios
-                          ? `시나리오 ${st.scenarios.join('·')}`
+                          ? `시나리오 ${st.scenarios.join('·')}${
+                              st.scenarios.length < exam.mock.scenarios!
+                                ? ` · ${setSizes[st.id] ?? 0}문항`
+                                : ''
+                            }`
                           : `시나리오 ${exam.mock.scenarios}개 무작위`}
                       {setRates[st.id] != null && ` · 정답률 ${setRates[st.id]}%`}
                     </span>

@@ -139,7 +139,8 @@ export function sessionLabel(s: Pick<Session, 'mode' | 'label'>): string {
 
 /**
  * 시나리오형 시험의 실전 출제. 회차를 주면 그 회차의 문항만 쓴다.
- * 회차에 시나리오가 정해져 있으면 그대로, 없으면 mock.scenarios개를 무작위로 고른다.
+ * 회차에 시나리오가 정해져 있으면 그대로(mock.scenarios개보다 적으면 그만큼 짧은 세트),
+ * 없으면 mock.scenarios개를 무작위로 고른다.
  * 시나리오마다 같은 수의 문항을 고르고, 시나리오 순서대로 묶는다(묶음 안에서는 섞는다).
  */
 export function pickScenarioMock(

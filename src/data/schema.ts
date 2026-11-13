@@ -297,10 +297,11 @@ function checkScenarios(exam: Exam, questions: Question[]): string[] {
   for (const g of groups) {
     const ids = g.fixed ?? exam.scenarios.map((s) => s.id);
     if (g.fixed) {
-      if (g.fixed.length !== pick)
-        errors.push(
-          `${g.label}: 시나리오가 ${g.fixed.length}개입니다(mock.scenarios ${pick}개 필요)`,
-        );
+      // 시나리오를 mock.scenarios개보다 적게 고정하면 그만큼 짧은 실전 세트가 된다.
+      if (g.fixed.length < 1 || g.fixed.length > pick)
+        errors.push(`${g.label}: 시나리오가 ${g.fixed.length}개입니다(1~${pick}개여야 합니다)`);
+      if (new Set(g.fixed).size !== g.fixed.length)
+        errors.push(`${g.label}: 시나리오가 중복됩니다`);
       for (const id of g.fixed)
         if (!scenIds.has(id)) errors.push(`${g.label}: 시나리오 ${id}이 exam.json에 없습니다`);
     } else if (ids.length < pick) errors.push(`${g.label}: 시나리오가 ${pick}개보다 적습니다`);
