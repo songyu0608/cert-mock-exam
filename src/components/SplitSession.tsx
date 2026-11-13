@@ -118,6 +118,7 @@ export function SplitSession({
   const scRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLElement>(null);
   const noRef = useRef<HTMLButtonElement>(null);
+  const yesRef = useRef<HTMLButtonElement>(null);
 
   const total = session.itemKeys.length;
   const i = session.current;
@@ -148,8 +149,17 @@ export function SplitSession({
   useEffect(() => {
     if (!confirming) return;
     noRef.current?.focus();
+    // 확인창이 열린 동안 배경은 inert로 막고, Tab은 いいえ·はい 사이에서만 돈다.
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setConfirming(false);
+      if (e.key !== 'Tab') return;
+      const first = noRef.current;
+      const last = yesRef.current;
+      const at = document.activeElement;
+      if (e.shiftKey ? at === first || at !== last : at === last || at !== first) {
+        e.preventDefault();
+        (e.shiftKey ? last : first)?.focus();
+      }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
@@ -185,7 +195,7 @@ export function SplitSession({
 
   return (
     <div className="sv">
-      <header className="sv-bar">
+      <header className="sv-bar" inert={confirming}>
         <div className="sv-bar-in">
           <span className="code">{exam.code}</span>
           <span className="bar-title">
@@ -226,7 +236,7 @@ export function SplitSession({
       </header>
 
       {saveFailed && (
-        <div className="sv-alert" role="alert">
+        <div className="sv-alert" role="alert" inert={confirming}>
           <b>결과를 저장하지 못했습니다.</b>{' '}
           <span className="small">
             브라우저 저장 공간이 부족하거나 저장이 막혀 있을 수 있습니다. 푼 내용은 그대로 남아
@@ -239,7 +249,12 @@ export function SplitSession({
       )}
 
       {review ? (
-        <main className="sv-review" ref={reviewRef} aria-labelledby="sv-review-h">
+        <main
+          className="sv-review"
+          ref={reviewRef}
+          aria-labelledby="sv-review-h"
+          inert={confirming}
+        >
           <div className="sv-review-in">
             <div className="sv-review-head">
               <h2 id="sv-review-h">{t.review}</h2>
@@ -301,7 +316,7 @@ export function SplitSession({
           </div>
         </main>
       ) : (
-        <main className="sv-stage" ref={stageRef}>
+        <main className="sv-stage" ref={stageRef} inert={confirming}>
           <section
             className={`sv-pane sv-sc${scenarioOpen ? '' : ' closed'}`}
             ref={scRef}
@@ -372,7 +387,7 @@ export function SplitSession({
         </main>
       )}
 
-      <footer className="sv-foot">
+      <footer className="sv-foot" inert={confirming}>
         {review ? (
           <div className="sv-foot-in">
             <span className="sv-sp" />
@@ -435,6 +450,7 @@ export function SplitSession({
               <button
                 type="button"
                 className="btn primary"
+                ref={yesRef}
                 onClick={() => {
                   setConfirming(false);
                   onSubmit();

@@ -308,6 +308,13 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   const dialog = page.getByRole('alertdialog');
   await expect(dialog).toContainText('問題を提出しますか？');
   await expect(dialog).toContainText('未回答が 59 問あります。');
+  // 키보드 포커스는 확인창 안에서만 돈다(배경은 inert).
+  await expect(dialog.getByRole('button', { name: 'いいえ' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(dialog.getByRole('button', { name: 'はい' })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(dialog.getByRole('button', { name: 'いいえ' })).toBeFocused();
+  await expect(page.locator('.sv-review')).toHaveAttribute('inert', '');
   await dialog.getByRole('button', { name: 'いいえ' }).click();
   await expect(dialog).toHaveCount(0);
   await page.getByRole('button', { name: '問題提出' }).click();
