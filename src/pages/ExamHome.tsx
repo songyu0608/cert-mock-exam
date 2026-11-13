@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
-import type { Exam } from '../data/schema.ts';
+import { inHiddenSet, type Exam } from '../data/schema.ts';
 import { flattenQuestion } from '../lib/items.ts';
 import { shuffle } from '../lib/scoring.ts';
 import {
@@ -41,7 +41,9 @@ export function ExamHome({ exam }: { exam: Exam }) {
 
   const [mockN, setMockN] = useState(exam.mock.questions);
   const [domains, setDomains] = useState<string[]>(exam.domains.map((d) => d.id));
-  const [practiceSets, setPracticeSets] = useState<string[]>(exam.sets.map((s) => s.id));
+  // 숨긴 회차는 실전 목록·연습·오답 다시 풀기에서 뺀다(문항과 기록은 그대로).
+  const sets = useMemo(() => exam.sets.filter((s) => !s.hidden), [exam]);
+  const [practiceSets, setPracticeSets] = useState<string[]>(sets.map((s) => s.id));
   const scenarioExam = !!exam.mock.scenarios;
   const inPracticeSets = (set?: string) =>
     !exam.sets.length || (set !== undefined && practiceSets.includes(set));
@@ -49,15 +51,29 @@ export function ExamHome({ exam }: { exam: Exam }) {
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetFailed, setResetFailed] = useState(false);
 
-  const wrong = useMemo(() => {
-    if (!data) return [];
-    return wrongKeys(stats).filter((k) => data.itemsByKey.has(k));
-  }, [data, stats]);
+  // 숨긴 회차를 뺀 문항 key. 오답 다시 풀기와 도메인별 정답률은 이것만 센다.
+  const visibleKeys = useMemo(
+    () =>
+      new Set(
+        (data?.questions ?? [])
+          .filter((q) => !inHiddenSet(exam, q.set))
+          .flatMap((q) => flattenQuestion(q).map((i) => i.key)),
+      ),
+    [exam, data],
+  );
+
+  const wrong = useMemo(
+    () => wrongKeys(stats).filter((k) => visibleKeys.has(k)),
+    [visibleKeys, stats],
+  );
 
   const domainRows = useMemo(
     () =>
       exam.domains.map((d) => {
-        const keys = data?.items.filter((i) => i.topDomain === d.id).map((i) => i.key) ?? [];
+        const keys =
+          data?.items
+            .filter((i) => i.topDomain === d.id && visibleKeys.has(i.key))
+            .map((i) => i.key) ?? [];
         const seen = keys.filter((k) => stats[k]);
         const sum = seen.reduce((s, k) => s + stats[k]!.last, 0);
         return {
@@ -66,7 +82,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
           detail: `${seen.length}/${keys.length} 풀이`,
         };
       }),
-    [exam, data, stats],
+    [exam, data, stats, visibleKeys],
   );
 
   // 회차별 문항 수(하위 문항까지 센다)
@@ -80,7 +96,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
   // 회차별 정답률(문항마다 마지막으로 푼 결과)
   const setRates = useMemo(() => {
     const out: Record<string, number | null> = {};
-    for (const st of exam.sets) {
+    for (const st of sets) {
       const keys =
         data?.questions
           .filter((q) => q.set === st.id)
@@ -91,7 +107,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
         : null;
     }
     return out;
-  }, [exam, data, stats]);
+  }, [sets, data, stats]);
 
   const start = (mode: Mode, setId?: string) => {
     if (!data) return;
@@ -238,7 +254,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
                 {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
               </p>
               <div className="set-list">
-                {exam.sets.map((st) => (
+                {sets.map((st) => (
                   <div className="set-row" key={st.id}>
                     <button
                       type="button"
@@ -302,7 +318,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
           </p>
           {exam.sets.length > 0 && (
             <div className="chips" role="group" aria-label="회차">
-              {exam.sets.map((st) => (
+              {sets.map((st) => (
                 <button
                   key={st.id}
                   type="button"

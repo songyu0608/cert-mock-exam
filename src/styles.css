@@ -561,7 +561,8 @@ select.sel {
   font-weight: 500;
 }
 .q-text p {
-  margin: 0 0 8px;
+  /* 문단 사이에 빈 줄 한 줄(줄 높이 1.7)만큼 띄운다 */
+  margin: 0 0 1.7em;
 }
 .q-text p:last-child {
   margin-bottom: 0;

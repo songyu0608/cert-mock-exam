@@ -230,12 +230,14 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('html')).toHaveAttribute('data-vendor', 'anthropic');
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
   const card = modeCard(page, '실전 모의고사');
-  await expect(card.getByRole('button', { name: /회 시작$/ })).toHaveCount(5);
-  await card.getByRole('button', { name: '2회 시작' }).click();
+  // 1~5회는 숨긴 회차(hidden)라 목록에 없다.
+  await expect(card.getByRole('button', { name: /시작$/ })).toHaveCount(1);
+  await expect(card.getByRole('button', { name: '2회 시작' })).toHaveCount(0);
+  await card.getByRole('button', { name: '6회 · 장문 시작' }).click();
 
   // 위: 진행 위치, フラグ, 남은 시간(표시/비표시 한 버튼). 나가기 버튼은 없다.
   await expect(page.locator('.bar-title')).toContainText('問題 1 / 60');
-  await expect(page.locator('.bar-mode')).toContainText('2회 · 시나리오 1·2·4·6');
+  await expect(page.locator('.bar-mode')).toContainText('6회 · 장문 · 시나리오 1·2·3·6');
   await expect(page.getByRole('link', { name: '나가기' })).toHaveCount(0);
   // 숨기면 화면 읽기 프로그램에서도 빠지므로(aria-hidden) 역할 대신 위치로 찾는다.
   const timer = page.locator('.sv-clock .timer');

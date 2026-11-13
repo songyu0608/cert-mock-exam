@@ -82,6 +82,8 @@ export const examSchema = z
             id: z.string().regex(/^\d+$/),
             name: text,
             scenarios: z.array(z.string()).optional(),
+            /** true면 목록·연습·오답 다시 풀기에서 뺀다. 문항과 기록은 그대로 둔다. */
+            hidden: z.boolean().optional(),
           })
           .strict(),
       )
@@ -89,6 +91,11 @@ export const examSchema = z
   })
   .strict();
 export type Exam = z.infer<typeof examSchema>;
+
+/** 숨긴 회차(sets[].hidden)의 문항인지. 회차가 없는 문항은 숨기지 않는다. */
+export function inHiddenSet(exam: Exam, set?: string): boolean {
+  return set !== undefined && exam.sets.some((s) => s.id === set && s.hidden);
+}
 export type Theory = Exam['theories'][number];
 
 const base = {
@@ -249,6 +256,8 @@ function checkScenarios(exam: Exam, questions: Question[]): string[] {
   const setIds = new Set(exam.sets.map((s) => s.id));
   if (scenIds.size !== exam.scenarios.length) errors.push('scenarios의 id가 중복됩니다');
   if (setIds.size !== exam.sets.length) errors.push('sets의 id가 중복됩니다');
+  if (exam.sets.length && exam.sets.every((s) => s.hidden))
+    errors.push('모든 회차가 숨겨져 있습니다(hidden)');
   for (const q of questions) {
     if (q.scenarioId !== undefined && !scenIds.has(q.scenarioId))
       errors.push(`${q.id}: 시나리오 ${q.scenarioId}이 exam.json에 없습니다`);
