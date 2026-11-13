@@ -39,7 +39,12 @@ const LABELS = {
     colNo: 'No',
     colQ: '問題',
     colFlag: 'フラグ',
-    goTo: (n: number, flagged: boolean) => `問題 ${n}${flagged ? '、フラグあり' : ''}に移動`,
+    goTo: (n: number, flagged: boolean, answered: boolean) =>
+      `問題 ${n}${answered ? '' : '、未回答'}${flagged ? '、フラグあり' : ''}に移動`,
+    saveFailed: '結果を保存できませんでした。',
+    saveFailedBody:
+      'ブラウザの保存容量が足りないか、保存がブロックされている可能性があります。解答はそのまま残っているので、保存容量を空けてからもう一度提出してください。',
+    retry: 'もう一度提出',
     confirmTitle: '問題を提出しますか？',
     confirmBody: (unanswered: number, flagged: number) =>
       `提出すると採点して試験を終了します。${
@@ -70,7 +75,12 @@ const LABELS = {
     colNo: '번호',
     colQ: '문항',
     colFlag: '플래그',
-    goTo: (n: number, flagged: boolean) => `${n}번${flagged ? ', 플래그' : ''}으로 이동`,
+    goTo: (n: number, flagged: boolean, answered: boolean) =>
+      `${n}번${answered ? '' : ', 안 답함'}${flagged ? ', 플래그' : ''}으로 이동`,
+    saveFailed: '결과를 저장하지 못했습니다.',
+    saveFailedBody:
+      '브라우저 저장 공간이 부족하거나 저장이 막혀 있을 수 있습니다. 푼 내용은 그대로 남아 있으니, 저장 공간을 정리한 뒤 다시 제출하세요.',
+    retry: '다시 제출',
     confirmTitle: '제출하시겠습니까?',
     confirmBody: (unanswered: number, flagged: number) =>
       `제출하면 채점하고 끝납니다. ${
@@ -119,6 +129,8 @@ export function SplitSession({
   const stageRef = useRef<HTMLElement>(null);
   const noRef = useRef<HTMLButtonElement>(null);
   const yesRef = useRef<HTMLButtonElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const wasConfirming = useRef(false);
 
   const total = session.itemKeys.length;
   const i = session.current;
@@ -145,6 +157,12 @@ export function SplitSession({
   useLayoutEffect(() => {
     if (review) reviewRef.current?.scrollTo?.(0, 0);
   }, [review]);
+
+  // 확인창을 닫으면(いいえ·Escape·바깥 누름) 포커스를 問題提出 버튼으로 돌려준다.
+  useEffect(() => {
+    if (wasConfirming.current && !confirming) submitRef.current?.focus();
+    wasConfirming.current = confirming;
+  }, [confirming]);
 
   useEffect(() => {
     if (!confirming) return;
@@ -237,13 +255,9 @@ export function SplitSession({
 
       {saveFailed && (
         <div className="sv-alert" role="alert" inert={confirming}>
-          <b>결과를 저장하지 못했습니다.</b>{' '}
-          <span className="small">
-            브라우저 저장 공간이 부족하거나 저장이 막혀 있을 수 있습니다. 푼 내용은 그대로 남아
-            있으니, 저장 공간을 정리한 뒤 다시 제출하세요.
-          </span>{' '}
+          <b>{t.saveFailed}</b> <span className="small">{t.saveFailedBody}</span>{' '}
           <button type="button" className="btn sm primary" onClick={onSubmit}>
-            다시 제출
+            {t.retry}
           </button>
         </div>
       )}
@@ -289,13 +303,14 @@ export function SplitSession({
                     const it = itemsByKey.get(k);
                     const f = !!session.flagged[k];
                     const locked = !!session.locked[k];
+                    const answered = isTouched(session.answers[k], session.views[k]);
                     return (
                       <tr
                         key={k}
                         className={`${n === i ? 'cur' : ''}${locked ? ' locked' : ''}`}
                         tabIndex={locked ? -1 : 0}
                         aria-disabled={locked || undefined}
-                        aria-label={t.goTo(n + 1, f)}
+                        aria-label={t.goTo(n + 1, f, answered)}
                         onClick={() => jump(n)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' || e.key === ' ') {
@@ -304,7 +319,10 @@ export function SplitSession({
                           }
                         }}
                       >
-                        <td className="c-no">{n + 1}</td>
+                        <td className="c-no">
+                          <span className="sv-no">{n + 1}</span>
+                          {!answered && <span className="sv-unans">{t.unanswered}</span>}
+                        </td>
                         <td>{it ? itemSummary(it) : '—'}</td>
                         <td className="c-flag">{f ? '✓' : ''}</td>
                       </tr>
@@ -391,7 +409,12 @@ export function SplitSession({
         {review ? (
           <div className="sv-foot-in">
             <span className="sv-sp" />
-            <button type="button" className="btn primary" onClick={() => setConfirming(true)}>
+            <button
+              type="button"
+              className="btn primary"
+              ref={submitRef}
+              onClick={() => setConfirming(true)}
+            >
               {t.submit}
             </button>
           </div>

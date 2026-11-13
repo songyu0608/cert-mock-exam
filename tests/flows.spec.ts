@@ -293,6 +293,10 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(rows.first().locator('td').nth(2)).toHaveText('✓');
   await expect(rows.nth(1).locator('td').nth(2)).toHaveText('');
   await expect(rows.first().locator('td').nth(1)).not.toHaveText('');
+  // 답한 1번은 표시 없음, 안 답한 문항은 번호 옆에 未回答.
+  await expect(rows.first().locator('.sv-unans')).toHaveCount(0);
+  await expect(rows.nth(1).locator('.sv-unans')).toHaveText('未回答');
+  await expect(rows.nth(1)).toHaveAttribute('aria-label', '問題 2、未回答に移動');
   await expect(page.getByRole('button', { name: '問題に戻る' })).toHaveCount(0);
   await expect(page.locator('.sv-flag')).toHaveCount(0);
   await rows.nth(59).click();
@@ -317,6 +321,7 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('.sv-review')).toHaveAttribute('inert', '');
   await dialog.getByRole('button', { name: 'いいえ' }).click();
   await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '問題提出' })).toBeFocused();
   await page.getByRole('button', { name: '問題提出' }).click();
   await page.getByRole('alertdialog').getByRole('button', { name: 'はい' }).click();
   await expect(page).toHaveURL(/\/result\//);
