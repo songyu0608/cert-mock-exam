@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { crossCheck, examSchema, questionsFileSchema } from '../data/schema.ts';
+import { crossCheck, examSchema, inHiddenSet, questionsFileSchema } from '../data/schema.ts';
 import { flattenAll, flattenQuestion, itemSummary } from './items.ts';
 import {
   allocate,
@@ -143,6 +143,24 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
   it('시나리오 문항 수가 모자라면 형식 검사가 알려 준다', () => {
     const broken = questions.filter((q) => !(q.set === '2' && q.scenarioId === '1')).slice();
     expect(crossCheck(exam, broken).join('\n')).toContain('회차 2: 시나리오 1의 문항이 0개');
+  });
+
+  it('숨긴 회차(1~5회)를 알아보고, 모든 회차를 숨기면 검사에서 걸린다', () => {
+    expect(inHiddenSet(exam, '1')).toBe(true);
+    expect(inHiddenSet(exam, '6')).toBe(false);
+    expect(inHiddenSet(exam, undefined)).toBe(false);
+    const allHidden = { ...exam, sets: exam.sets.map((s) => ({ ...s, hidden: true })) };
+    expect(crossCheck(allHidden, questions)).toContain('모든 회차가 숨겨져 있습니다(hidden)');
+  });
+
+  it('6회 장문 문항은 3문단이고 해설과 요약이 있다', () => {
+    const set6 = questions.filter((q) => q.set === '6');
+    expect(set6).toHaveLength(exam.mock.questions);
+    for (const q of set6) {
+      expect(q.stem.split('\n\n')).toHaveLength(3);
+      expect(q.explanation).toBeTruthy();
+      expect(q.summary).toBeTruthy();
+    }
   });
 });
 
