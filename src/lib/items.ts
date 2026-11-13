@@ -41,6 +41,8 @@ export interface Item {
   noReturn?: boolean;
   /** 문항이 딸린 시나리오 id(exam.json scenarios) */
   scenarioId?: string;
+  /** 문제의 핵심 한 문장(questions.json summary) */
+  summary?: string;
 }
 
 export function flattenQuestion(q: Question): Item[] {
@@ -50,6 +52,7 @@ export function flattenQuestion(q: Question): Item[] {
     topDomain: q.domain.split('.')[0] ?? q.domain,
     ...(q.note ? { note: q.note } : {}),
     ...(q.scenarioId ? { scenarioId: q.scenarioId } : {}),
+    ...(q.summary ? { summary: q.summary } : {}),
   };
   if (q.type === 'case') {
     return q.questions.map((sub, i) => ({
@@ -81,8 +84,34 @@ export function flattenQuestion(q: Question): Item[] {
       noReturn: true,
     }));
   }
-  const { id: _id, domain: _d, origin: _o, note: _n, scenarioId: _s, set: _set, ...body } = q;
+  const {
+    id: _id,
+    domain: _d,
+    origin: _o,
+    note: _n,
+    scenarioId: _s,
+    set: _set,
+    summary: _sum,
+    ...body
+  } = q;
   return [{ ...common, key: q.id, body: body as Body }];
+}
+
+/**
+ * レビュー 목록에 쓸 한 줄. 문항에 summary가 있으면 그것을, 없으면 본문의 첫 문장을 쓴다.
+ * 마크다운 기호는 간단히 걷어 내고, 너무 길면 자른다.
+ */
+export function itemSummary(item: Item, max = 60): string {
+  if (item.summary) return item.summary;
+  const plain = item.body.stem
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/^\s*(?:#+|>)\s*/gm, '')
+    .replace(/[`*]/g, '')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const first = plain.match(/^.+?(?:[。．！？]|[.!?](?=\s|$))/)?.[0] ?? plain;
+  return first.length > max ? first.slice(0, max - 1) + '…' : first;
 }
 
 export function flattenAll(questions: Question[]): Item[] {

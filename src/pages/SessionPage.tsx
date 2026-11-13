@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { QuestionView } from '../components/QuestionView.tsx';
+import { SplitSession } from '../components/SplitSession.tsx';
+import { Timer } from '../components/Timer.tsx';
 import type { Exam } from '../data/schema.ts';
 import type { Item } from '../lib/items.ts';
 import { isComplete, isTouched, type Answer } from '../lib/scoring.ts';
@@ -8,37 +10,6 @@ import { clearActive, loadActive, saveActive, saveAttempt } from '../lib/storage
 import { syncNow } from '../lib/sync.ts';
 import { useQuestions } from '../lib/useQuestions.ts';
 import { navigate, onLinkClick, paths } from '../router.ts';
-
-function formatClock(ms: number): string {
-  const t = Math.max(0, Math.ceil(ms / 1000));
-  const h = Math.floor(t / 3600);
-  const m = Math.floor((t % 3600) / 60);
-  const s = t % 60;
-  const mm = String(m).padStart(2, '0');
-  const ss = String(s).padStart(2, '0');
-  return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
-}
-
-function Timer({ deadline, onExpire }: { deadline: number; onExpire: () => void }) {
-  const [now, setNow] = useState(() => Date.now());
-  const fired = useRef(false);
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(t);
-  }, []);
-  const left = deadline - now;
-  useEffect(() => {
-    if (left <= 0 && !fired.current) {
-      fired.current = true;
-      onExpire();
-    }
-  }, [left, onExpire]);
-  return (
-    <span className={`timer${left < 5 * 60_000 ? ' low' : ''}`} role="timer" aria-label="남은 시간">
-      {formatClock(left)}
-    </span>
-  );
-}
 
 export function SessionPage({ exam }: { exam: Exam }) {
   const { data, error } = useQuestions(exam.id);
@@ -147,6 +118,22 @@ export function SessionPage({ exam }: { exam: Exam }) {
   const unanswered = total - answeredCount;
   const flaggedCount = Object.keys(session.flagged).length;
   const progress = isMock ? answeredCount / total : checkedCount / total;
+
+  // 시나리오형 시험의 실전은 왼쪽 시나리오·오른쪽 문제의 2단 화면으로 푼다.
+  if (isMock && exam.scenarios.length > 0)
+    return (
+      <SplitSession
+        exam={exam}
+        itemsByKey={data.itemsByKey}
+        session={session}
+        setSession={setSession}
+        item={item}
+        go={go}
+        onExpire={() => finish(true)}
+        onSubmit={() => finish()}
+        saveFailed={saveFailed}
+      />
+    );
 
   return (
     <>

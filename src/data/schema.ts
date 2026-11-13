@@ -95,6 +95,8 @@ const base = {
   id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
   domain: z.string().regex(/^\d+(\.\d+)*$/),
   stem: text,
+  /** 문제의 핵심 한 문장. 시나리오형 실전 화면의 レビュー 목록에 쓴다(없으면 본문 앞부분) */
+  summary: text.optional(),
   explanation: z.string().optional(),
   origin: z.enum(['claude', 'user']),
   note: z.string().optional(),

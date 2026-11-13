@@ -37,6 +37,10 @@ export interface Session {
   startedAt: number;
   /** 실전 모드 제한 시각(ms) */
   deadline?: number;
+  /** 시나리오형 실전 화면: 취소선을 그어 고를 수 없게 한 보기(item key → 원래 보기 번호) */
+  struck?: Record<string, number[]>;
+  /** 시나리오형 실전 화면: 남은 시간을 숨겼는지 */
+  timerHidden?: boolean;
 }
 
 export interface DomainResult {
@@ -225,6 +229,29 @@ export function createSession(
     current: 0,
     startedAt: now,
     ...(mode === 'mock' && opts.minutes ? { deadline: now + opts.minutes * 60_000 } : {}),
+  };
+}
+
+/**
+ * 보기 하나에 취소선을 긋거나 걷는다(시나리오형 실전 화면). option은 원래 보기 번호.
+ * 취소선을 그은 보기는 고를 수 없으므로, 이미 골랐다면 선택도 푼다.
+ */
+export function toggleStrike(session: Session, key: string, option: number): Session {
+  const now = session.struck?.[key] ?? [];
+  const striking = !now.includes(option);
+  const next = striking ? [...now, option].sort((a, b) => a - b) : now.filter((o) => o !== option);
+  const struck = { ...session.struck };
+  if (next.length) struck[key] = next;
+  else delete struck[key];
+  let answer = session.answers[key];
+  if (striking && answer?.type === 'single' && answer.choice === option)
+    answer = { type: 'single', choice: null };
+  if (striking && answer?.type === 'multi' && answer.choices.includes(option))
+    answer = { type: 'multi', choices: answer.choices.filter((c) => c !== option) };
+  return {
+    ...session,
+    struck,
+    answers: answer ? { ...session.answers, [key]: answer } : session.answers,
   };
 }
 
