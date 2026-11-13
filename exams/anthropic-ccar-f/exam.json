@@ -206,6 +206,26 @@
       "id": "15",
       "name": "S2 · D",
       "scenarios": ["2"]
+    },
+    {
+      "id": "16",
+      "name": "S3 · A",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "17",
+      "name": "S3 · B",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "18",
+      "name": "S3 · C",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "19",
+      "name": "S3 · D",
+      "scenarios": ["3"]
     }
   ]
 }
