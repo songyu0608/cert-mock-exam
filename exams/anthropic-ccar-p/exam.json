@@ -46,7 +46,7 @@
     "questions": 63,
     "minutes": 120,
     "passPercent": 72,
-    "layout": "split"
+    "layout": "exam"
   },
   "types": ["single", "multi"],
   "scoring": "all-or-nothing",

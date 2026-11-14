@@ -1,6 +1,7 @@
-// 시나리오형 시험(예: CCAR-F)과 mock.layout이 split인 시험(예: CCAO-F, CCAR-P)의 실전 모의고사 화면.
-// 왼쪽에 지금 문항 번호와 시나리오, 오른쪽에 문제와 보기를 두고, 아래에서 レビュー·이전·다음으로 움직인다.
-// 시나리오가 없는 문항은 왼쪽에 문제 지문, 오른쪽에 지시문과 보기를 둔다.
+// 시나리오형 시험(예: CCAR-F)과 mock.layout이 exam인 시험(예: CCAO-F, CCAR-P)의 실전 모의고사 화면.
+// 시나리오형은 왼쪽에 지금 문항 번호와 시나리오, 오른쪽에 문제와 보기를 둔다(2단).
+// 시나리오가 없는 시험은 한 칸에 문항 번호, 문제, 보기를 둔다(1단).
+// 위의 フラグ·残り時間, 보기 취소선, 아래의 レビュー·이전·다음은 두 경우 모두 같다.
 import {
   useEffect,
   useLayoutEffect,
@@ -150,9 +151,7 @@ export function SplitSession({
   useLayoutEffect(() => {
     qRef.current?.scrollTo?.(0, 0);
     stageRef.current?.scrollTo?.(0, 0);
-    // 시나리오가 없으면 왼쪽 칸에 문제 지문이 있으니 같이 올린다.
-    if (!item.scenarioId) scRef.current?.scrollTo?.(0, 0);
-  }, [key, item.scenarioId]);
+  }, [key]);
   useLayoutEffect(() => {
     scRef.current?.scrollTo?.(0, 0);
   }, [item.scenarioId]);
@@ -213,8 +212,13 @@ export function SplitSession({
   const body = item.body;
   const choiceBody =
     !item.context && (body.type === 'single' || body.type === 'multi') ? body : undefined;
-  // 시나리오가 없는 선택형 문항은 지문을 왼쪽 칸으로 옮긴다.
-  const stemLeft = !scenario && choiceBody ? choiceBody : undefined;
+  // 시나리오가 없는 시험은 왼쪽 칸 없이 한 칸으로 그린다.
+  const onePane = exam.scenarios.length === 0;
+  const num = (
+    <h2 className="sv-num" id="sv-num">
+      {t.num(i + 1)}
+    </h2>
+  );
 
   return (
     <div className="sv">
@@ -339,47 +343,41 @@ export function SplitSession({
           </div>
         </main>
       ) : (
-        <main className="sv-stage" ref={stageRef} inert={confirming}>
-          <section
-            className={`sv-pane sv-sc${scenarioOpen ? '' : ' closed'}`}
-            ref={scRef}
-            aria-labelledby="sv-num"
-          >
-            <div className="sv-pane-in">
-              <h2 className="sv-num" id="sv-num">
-                {t.num(i + 1)}
-              </h2>
-              {scenario && (
-                <>
-                  <button
-                    type="button"
-                    className="sv-sc-toggle"
-                    aria-expanded={scenarioOpen}
-                    onClick={() => setScenarioOpen((o) => !o)}
-                  >
-                    {t.scenario}
-                  </button>
-                  <p className="sv-sc-text" lang={exam.lang}>
-                    {scenario.description}
-                  </p>
-                </>
-              )}
-              {stemLeft && (
-                <div className="q-text" lang={exam.lang}>
-                  <Markdown>{stemLeft.stem}</Markdown>
-                </div>
-              )}
-            </div>
-          </section>
+        <main className={`sv-stage${onePane ? ' one' : ''}`} ref={stageRef} inert={confirming}>
+          {!onePane && (
+            <section
+              className={`sv-pane sv-sc${scenarioOpen ? '' : ' closed'}`}
+              ref={scRef}
+              aria-labelledby="sv-num"
+            >
+              <div className="sv-pane-in">
+                {num}
+                {scenario && (
+                  <>
+                    <button
+                      type="button"
+                      className="sv-sc-toggle"
+                      aria-expanded={scenarioOpen}
+                      onClick={() => setScenarioOpen((o) => !o)}
+                    >
+                      {t.scenario}
+                    </button>
+                    <p className="sv-sc-text" lang={exam.lang}>
+                      {scenario.description}
+                    </p>
+                  </>
+                )}
+              </div>
+            </section>
+          )}
           <section className="sv-pane sv-q" ref={qRef} aria-labelledby="sv-num">
             <div className="sv-pane-in">
+              {onePane && num}
               {choiceBody ? (
                 <div lang={exam.lang}>
-                  {!stemLeft && (
-                    <div className="q-text">
-                      <Markdown>{choiceBody.stem}</Markdown>
-                    </div>
-                  )}
+                  <div className="q-text">
+                    <Markdown>{choiceBody.stem}</Markdown>
+                  </div>
                   <p className="q-inst">{t.pick(correctCount(choiceBody))}</p>
                   <Choices
                     body={choiceBody}

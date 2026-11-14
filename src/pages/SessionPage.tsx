@@ -119,8 +119,8 @@ export function SessionPage({ exam }: { exam: Exam }) {
   const flaggedCount = Object.keys(session.flagged).length;
   const progress = isMock ? answeredCount / total : checkedCount / total;
 
-  // 시나리오형 시험과 mock.layout이 split인 시험의 실전은 2단 화면으로 푼다.
-  if (isMock && (exam.scenarios.length > 0 || exam.mock.layout === 'split'))
+  // 시나리오형 시험(2단)과 mock.layout이 exam인 시험(1단)의 실전은 실제 시험형 화면으로 푼다.
+  if (isMock && (exam.scenarios.length > 0 || exam.mock.layout === 'exam'))
     return (
       <SplitSession
         exam={exam}
