@@ -278,8 +278,11 @@ export function ExamHome({ exam }: { exam: Exam }) {
           )}
           {exam.sets.length > 0 ? (
             <>
+              {/* 고정 회차는 회차마다 문항 수와 시간이 다를 수 있어 회차 줄에 따로 보이고, 여기서는 합격선만 보인다. */}
               <p className="small">
-                {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
+                {scenarioExam
+                  ? `${exam.mock.questions}문항 · ${exam.mock.minutes}분 · 합격선 ${exam.mock.passPercent}%`
+                  : `합격선 ${exam.mock.passPercent}%`}
               </p>
               <div className="set-list">
                 {canMix(exam) && (
@@ -310,7 +313,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
                     </button>
                     <span className="small muted">
                       {!scenarioExam
-                        ? `${setSizes[st.id] ?? 0}문항 고정`
+                        ? `${setSizes[st.id] ?? 0}문항 고정 · ${minutesLabel(mockMinutes(exam, setSizes[st.id] ?? 0))}`
                         : st.scenarios
                           ? `시나리오 ${st.scenarios.join('·')}${shortSetNote(st.scenarios.length)}`
                           : `시나리오 ${exam.mock.scenarios}개 무작위`}
