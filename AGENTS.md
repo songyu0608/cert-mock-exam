@@ -8,7 +8,7 @@
 choi(GitHub: `songyu0608`)가 혼자 쓰는 자격증 모의고사 사이트. 시험을 고르고 실전 모의고사, 연습, 오답 다시 풀기로 풀고 채점한다.
 
 - 화면 문구, 저장소 문서, 커밋 메시지, PR 설명: 한국어. 기술 용어는 영어 그대로
-  - 예외: 일본어 시험(`lang: ja`)의 시나리오형 실전 화면(`SplitSession`)은 실제 시험처럼 조작 문구도 일본어(レビュー, フラグ, 前の問題 등)로 쓴다(choi 결정, PR #21)
+  - 예외: 일본어 시험(`lang: ja`)의 2단 실전 화면(`SplitSession`, 시나리오형 시험과 `mock.layout: split` 시험)은 실제 시험처럼 조작 문구도 일본어(レビュー, フラグ, 前の問題 등)로 쓴다(choi 결정, PR #21)
 - 스택: Vite + React + TypeScript(strict), Cloudflare Workers 정적 배포
 - 계획·결정 기록: [PR #1](https://github.com/songyu0608/cert-mock-exam/pull/1) 설명과 `README.md`
 

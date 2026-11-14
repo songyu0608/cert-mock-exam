@@ -45,7 +45,8 @@
   "mock": {
     "questions": 60,
     "minutes": 120,
-    "passPercent": 72
+    "passPercent": 72,
+    "layout": "split"
   },
   "types": ["single", "multi"],
   "scoring": "all-or-nothing",

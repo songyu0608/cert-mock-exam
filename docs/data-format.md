@@ -29,7 +29,7 @@ exams/
 | `code`, `name` | 예     | 시험 코드와 이름                                                                                                                                                                                                                                                                                                                         |
 | `level`        | 아니요 | 예: `Foundational`                                                                                                                                                                                                                                                                                                                       |
 | `domains[]`    | 예     | `{ id: "1", name, weight }`. `weight`는 실전 모드 출제 비율(%)                                                                                                                                                                                                                                                                           |
-| `mock`         | 예     | `{ questions, minutes, passPercent, questionChoices, scenarios? }`. `questionChoices`(예: `[50, 65, 85]`)가 있으면 문항 수를 고르고 시간은 비례                                                                                                                                                                                          |
+| `mock`         | 예     | `{ questions, minutes, passPercent, questionChoices, scenarios?, layout? }`. `questionChoices`(예: `[50, 65, 85]`)가 있으면 문항 수를 고르고 시간은 비례. `layout: "split"`이면 시나리오가 없어도 실전을 2단 화면으로 푼다(아래 고정 회차 참고)                                                                                          |
 | `types`        | 예     | 이 시험에서 허용하는 문항 유형. 목록에 없는 유형이 있으면 검사 실패                                                                                                                                                                                                                                                                      |
 | `scoring`      | 아니요 | `all-or-nothing`(기본) 또는 `partial`                                                                                                                                                                                                                                                                                                    |
 | `facts[]`      | 아니요 | 시험 홈 상단 요약 `{ value, label }`                                                                                                                                                                                                                                                                                                     |
@@ -99,6 +99,8 @@ exams/
   - 제출은 レビュー의 問題提出 → 확인 팝업(はい/いいえ)으로 한다. 화면 문구는 시험 언어(`lang`)가 `ja`면 일본어, 아니면 한국어.
 
 `mock.scenarios` 없이 `sets`만 있으면 회차는 고정 세트다(예: CCAR-P 1~5회 × 63문항). 실전은 고른 회차의 문항을 모두 섞어서 내고, 시간은 `mock.minutes`를 문항 수에 비례해 정한다. 회차에 `scenarios`를 쓸 수 없고, 회차마다 문항이 하나 이상 있어야 한다.
+
+`mock.layout`이 `split`이면(예: CCAO-F, CCAR-P) 실전도 시나리오형 시험과 같은 2단 화면(`SplitSession`)으로 푼다. 시나리오가 없으므로 왼쪽에 문항 번호와 문제 지문, 오른쪽에 지시문(「1つ選択してください。」 등)과 보기를 둔다. 연습 모드는 기존 화면 그대로다.
 
 ## 채점
 

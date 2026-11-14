@@ -1367,7 +1367,7 @@ details.callout[open] > summary.callout-title {
 .sv-sc-toggle {
   display: none;
 }
-.sv-q .q-text {
+.sv-pane .q-text {
   margin-top: 0;
 }
 .sv-opt {

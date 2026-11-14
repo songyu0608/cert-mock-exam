@@ -1,5 +1,6 @@
-// 시나리오형 시험(예: CCAR-F)의 실전 모의고사 화면.
+// 시나리오형 시험(예: CCAR-F)과 mock.layout이 split인 시험(예: CCAO-F, CCAR-P)의 실전 모의고사 화면.
 // 왼쪽에 지금 문항 번호와 시나리오, 오른쪽에 문제와 보기를 두고, 아래에서 レビュー·이전·다음으로 움직인다.
+// 시나리오가 없는 문항은 왼쪽에 문제 지문, 오른쪽에 지시문과 보기를 둔다.
 import {
   useEffect,
   useLayoutEffect,
@@ -149,7 +150,9 @@ export function SplitSession({
   useLayoutEffect(() => {
     qRef.current?.scrollTo?.(0, 0);
     stageRef.current?.scrollTo?.(0, 0);
-  }, [key]);
+    // 시나리오가 없으면 왼쪽 칸에 문제 지문이 있으니 같이 올린다.
+    if (!item.scenarioId) scRef.current?.scrollTo?.(0, 0);
+  }, [key, item.scenarioId]);
   useLayoutEffect(() => {
     scRef.current?.scrollTo?.(0, 0);
   }, [item.scenarioId]);
@@ -210,6 +213,8 @@ export function SplitSession({
   const body = item.body;
   const choiceBody =
     !item.context && (body.type === 'single' || body.type === 'multi') ? body : undefined;
+  // 시나리오가 없는 선택형 문항은 지문을 왼쪽 칸으로 옮긴다.
+  const stemLeft = !scenario && choiceBody ? choiceBody : undefined;
 
   return (
     <div className="sv">
@@ -359,15 +364,22 @@ export function SplitSession({
                   </p>
                 </>
               )}
+              {stemLeft && (
+                <div className="q-text" lang={exam.lang}>
+                  <Markdown>{stemLeft.stem}</Markdown>
+                </div>
+              )}
             </div>
           </section>
           <section className="sv-pane sv-q" ref={qRef} aria-labelledby="sv-num">
             <div className="sv-pane-in">
               {choiceBody ? (
                 <div lang={exam.lang}>
-                  <div className="q-text">
-                    <Markdown>{choiceBody.stem}</Markdown>
-                  </div>
+                  {!stemLeft && (
+                    <div className="q-text">
+                      <Markdown>{choiceBody.stem}</Markdown>
+                    </div>
+                  )}
                   <p className="q-inst">{t.pick(correctCount(choiceBody))}</p>
                   <Choices
                     body={choiceBody}
