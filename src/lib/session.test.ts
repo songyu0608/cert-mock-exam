@@ -316,7 +316,7 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
 describe('고정 회차 실전 출제(anthropic-ccar-p, 시나리오 없음)', () => {
   const { exam, questions } = load('anthropic-ccar-p');
 
-  // 1~5회는 실제 시험과 같은 63문항, 6회(장문)는 60문항 세트다.
+  // 숨긴 회차 1~5는 실제 시험과 같은 63문항, 회차 id 6(화면 이름 「1회」, 장문)은 60문항 세트다.
   const setSize = (id: string) => (id === '6' ? 60 : exam.mock.questions);
 
   it('형식 검사를 통과하고, 회차마다 정해진 문항 수만큼 있다', () => {
