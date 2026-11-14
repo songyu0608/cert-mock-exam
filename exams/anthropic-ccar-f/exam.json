@@ -266,6 +266,26 @@
       "id": "27",
       "name": "S5 · D",
       "scenarios": ["5"]
+    },
+    {
+      "id": "28",
+      "name": "S6 · A",
+      "scenarios": ["6"]
+    },
+    {
+      "id": "29",
+      "name": "S6 · B",
+      "scenarios": ["6"]
+    },
+    {
+      "id": "30",
+      "name": "S6 · C",
+      "scenarios": ["6"]
+    },
+    {
+      "id": "31",
+      "name": "S6 · D",
+      "scenarios": ["6"]
     }
   ]
 }
