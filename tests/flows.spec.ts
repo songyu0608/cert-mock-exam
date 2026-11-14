@@ -440,6 +440,16 @@ test('고정 회차 시험(CCAR-P): 회차를 골라 시작하면 그 회차 63�
   await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
 });
 
+test('고정 회차 시험(CCAR-P): 6회 · 장문을 시작하면 60문항을 낸다', async ({ page }) => {
+  await openExam(page, 'CCAR-P');
+  const card = modeCard(page, '실전 모의고사');
+  await expect(card).toContainText('60문항 고정');
+  await card.getByRole('button', { name: '6회 · 장문 시작' }).click();
+  await expect(page.locator('.bar-title')).toContainText('1/60');
+  await expect(page.locator('.bar-mode')).toContainText('6회 · 장문');
+  await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
+});
+
 test('고정 회차 시험(CCAO-F): 1회를 시작하면 60문항을 낸다', async ({ page }) => {
   await openExam(page, 'CCAO-F');
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');

@@ -316,20 +316,25 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
 describe('고정 회차 실전 출제(anthropic-ccar-p, 시나리오 없음)', () => {
   const { exam, questions } = load('anthropic-ccar-p');
 
-  it('형식 검사를 통과하고, 회차마다 실전 문항 수만큼 있다', () => {
+  // 1~5회는 실제 시험과 같은 63문항, 6회(장문)는 60문항 세트다.
+  const setSize = (id: string) => (id === '6' ? 60 : exam.mock.questions);
+
+  it('형식 검사를 통과하고, 회차마다 정해진 문항 수만큼 있다', () => {
     expect(crossCheck(exam, questions)).toEqual([]);
     for (const st of exam.sets)
-      expect(questions.filter((q) => q.set === st.id)).toHaveLength(exam.mock.questions);
+      expect(questions.filter((q) => q.set === st.id)).toHaveLength(setSize(st.id));
   });
 
   it('그 회차의 문항을 모두 섞어서 낸다', () => {
     for (const st of exam.sets) {
       const picked = pickSetMock(exam, questions, st.id);
-      expect(picked).toHaveLength(exam.mock.questions);
+      expect(picked).toHaveLength(setSize(st.id));
       expect(picked.every((q) => q.set === st.id)).toBe(true);
       expect(new Set(picked.map((q) => q.id)).size).toBe(picked.length);
     }
     expect(mockMinutes(exam, exam.mock.questions)).toBe(exam.mock.minutes);
+    // 60문항 세트의 시간은 문항 수에 비례한다(120 × 60 / 63 ≈ 114분).
+    expect(Math.round(mockMinutes(exam, setSize('6')))).toBe(114);
     expect(() => pickSetMock(exam, questions, '9')).toThrow();
   });
 
