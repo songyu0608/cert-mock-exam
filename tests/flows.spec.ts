@@ -424,6 +424,17 @@ test('고정 회차 시험(CCAR-P): 회차를 골라 시작하면 그 회차 63�
   await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
 });
 
+test('고정 회차 시험(CCAO-F): 1회를 시작하면 60문항을 낸다', async ({ page }) => {
+  await openExam(page, 'CCAO-F');
+  await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
+  const card = modeCard(page, '실전 모의고사');
+  await expect(card.getByRole('button', { name: /회 시작$/ })).toHaveCount(1);
+  await expect(card).toContainText('60문항 고정');
+  await card.getByRole('button', { name: '1회 시작' }).click();
+  await expect(page.locator('.bar-title')).toContainText('1/60');
+  await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
+});
+
 test('가이드 탭: 시험별 가이드를 고르면 문서를 연다', async ({ page }) => {
   await page.goto('/');
   await page
