@@ -435,8 +435,10 @@ test('고정 회차 시험(CCAR-P): 숨긴 1~5회는 빠지고 1회(장문)만 �
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
   const card = modeCard(page, '실전 모의고사');
   await expect(card.getByRole('button', { name: /시작$/ })).toHaveCount(1);
-  await expect(card).toContainText('60문항 고정');
-  await expect(card).not.toContainText('63문항 고정');
+  // 고정 회차는 회차 줄에 그 회차의 문항 수와 시간을 보이고, 실제 시험의 63문항 · 120분은 보이지 않는다.
+  await expect(card).toContainText('60문항 고정 · 114분');
+  await expect(card).not.toContainText('63문항');
+  await expect(card).not.toContainText('120분');
   await card.getByRole('button', { name: '1회 시작' }).click();
   await expect(page.locator('.bar-title')).toContainText('1/60');
   await expect(page.locator('.bar-mode')).toContainText('1회');
