@@ -259,6 +259,7 @@ export function itemCount(q: Question): number {
 
 /** 크기가 sizes인 묶음들을 나누지 않고 골라 합을 정확히 n으로 만들 수 있는지(부분합). */
 export function canFill(sizes: number[], n: number): boolean {
+  if (!Number.isInteger(n) || n < 0) return false;
   const reach = Array<boolean>(n + 1).fill(false);
   reach[0] = true;
   for (const size of sizes) for (let t = n; t >= size; t--) if (reach[t - size]) reach[t] = true;
@@ -325,7 +326,8 @@ function checkScenarios(exam: Exam, questions: Question[]): string[] {
       const sizes = g.pool.filter((q) => q.scenarioId === id).map(itemCount);
       const n = sizes.reduce((sum, x) => sum + x, 0);
       if (n < per) errors.push(`${g.label}: 시나리오 ${id}의 문항이 ${n}개입니다(${per}개 필요)`);
-      else if (!canFill(sizes, per))
+      // 할당량이 정수가 아니면 위에서 이미 오류를 냈으므로 부분합 검사는 건너뛴다.
+      else if (Number.isInteger(per) && !canFill(sizes, per))
         errors.push(
           `${g.label}: 시나리오 ${id}의 문항으로 ${per}문항을 정확히 채울 수 없습니다(사례·문제-해결 세트는 나누지 않음)`,
         );

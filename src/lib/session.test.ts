@@ -276,6 +276,13 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
     for (let i = 0; i < 10; i++) expect(flattenAll(pickExact(pool, 4)!)).toHaveLength(4);
   });
 
+  it('시나리오 할당량이 정수가 아니면 검사가 멈추지 않고 오류를 돌려준다', () => {
+    const odd = { ...exam, mock: { ...exam.mock, questions: 59 } };
+    let errors: string[] = [];
+    expect(() => (errors = crossCheck(odd, questions))).not.toThrow();
+    expect(errors).toContain('mock.questions(59)가 mock.scenarios(4)로 나누어지지 않습니다');
+  });
+
   it('세션 이름에 회차와 시나리오를 붙인다', () => {
     const s = createSession(exam, questions.slice(0, 2), 'mock', { label: '2회 · 시나리오 1·2' });
     expect(sessionLabel(s)).toBe('실전 모의고사 · 2회 · 시나리오 1·2');
