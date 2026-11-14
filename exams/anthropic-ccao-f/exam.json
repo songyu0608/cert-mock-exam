@@ -75,6 +75,13 @@
       "checked": "2026-11-14"
     }
   ],
+  "guides": [
+    {
+      "id": "official-guide",
+      "title": "공식 시험 가이드",
+      "description": "v1.0 전문 · 한국어 번역(일본어판 기준) / 日本語 공식판 / 한·日 대조"
+    }
+  ],
   "sets": [
     {
       "id": "1",

@@ -1,0 +1,90 @@
+{
+  "id": "anthropic-ccdv-f",
+  "vendor": "anthropic",
+  "code": "CCDV-F",
+  "name": "Claude Certified Developer – Foundations",
+  "lang": "ja",
+  "level": "Foundations",
+  "domains": [
+    {
+      "id": "1",
+      "name": "エージェントとワークフロー",
+      "weight": 14.7
+    },
+    {
+      "id": "2",
+      "name": "アプリケーションと統合",
+      "weight": 33.1
+    },
+    {
+      "id": "3",
+      "name": "Claude Code",
+      "weight": 3.1
+    },
+    {
+      "id": "4",
+      "name": "評価、テスト、デバッグ",
+      "weight": 2.6
+    },
+    {
+      "id": "5",
+      "name": "モデルの選択と最適化",
+      "weight": 16.8
+    },
+    {
+      "id": "6",
+      "name": "プロンプトとコンテキストのエンジニアリング",
+      "weight": 11.0
+    },
+    {
+      "id": "7",
+      "name": "セキュリティと安全性",
+      "weight": 8.1
+    },
+    {
+      "id": "8",
+      "name": "ツールとMCP",
+      "weight": 10.6
+    }
+  ],
+  "mock": {
+    "questions": 53,
+    "minutes": 120,
+    "passPercent": 72
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "53문항",
+      "label": "단일 선택·복수 선택(고를 개수는 문제에 표시)"
+    },
+    {
+      "value": "120분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "720 / 1,000",
+      "label": "합격 스케일 점수(100~1,000)"
+    },
+    {
+      "value": "8 / 25",
+      "label": "분야 / 스킬"
+    }
+  ],
+  "notes": "아직 모의고사 문항이 없고 공식 시험 가이드만 있는 읽기 자료입니다. 문항 수·시간·합격점·분야 배점은 일본어 시험 가이드 v1.0(2026년 7월 발효) 기준입니다.",
+  "sources": [
+    {
+      "label": "Certification FAQ(문항 수·시간·합격점·분야 배점은 일본어 시험 가이드 v1.0 PDF, 2026년 7월 발효 기준)",
+      "url": "https://anthropic-partners.skilljar.com/page/faq-certifications",
+      "checked": "2026-11-14"
+    }
+  ],
+  "guides": [
+    {
+      "id": "official-guide",
+      "title": "공식 시험 가이드",
+      "description": "v1.0 전문 · 한국어 번역(일본어판 기준) / 日本語 공식판 / 한·日 대조"
+    }
+  ]
+}
