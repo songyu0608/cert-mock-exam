@@ -340,6 +340,22 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
 });
 
+test('시나리오형 시험(CCAR-F): 무작위 조합은 시나리오 4개에서 세트 하나씩 골라 60문항을 낸다', async ({
+  page,
+}) => {
+  await openExam(page, 'CCAR-F');
+  const card = modeCard(page, '실전 모의고사');
+  // 목록 맨 위에 있다.
+  await expect(card.locator('.set-row').first()).toContainText('무작위 조합 시작');
+  await card.getByRole('button', { name: '무작위 조합 시작' }).click();
+  await expect(page.locator('.bar-title')).toContainText('問題 1 / 60');
+  // 이름에 고른 세트 4개가 시나리오 순서대로 붙는다(예: S1 · B, S3 · A, S4 · D, S6 · C).
+  await expect(page.locator('.bar-mode')).toContainText(
+    /무작위 조합 · S\d · [A-D](, S\d · [A-D]){3}/,
+  );
+  await expect(page.locator('.sv-clock .timer')).toHaveText(/^(2:00:00|1:59:5\d)$/);
+});
+
 test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동작한다', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('navigation', { name: '화면' }).getByRole('link', { name: '이론' }).click();
