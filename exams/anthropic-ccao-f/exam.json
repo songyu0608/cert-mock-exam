@@ -1,0 +1,84 @@
+{
+  "id": "anthropic-ccao-f",
+  "vendor": "anthropic",
+  "code": "CCAO-F",
+  "name": "Claude Certified Associate – Foundations",
+  "lang": "ja",
+  "level": "Foundations",
+  "domains": [
+    {
+      "id": "1",
+      "name": "プロンプト作成とタスク実行",
+      "weight": 14
+    },
+    {
+      "id": "2",
+      "name": "出力の評価と検証",
+      "weight": 21
+    },
+    {
+      "id": "3",
+      "name": "製品とモデルの選択",
+      "weight": 12
+    },
+    {
+      "id": "4",
+      "name": "ワークフロー統合とソリューション設計",
+      "weight": 16
+    },
+    {
+      "id": "5",
+      "name": "設定とナレッジ管理",
+      "weight": 12
+    },
+    {
+      "id": "6",
+      "name": "ガバナンス、リスク、責任ある利用",
+      "weight": 15
+    },
+    {
+      "id": "7",
+      "name": "トラブルシューティングと最適化",
+      "weight": 10
+    }
+  ],
+  "mock": {
+    "questions": 60,
+    "minutes": 120,
+    "passPercent": 72
+  },
+  "types": ["single", "multi"],
+  "scoring": "all-or-nothing",
+  "facts": [
+    {
+      "value": "60문항",
+      "label": "단일 선택·복수 선택(고를 개수는 문제에 표시)"
+    },
+    {
+      "value": "120분",
+      "label": "시험 시간"
+    },
+    {
+      "value": "720 / 1,000",
+      "label": "합격 스케일 점수(100~1,000)"
+    },
+    {
+      "value": "7 / 30",
+      "label": "도메인 / 가이드 목표"
+    }
+  ],
+  "notes": "60문항 · 120분. 1회는 60문항으로 고정된 세트이며, 분야별 문항 수는 가이드 배점(14/21/12/16/12/15/10%)을 따릅니다(8/13/7/10/7/9/6). 문항은 공식 시험 가이드(일본어판 v1.0, 2026년 7월 발효)의 목표를 풀어 쓴 목표 37개를 바탕으로 만든 일본어 연습 문제이며 실제 기출이 아닙니다. 가이드에는 시나리오가 없어 문항은 서로 독립이고, 본문은 CCAR-F 회차와 같은 3문단 형식(상황과 수치 / 이미 한 조치·제약·관계없는 정보 / 질문)입니다. 문항 아래 '참고'의 번호는 그 목표 번호입니다. 모델 설명은 가이드가 드는 Haiku·Sonnet·Opus 3종 기준입니다. 실제 시험은 100~1,000 스케일 점수로 720점 이상이 합격이고 정답률과 1:1로 대응하지 않으므로, 합격선 72%는 대략적인 기준입니다.",
+  "sources": [
+    {
+      "label": "Certification FAQ(문항 수·시간·합격점·분야 배점은 일본어 시험 가이드 v1.0 PDF, 2026년 7월 발효 기준)",
+      "url": "https://anthropic-partners.skilljar.com/page/faq-certifications",
+      "checked": "2026-11-14"
+    }
+  ],
+  "sets": [
+    {
+      "id": "1",
+      "name": "1회"
+    }
+  ]
+}
