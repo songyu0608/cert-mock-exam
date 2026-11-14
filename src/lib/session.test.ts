@@ -1,6 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { crossCheck, examSchema, inHiddenSet, questionsFileSchema } from '../data/schema.ts';
+import {
+  crossCheck,
+  examSchema,
+  inHiddenSet,
+  questionSchema,
+  questionsFileSchema,
+} from '../data/schema.ts';
 import { flattenAll, flattenQuestion, itemSummary } from './items.ts';
 import {
   allocate,
@@ -10,6 +16,7 @@ import {
   canMix,
   mockMinutes,
   pickMixedMock,
+  pickExact,
   pickMockQuestions,
   pickScenarioMock,
   pickSetMock,
@@ -205,6 +212,68 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
     };
     expect(canMix(few)).toBe(false);
     expect(() => pickMixedMock(few, questions)).toThrow('모자랍니다');
+  });
+
+  it('시나리오 할당량은 채점 단위로 센다: 사례를 나누지 않고 정확히 채우고, 못 채우면 검사에서 걸린다', () => {
+    const opt = [
+      { text: 'a', correct: true },
+      { text: 'b', correct: false },
+    ];
+    const single = (id: string, set: string, scenarioId: string) =>
+      questionSchema.parse({
+        id,
+        domain: '1.1',
+        stem: 's',
+        origin: 'claude',
+        type: 'single',
+        options: opt,
+        set,
+        scenarioId,
+      });
+    const twoPart = (id: string, set: string, scenarioId: string) =>
+      questionSchema.parse({
+        id,
+        domain: '1.1',
+        stem: 's',
+        origin: 'claude',
+        type: 'case',
+        scenario: 'c',
+        set,
+        scenarioId,
+        questions: [
+          { stem: 'x', type: 'single', options: opt },
+          { stem: 'y', type: 'single', options: opt },
+        ],
+      });
+    // 2개 시나리오 × 1문항 · 4분. 시나리오 1의 세트에는 단일 문항 1개와 하위 문항 2개짜리 사례 1개.
+    const small = {
+      ...exam,
+      domains: exam.domains.slice(0, 1),
+      types: [...exam.types, 'case' as const],
+      mock: { ...exam.mock, questions: 2, minutes: 4, scenarios: 2 },
+      scenarios: exam.scenarios.slice(0, 2),
+      sets: [
+        { id: 'a', name: 'S1 · A', scenarios: ['1'] },
+        { id: 'b', name: 'S2 · A', scenarios: ['2'] },
+      ],
+    };
+    const qs = [single('t-1', 'a', '1'), twoPart('t-2', 'a', '1'), single('t-3', 'b', '2')];
+    expect(crossCheck(small, qs)).toEqual([]);
+    for (let i = 0; i < 20; i++) {
+      const mixed = pickMixedMock(small, qs).questions;
+      expect(flattenAll(mixed)).toHaveLength(2);
+      expect(mixed.map((q) => q.id)).toEqual(['t-1', 't-3']);
+      expect(flattenAll(pickScenarioMock(small, qs, 'a').questions)).toHaveLength(1);
+    }
+    // 하위 문항 2개짜리 사례만으로는 1문항을 채울 수 없다.
+    const noFit = [twoPart('t-2', 'a', '1'), single('t-3', 'b', '2')];
+    expect(crossCheck(small, noFit)).toContain(
+      '회차 a: 시나리오 1의 문항으로 1문항을 정확히 채울 수 없습니다(사례·문제-해결 세트는 나누지 않음)',
+    );
+    expect(pickExact(noFit.slice(0, 1), 1)).toBeNull();
+    // 1 + 2 + 2 중 4를 채우려면 사례 둘을 고른다.
+    const pool = [single('u-1', 'a', '1'), twoPart('u-2', 'a', '1'), twoPart('u-3', 'a', '1')];
+    for (let i = 0; i < 10; i++) expect(flattenAll(pickExact(pool, 4)!)).toHaveLength(4);
   });
 
   it('세션 이름에 회차와 시나리오를 붙인다', () => {

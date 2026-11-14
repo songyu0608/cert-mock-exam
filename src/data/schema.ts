@@ -250,6 +250,21 @@ export function crossCheck(exam: Exam, questions: Question[]): string[] {
   return errors;
 }
 
+/** 문항의 채점 단위(item) 수. 사례 연구는 하위 문항 수, 문제-해결 세트는 해결책 수(lib/items.ts와 같은 기준). */
+export function itemCount(q: Question): number {
+  if (q.type === 'case') return q.questions.length;
+  if (q.type === 'problem-solution') return q.solutions.length;
+  return 1;
+}
+
+/** 크기가 sizes인 묶음들을 나누지 않고 골라 합을 정확히 n으로 만들 수 있는지(부분합). */
+export function canFill(sizes: number[], n: number): boolean {
+  const reach = Array<boolean>(n + 1).fill(false);
+  reach[0] = true;
+  for (const size of sizes) for (let t = n; t >= size; t--) if (reach[t - size]) reach[t] = true;
+  return reach[n]!;
+}
+
 function checkScenarios(exam: Exam, questions: Question[]): string[] {
   const errors: string[] = [];
   const scenIds = new Set(exam.scenarios.map((s) => s.id));
@@ -286,7 +301,8 @@ function checkScenarios(exam: Exam, questions: Question[]): string[] {
   if (exam.mock.questionChoices)
     errors.push('mock.scenarios와 questionChoices는 함께 쓸 수 없습니다');
   const per = exam.mock.questions / pick;
-  // 실전 모드에서 고를 수 있는 시나리오마다 문항이 per개 이상 있어야 한다.
+  // 실전 모드에서 고를 수 있는 시나리오마다 채점 단위로 per개를 정확히 채울 수 있어야 한다.
+  // 사례 연구·문제-해결 세트는 나누지 않으므로, 단위 수가 per 이상이어도 정확히 맞추지 못할 수 있다.
   const groups = exam.sets.length
     ? exam.sets.map((s) => ({
         label: `회차 ${s.id}`,
@@ -306,8 +322,13 @@ function checkScenarios(exam: Exam, questions: Question[]): string[] {
         if (!scenIds.has(id)) errors.push(`${g.label}: 시나리오 ${id}이 exam.json에 없습니다`);
     } else if (ids.length < pick) errors.push(`${g.label}: 시나리오가 ${pick}개보다 적습니다`);
     for (const id of ids) {
-      const n = g.pool.filter((q) => q.scenarioId === id).length;
+      const sizes = g.pool.filter((q) => q.scenarioId === id).map(itemCount);
+      const n = sizes.reduce((sum, x) => sum + x, 0);
       if (n < per) errors.push(`${g.label}: 시나리오 ${id}의 문항이 ${n}개입니다(${per}개 필요)`);
+      else if (!canFill(sizes, per))
+        errors.push(
+          `${g.label}: 시나리오 ${id}의 문항으로 ${per}문항을 정확히 채울 수 없습니다(사례·문제-해결 세트는 나누지 않음)`,
+        );
     }
   }
   return errors;

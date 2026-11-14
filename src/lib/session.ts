@@ -1,5 +1,5 @@
 // 풀이 세션: 출제(문항 고르기), 진행 상태, 결과 계산.
-import type { Exam, Question } from '../data/schema.ts';
+import { itemCount, type Exam, type Question } from '../data/schema.ts';
 import { flattenQuestion, type Item } from './items.ts';
 import {
   blankAnswer,
@@ -162,14 +162,52 @@ export function pickScenarioMock(
         rng,
       ).slice(0, pick);
   chosen.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-  const per = scenarioPer(exam);
-  const picked = chosen.flatMap((id) =>
-    shuffle(
-      pool.filter((q) => q.scenarioId === id),
-      rng,
-    ).slice(0, per),
-  );
+  const label = set ? `회차 ${set.id}` : '전체';
+  const picked = chosen.flatMap((id) => pickScenarioItems(exam, pool, label, id, rng));
   return { questions: picked, scenarios: chosen };
+}
+
+/**
+ * pool에서 채점 단위(item) 합이 정확히 n이 되도록 문항을 무작위로 고른다.
+ * 사례 연구·문제-해결 세트는 나누지 않는다. 채울 수 없으면 null(형식 검사가 미리 알린다).
+ */
+export function pickExact(pool: Question[], n: number, rng: Rng = Math.random): Question[] | null {
+  const qs = shuffle(pool, rng);
+  const sizes = qs.map(itemCount);
+  // reach[i][t]: qs[i..]에서 골라 합 t를 만들 수 있는지
+  const reach = Array.from({ length: qs.length + 1 }, () => Array<boolean>(n + 1).fill(false));
+  reach[qs.length]![0] = true;
+  for (let i = qs.length - 1; i >= 0; i--)
+    for (let t = 0; t <= n; t++)
+      reach[i]![t] = reach[i + 1]![t]! || (t >= sizes[i]! && reach[i + 1]![t - sizes[i]!]!);
+  if (!reach[0]![n]) return null;
+  // 섞은 순서대로, 넣어도 나머지로 채울 수 있으면 넣는다.
+  const out: Question[] = [];
+  let left = n;
+  for (let i = 0; i < qs.length && left > 0; i++)
+    if (sizes[i]! <= left && reach[i + 1]![left - sizes[i]!]) {
+      out.push(qs[i]!);
+      left -= sizes[i]!;
+    }
+  return out;
+}
+
+function pickScenarioItems(
+  exam: Exam,
+  pool: Question[],
+  label: string,
+  scenarioId: string,
+  rng: Rng,
+): Question[] {
+  const per = scenarioPer(exam);
+  const picked = pickExact(
+    pool.filter((q) => q.scenarioId === scenarioId),
+    per,
+    rng,
+  );
+  if (!picked)
+    throw new Error(`${exam.id}: ${label} 시나리오 ${scenarioId}로 ${per}문항을 채울 수 없습니다`);
+  return picked;
 }
 
 /** 시나리오 1개만 고정한 보이는 회차(시나리오별 세트)를 시나리오 id별로 모은다. */
@@ -208,12 +246,14 @@ export function pickMixedMock(
     .slice(0, pick)
     .sort((a, b) => order.indexOf(a) - order.indexOf(b));
   const sets = scenarios.map((id) => shuffle(bySc[id]!, rng)[0]!);
-  const per = scenarioPer(exam);
   const picked = sets.flatMap((st, i) =>
-    shuffle(
-      questions.filter((q) => q.set === st.id && q.scenarioId === scenarios[i]),
+    pickScenarioItems(
+      exam,
+      questions.filter((q) => q.set === st.id),
+      `회차 ${st.id}`,
+      scenarios[i]!,
       rng,
-    ).slice(0, per),
+    ),
   );
   return { questions: picked, scenarios, sets };
 }
