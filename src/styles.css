@@ -1370,6 +1370,17 @@ details.callout[open] > summary.callout-title {
 .sv-q .q-text {
   margin-top: 0;
 }
+/* 시나리오가 없는 시험은 한 칸. 글줄이 너무 길지 않게 가운데 폭을 둔다 */
+.sv-stage.one {
+  grid-template-columns: minmax(0, 1fr);
+}
+.sv-stage.one .sv-q {
+  padding-left: max(16px, env(safe-area-inset-left));
+}
+.sv-stage.one .sv-pane-in {
+  max-width: 880px;
+  margin: 0 auto;
+}
 .sv-opt {
   padding: 0;
   gap: 0;

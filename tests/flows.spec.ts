@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { answerSampleCorrectly, modeCard, openExam } from './helpers.ts';
 
 // 화면에서 자바스크립트 오류가 나면 테스트를 실패시킨다.
@@ -428,7 +428,28 @@ test('문항 없이 이론만 있는 시험(GH-200)은 이론 탭에만 보인�
   await expect(page.getByText('아직 모의고사 문항이 없습니다', { exact: false })).toBeVisible();
 });
 
-test('고정 회차 시험(CCAR-P): 숨긴 1~5회는 빠지고 1회(장문)만 보이며 60문항을 낸다', async ({
+// 시나리오가 없는 시험(mock.layout: exam)의 실전 화면: 왼쪽 칸 없이 한 칸에 문항 번호·문제·지시문·보기.
+async function expectExamScreenWithoutScenario(page: Page) {
+  await expect(page.locator('.sv-sc')).toHaveCount(0);
+  const pane = page.locator('.sv-q');
+  await expect(pane.getByRole('heading', { name: '問題 1' })).toBeVisible();
+  const stem = pane.locator('[lang="ja"] .q-text');
+  await expect(stem).toBeVisible();
+  const first = await stem.innerText();
+  await expect(pane.locator('.q-inst')).toHaveText(/選択してください。$/);
+  await pane.getByRole('button', { name: '選択肢 A に取り消し線を引く' }).click();
+  await expect(pane.getByRole('radio').or(pane.getByRole('checkbox')).first()).toBeDisabled();
+  await page.getByRole('button', { name: 'フラグ', exact: true }).click();
+  await expect(page.locator('.sv-flag')).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: '次の問題' }).click();
+  await expect(pane.getByRole('heading', { name: '問題 2' })).toBeVisible();
+  await expect(stem).not.toHaveText(first);
+  await page.getByRole('button', { name: /^レビュー/ }).click();
+  await expect(page.locator('.sv-table tbody tr')).toHaveCount(60);
+  await expect(page.getByRole('link', { name: '나가기' })).toHaveCount(0);
+}
+
+test('고정 회차 시험(CCAR-P): 숨긴 1~5회는 빠지고 1회(장문)만 보이며 60문항을 실제 시험형 화면으로 낸다', async ({
   page,
 }) => {
   await openExam(page, 'CCAR-P');
@@ -440,20 +461,23 @@ test('고정 회차 시험(CCAR-P): 숨긴 1~5회는 빠지고 1회(장문)만 �
   await expect(card).not.toContainText('63문항');
   await expect(card).not.toContainText('120분');
   await card.getByRole('button', { name: '1회 시작' }).click();
-  await expect(page.locator('.bar-title')).toContainText('1/60');
+  await expect(page.locator('.bar-title')).toContainText('問題 1 / 60');
   await expect(page.locator('.bar-mode')).toContainText('1회');
-  await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
+  await expectExamScreenWithoutScenario(page);
 });
 
-test('고정 회차 시험(CCAO-F): 1회를 시작하면 60문항을 낸다', async ({ page }) => {
+test('고정 회차 시험(CCAO-F): 1회를 시작하면 60문항을 실제 시험형 화면으로 낸다', async ({
+  page,
+}) => {
   await openExam(page, 'CCAO-F');
   await expect(page.locator('html')).toHaveAttribute('data-lang', 'ja');
   const card = modeCard(page, '실전 모의고사');
   await expect(card.getByRole('button', { name: /회 시작$/ })).toHaveCount(1);
   await expect(card).toContainText('60문항 고정');
   await card.getByRole('button', { name: '1회 시작' }).click();
-  await expect(page.locator('.bar-title')).toContainText('1/60');
-  await expect(page.locator('article')).toHaveAttribute('lang', 'ja');
+  await expect(page.locator('.bar-title')).toContainText('問題 1 / 60');
+  await expect(page.locator('.bar-mode')).toContainText('1회');
+  await expectExamScreenWithoutScenario(page);
 });
 
 test('가이드 탭: 시험별 가이드를 고르면 문서를 연다', async ({ page }) => {
