@@ -172,6 +172,52 @@ export function pickScenarioMock(
   return { questions: picked, scenarios: chosen };
 }
 
+/** 시나리오 1개만 고정한 보이는 회차(시나리오별 세트)를 시나리오 id별로 모은다. */
+export function singleScenarioSets(exam: Exam): Record<string, Exam['sets']> {
+  const out: Record<string, Exam['sets']> = {};
+  for (const st of exam.sets) {
+    const [id, ...more] = st.scenarios ?? [];
+    if (st.hidden || id === undefined || more.length) continue;
+    (out[id] ??= []).push(st);
+  }
+  return out;
+}
+
+/** 무작위 조합을 낼 수 있는지: 시나리오별 세트가 있는 시나리오가 mock.scenarios개 이상. */
+export function canMix(exam: Exam): boolean {
+  const pick = exam.mock.scenarios;
+  return !!pick && Object.keys(singleScenarioSets(exam)).length >= pick;
+}
+
+/**
+ * 무작위 조합 실전 출제. 시나리오별 세트가 있는 시나리오 중 mock.scenarios개를 무작위로 고르고,
+ * 시나리오마다 세트 하나를 무작위로 골라 그 세트의 문항을 낸다.
+ * 시나리오 순서대로 묶고, 묶음 안에서는 섞는다.
+ */
+export function pickMixedMock(
+  exam: Exam,
+  questions: Question[],
+  rng: Rng = Math.random,
+): { questions: Question[]; scenarios: string[]; sets: Exam['sets'] } {
+  const pick = exam.mock.scenarios;
+  const bySc = singleScenarioSets(exam);
+  if (!pick || Object.keys(bySc).length < pick)
+    throw new Error(`${exam.id}: 시나리오별 세트가 있는 시나리오가 모자랍니다`);
+  const order = exam.scenarios.map((s) => s.id);
+  const scenarios = shuffle(Object.keys(bySc), rng)
+    .slice(0, pick)
+    .sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  const sets = scenarios.map((id) => shuffle(bySc[id]!, rng)[0]!);
+  const per = scenarioPer(exam);
+  const picked = sets.flatMap((st, i) =>
+    shuffle(
+      questions.filter((q) => q.set === st.id && q.scenarioId === scenarios[i]),
+      rng,
+    ).slice(0, per),
+  );
+  return { questions: picked, scenarios, sets };
+}
+
 /** 시나리오 없는 시험의 고정 회차: 그 회차의 문항을 모두 섞어서 낸다. */
 export function pickSetMock(
   exam: Exam,

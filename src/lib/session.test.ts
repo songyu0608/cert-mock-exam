@@ -7,11 +7,14 @@ import {
   createSession,
   finishSession,
   minutesLabel,
+  canMix,
   mockMinutes,
+  pickMixedMock,
   pickMockQuestions,
   pickScenarioMock,
   pickSetMock,
   sessionLabel,
+  singleScenarioSets,
   toggleStrike,
 } from './session.ts';
 
@@ -160,6 +163,48 @@ describe('시나리오형 실전 출제(anthropic-ccar-f)', () => {
       seen.add(scenarios.join(','));
     }
     expect(seen.size).toBeGreaterThan(1);
+  });
+
+  it('무작위 조합: 시나리오 4개를 고르고 시나리오마다 세트 하나의 문항을 낸다', () => {
+    expect(canMix(exam)).toBe(true);
+    const bySc = singleScenarioSets(exam);
+    expect(Object.keys(bySc).sort()).toEqual(exam.scenarios.map((s) => s.id));
+    const seenScenarios = new Set<string>();
+    const seenSets = new Set<string>();
+    for (let i = 0; i < 30; i++) {
+      const { questions: picked, scenarios, sets } = pickMixedMock(exam, questions);
+      expect(scenarios).toHaveLength(exam.mock.scenarios!);
+      expect(scenarios).toEqual([...scenarios].sort((a, b) => Number(a) - Number(b)));
+      expect(sets.map((s) => s.scenarios)).toEqual(scenarios.map((id) => [id]));
+      expect(picked).toHaveLength(exam.mock.questions);
+      expect(new Set(picked.map((q) => q.id)).size).toBe(picked.length);
+      // 시나리오 순서대로 per문항씩, 시나리오마다 한 세트에서만 낸다.
+      expect(picked.map((q) => q.scenarioId)).toEqual(
+        scenarios.flatMap((id) => Array<string>(per).fill(id)),
+      );
+      expect(picked.map((q) => q.set)).toEqual(sets.flatMap((s) => Array<string>(per).fill(s.id)));
+      seenScenarios.add(scenarios.join(','));
+      for (const s of sets) seenSets.add(s.id);
+    }
+    expect(seenScenarios.size).toBeGreaterThan(1);
+    expect(seenSets.size).toBeGreaterThan(exam.mock.scenarios!);
+  });
+
+  it('무작위 조합: 숨긴 세트는 빼고, 시나리오가 모자라면 낼 수 없다', () => {
+    const one = exam.sets.find((s) => s.scenarios?.length === 1)!;
+    const hidden = {
+      ...exam,
+      sets: exam.sets.map((s) => (s.id === one.id ? { ...s, hidden: true } : s)),
+    };
+    expect(Object.values(singleScenarioSets(hidden)).flat()).not.toContainEqual(
+      expect.objectContaining({ id: one.id }),
+    );
+    const few = {
+      ...exam,
+      sets: exam.sets.filter((s) => s.scenarios?.length !== 1 || s.scenarios[0] === '1'),
+    };
+    expect(canMix(few)).toBe(false);
+    expect(() => pickMixedMock(few, questions)).toThrow('모자랍니다');
   });
 
   it('세션 이름에 회차와 시나리오를 붙인다', () => {

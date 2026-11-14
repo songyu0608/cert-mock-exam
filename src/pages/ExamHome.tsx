@@ -5,15 +5,18 @@ import { inHiddenSet, type Exam } from '../data/schema.ts';
 import { flattenQuestion } from '../lib/items.ts';
 import { shuffle } from '../lib/scoring.ts';
 import {
+  canMix,
   createSession,
   minutesLabel,
   mockMinutes,
+  pickMixedMock,
   pickMockQuestions,
   pickScenarioMock,
   pickSetMock,
   scenarioPer,
   sessionLabel,
   type Mode,
+  type Session,
 } from '../lib/session.ts';
 import {
   clearActive,
@@ -119,6 +122,21 @@ export function ExamHome({ exam }: { exam: Exam }) {
     return ` · ${n}문항 · ${minutesLabel(mockMinutes(exam, n))}`;
   };
 
+  const launch = (s: Session) => {
+    if (!s.itemKeys.length) return;
+    saveActive(s);
+    navigate(paths.play(exam.id));
+  };
+
+  // 무작위 조합: 시나리오마다 시나리오별 세트 하나를 골라 섞는다.
+  const startMix = () => {
+    if (!data) return;
+    const picked = pickMixedMock(exam, data.questions);
+    const label = `무작위 조합 · ${picked.sets.map((x) => x.name).join(', ')}`;
+    const n = picked.questions.flatMap(flattenQuestion).length;
+    launch(createSession(exam, picked.questions, 'mock', { minutes: mockMinutes(exam, n), label }));
+  };
+
   const start = (mode: Mode, setId?: string) => {
     if (!data) return;
     let s;
@@ -160,9 +178,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
       );
       s = createSession(exam, picked, 'review', { onlyKeys: set });
     }
-    if (!s.itemKeys.length) return;
-    saveActive(s);
-    navigate(paths.play(exam.id));
+    launch(s);
   };
 
   const practiceAvailable = data
@@ -266,6 +282,22 @@ export function ExamHome({ exam }: { exam: Exam }) {
                 {exam.mock.questions}문항 · {exam.mock.minutes}분 · 합격선 {exam.mock.passPercent}%
               </p>
               <div className="set-list">
+                {canMix(exam) && (
+                  <div className="set-row">
+                    <button
+                      type="button"
+                      className="btn primary"
+                      disabled={!data || blocked}
+                      onClick={startMix}
+                    >
+                      무작위 조합 시작
+                    </button>
+                    <span className="small muted">
+                      시나리오 {exam.mock.scenarios}개 무작위 · 시나리오마다 시나리오별 세트 1개
+                      무작위
+                    </span>
+                  </div>
+                )}
                 {sets.map((st) => (
                   <div className="set-row" key={st.id}>
                     <button
