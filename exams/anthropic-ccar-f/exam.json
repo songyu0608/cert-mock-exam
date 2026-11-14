@@ -206,6 +206,86 @@
       "id": "15",
       "name": "S2 · D",
       "scenarios": ["2"]
+    },
+    {
+      "id": "16",
+      "name": "S3 · A",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "17",
+      "name": "S3 · B",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "18",
+      "name": "S3 · C",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "19",
+      "name": "S3 · D",
+      "scenarios": ["3"]
+    },
+    {
+      "id": "20",
+      "name": "S4 · A",
+      "scenarios": ["4"]
+    },
+    {
+      "id": "21",
+      "name": "S4 · B",
+      "scenarios": ["4"]
+    },
+    {
+      "id": "22",
+      "name": "S4 · C",
+      "scenarios": ["4"]
+    },
+    {
+      "id": "23",
+      "name": "S4 · D",
+      "scenarios": ["4"]
+    },
+    {
+      "id": "24",
+      "name": "S5 · A",
+      "scenarios": ["5"]
+    },
+    {
+      "id": "25",
+      "name": "S5 · B",
+      "scenarios": ["5"]
+    },
+    {
+      "id": "26",
+      "name": "S5 · C",
+      "scenarios": ["5"]
+    },
+    {
+      "id": "27",
+      "name": "S5 · D",
+      "scenarios": ["5"]
+    },
+    {
+      "id": "28",
+      "name": "S6 · A",
+      "scenarios": ["6"]
+    },
+    {
+      "id": "29",
+      "name": "S6 · B",
+      "scenarios": ["6"]
+    },
+    {
+      "id": "30",
+      "name": "S6 · C",
+      "scenarios": ["6"]
+    },
+    {
+      "id": "31",
+      "name": "S6 · D",
+      "scenarios": ["6"]
     }
   ]
 }
