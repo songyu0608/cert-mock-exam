@@ -11,7 +11,11 @@ const KEY = 'theme';
 const EVENT = 'cme:theme-changed';
 const DARK_QUERY = '(prefers-color-scheme: dark)';
 
+// 저장하지 못했을 때(저장소 차단·공간 부족)도 화면과 버튼 상태가 어긋나지 않도록 이 탭에서 고른 값을 들고 있는다.
+let chosen: ThemePref | undefined;
+
 export function getThemePref(): ThemePref {
+  if (chosen) return chosen;
   const v = read<unknown>(KEY, 'system');
   return v === 'light' || v === 'dark' ? v : 'system';
 }
@@ -38,9 +42,23 @@ export function applyTheme(doc: Document = document, pref: ThemePref = getThemeP
 }
 
 export function setThemePref(pref: ThemePref): void {
+  chosen = pref;
   write(KEY, pref === 'system' ? null : pref);
   applyTheme(document, pref);
   window.dispatchEvent(new Event(EVENT));
+}
+
+/**
+ * 앱 시작 때 한 번 부른다. 다른 탭에서 바꾼 테마를 화면 구독과 상관없이(풀이 화면처럼 버튼이 없는 화면에서도) 바로 건다.
+ */
+export function startThemeSync(): void {
+  applyTheme();
+  window.addEventListener('storage', (e) => {
+    if (e.key !== null && !e.key.endsWith(`:${KEY}`)) return;
+    chosen = undefined;
+    applyTheme();
+    window.dispatchEvent(new Event(EVENT));
+  });
 }
 
 /** 밝게 ↔ 어둡게. 지금 보이는 테마의 반대를 고른다. */
@@ -56,19 +74,11 @@ function subscribe(onChange: () => void): () => void {
   } catch {
     // matchMedia가 없는 환경이면 기기 설정 변화는 알 수 없다.
   }
+  // 다른 탭에서 바꾼 값은 startThemeSync가 이 이벤트로 알린다.
   window.addEventListener(EVENT, onChange);
-  // 다른 탭에서 바꾼 테마도 따라간다.
-  const onStorage = (e: StorageEvent) => {
-    if (e.key === null || e.key.endsWith(`:${KEY}`)) {
-      applyTheme();
-      onChange();
-    }
-  };
-  window.addEventListener('storage', onStorage);
   return () => {
     media?.removeEventListener('change', onChange);
     window.removeEventListener(EVENT, onChange);
-    window.removeEventListener('storage', onStorage);
   };
 }
 

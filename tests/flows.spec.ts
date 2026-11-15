@@ -612,3 +612,32 @@ test('다크 모드 버튼: 테마를 바꾸고 새로고침·가이드 iframe�
   await page.emulateMedia({ colorScheme: 'dark' });
   await expect(page.getByRole('button', { name: '밝은 화면으로 바꾸기' })).toBeVisible();
 });
+
+test('다크 모드 버튼: 저장소에 쓰지 못해도 버튼과 화면이 어긋나지 않고, 다른 탭의 변경은 풀이 화면에서도 따른다', async ({
+  page,
+  context,
+}) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  const root = page.locator('html');
+  await page.evaluate(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException('full', 'QuotaExceededError');
+    };
+  });
+  await page.getByRole('button', { name: '어두운 화면으로 바꾸기' }).click();
+  await expect(root).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: '밝은 화면으로 바꾸기' }).click();
+  await expect(root).toHaveAttribute('data-theme', 'light');
+
+  // 저장이 되는 새 탭에서 시험 홈 → 풀이 화면을 연 뒤, 다른 탭에서 어둡게를 고른다.
+  const exam = await context.newPage();
+  await exam.emulateMedia({ colorScheme: 'light' });
+  await openExam(exam, 'SAMPLE-01');
+  await modeCard(exam, '연습').getByRole('button', { name: '시작' }).click();
+  const other = await context.newPage();
+  await other.emulateMedia({ colorScheme: 'light' });
+  await other.goto('/');
+  await other.getByRole('button', { name: '어두운 화면으로 바꾸기' }).click();
+  await expect(exam.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
