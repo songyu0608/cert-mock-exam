@@ -477,3 +477,50 @@ test('가이드 탭: 시험별 가이드를 고르면 문서를 연다', async (
   await page.goto('/guide/sample-all-types/nope');
   await expect(page.getByRole('heading', { name: '가이드를 찾을 수 없습니다' })).toBeVisible();
 });
+
+test('공식 가이드: 장 칩·스크롤바 이동 뒤 언어를 바꿔도 지금 장을 유지한다', async ({ page }) => {
+  await page.goto('/guide/anthropic-ccao-f/official-guide');
+  const frame = page.frameLocator('iframe.guide-frame');
+  const pressed = frame.locator('#chaps button[aria-pressed="true"]');
+  const topOf = (n: number) =>
+    frame
+      .locator(`#c${n}`)
+      .evaluate(
+        (el) =>
+          el.getBoundingClientRect().top -
+          document.querySelector('header.top')!.getBoundingClientRect().bottom,
+      );
+  await frame.locator('#v-ko').click();
+  // 원문 머리말은 보기마다 나온다
+  await expect(frame.locator('#note')).toContainText('예고 없이 변경될 수 있습니다');
+  await frame.locator('#v-ja').click();
+  await expect(frame.locator('#note')).toContainText('本ガイドは予告なく変更されることがあります');
+  await frame.locator('#v-ko').click();
+
+  // 짧은 마지막 장: 칩으로 고르면 16장, 언어를 바꿔도 16장
+  await frame.locator('#chaps button[data-c="16"]').click();
+  await expect(pressed).toHaveAttribute('data-c', '16');
+  await frame.locator('#v-ja').click();
+  await expect(pressed).toHaveAttribute('data-c', '16');
+  await expect.poll(() => topOf(16)).toBeLessThan(400);
+
+  // 2장 칩을 누른 뒤 스크롤바(휠·키 입력 없는 스크롤)로 14장까지 내려가면 14장을 따른다
+  await frame.locator('#v-ko').click();
+  await frame.locator('#chaps button[data-c="2"]').click();
+  await expect(pressed).toHaveAttribute('data-c', '2');
+  await page.waitForTimeout(1600);
+  await frame.locator('#c14').evaluate((el) => {
+    const off = document.querySelector('header.top')!.getBoundingClientRect().bottom;
+    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - off - 8);
+  });
+  await expect(pressed).toHaveAttribute('data-c', '14');
+  await frame.locator('#v-ja').click();
+  await expect(pressed).toHaveAttribute('data-c', '14');
+  await expect.poll(() => topOf(14)).toBeLessThan(40);
+  await expect.poll(() => topOf(14)).toBeGreaterThan(-40);
+
+  // 지원 주소는 링크
+  await expect(
+    frame.locator('#c15 a[href="https://pearsonvue.com/us/en/anthropic.html"]'),
+  ).toBeVisible();
+});

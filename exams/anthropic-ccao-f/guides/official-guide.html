@@ -139,20 +139,22 @@ document.querySelector('.langs').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
   const cur=current();
   view=b.dataset.v; try{localStorage.setItem('ccao-f-guide-view',view);}catch(e){}
-  want=cur; render(); jump(cur,false);
-  requestAnimationFrame(()=>{(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{if(want===cur){jump(cur,false); spy();}});});
+  render(); pin(cur,false); pend=cur; const y0=scrollY;
+  requestAnimationFrame(()=>{(document.fonts?document.fonts.ready:Promise.resolve()).then(()=>{if(pend===cur&&Math.abs(scrollY-y0)<=2){pin(cur,false); spy();} pend=null;});});
 });
 document.getElementById('openAll').addEventListener('click',()=>{const cur=current(); openAll=!openAll; render(); jump(cur,false);});
-let want=null;
-nav.addEventListener('click',e=>{const b=e.target.closest('button'); if(b){want=b.dataset.c; jump(b.dataset.c,true); spy();}});
-['wheel','touchstart','keydown'].forEach(t=>addEventListener(t,()=>{want=null;},{passive:true}));
+let want=null, wantY=0, wantT=0, pend=null;
+function maxY(){return document.documentElement.scrollHeight-innerHeight;}
+function pin(n,smooth){const el=document.getElementById('c'+n); if(!el){want=null;return;} want=n; wantY=Math.max(0,Math.min(Math.round(el.getBoundingClientRect().top+scrollY-off()-8),maxY())); wantT=smooth?performance.now():0; jump(n,smooth);}
+nav.addEventListener('click',e=>{const b=e.target.closest('button'); if(b){pin(b.dataset.c,true); spy();}});
+['wheel','touchstart','keydown'].forEach(t=>addEventListener(t,()=>{want=null; pend=null;},{passive:true}));
 function off(){return document.querySelector('header.top').getBoundingClientRect().bottom;}
 function jump(n,smooth){
   const el=document.getElementById('c'+n); if(!el) return;
   window.scrollTo({top:el.getBoundingClientRect().top+scrollY-off()-8,behavior:smooth?'smooth':'auto'});
 }
 function current(){
-  if(want) return want;
+  if(want){ if(Math.abs(scrollY-wantY)<=2||performance.now()-wantT<1500) return want; want=null; }
   if(innerHeight+scrollY>=document.documentElement.scrollHeight-4) return DATA.ko.ch[N-1].n;
   const o=off()+20; let c=DATA.ko.ch[0].n;
   DATA.ko.ch.forEach(x=>{const el=document.getElementById('c'+x.n); if(el&&el.getBoundingClientRect().top<=o) c=x.n;}); return c;
