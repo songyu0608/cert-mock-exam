@@ -45,7 +45,8 @@
   "mock": {
     "questions": 63,
     "minutes": 120,
-    "passPercent": 72
+    "passPercent": 72,
+    "layout": "exam"
   },
   "types": ["single", "multi"],
   "scoring": "all-or-nothing",

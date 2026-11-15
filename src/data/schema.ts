@@ -33,6 +33,8 @@ export const examSchema = z
       questionChoices: z.array(z.number().int().positive()).nullable().default(null),
       /** 시나리오형 시험: 실전 모드에서 시나리오를 몇 개 고를지. 문항은 시나리오마다 같은 수로 나눈다. */
       scenarios: z.number().int().positive().optional(),
+      /** 실전 화면. `exam`이면 시나리오가 없어도 실제 시험형 화면(SplitSession, 1단)으로 푼다. 시나리오형 시험은 늘 2단. */
+      layout: z.enum(['exam']).optional(),
     }),
     types: z.array(z.enum(QUESTION_TYPES)).min(1),
     scoring: z.enum(['all-or-nothing', 'partial']).default('all-or-nothing'),
