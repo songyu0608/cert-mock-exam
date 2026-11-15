@@ -511,3 +511,76 @@ test('가이드 탭: 시험별 가이드를 고르면 문서를 연다', async (
   await page.goto('/guide/sample-all-types/nope');
   await expect(page.getByRole('heading', { name: '가이드를 찾을 수 없습니다' })).toBeVisible();
 });
+
+test('공식 가이드: 장 칩·스크롤바 이동 뒤 언어를 바꿔도 지금 장을 유지한다', async ({ page }) => {
+  await page.goto('/guide/anthropic-ccao-f/official-guide');
+  const frame = page.frameLocator('iframe.guide-frame');
+  const pressed = frame.locator('#chaps button[aria-pressed="true"]');
+  const topOf = (n: number) =>
+    frame
+      .locator(`#c${n}`)
+      .evaluate(
+        (el) =>
+          el.getBoundingClientRect().top -
+          document.querySelector('header.top')!.getBoundingClientRect().bottom,
+      );
+  await frame.locator('#v-ko').click();
+  // 원문 머리말은 보기마다 나온다
+  await expect(frame.locator('#note')).toContainText('예고 없이 변경될 수 있습니다');
+  await frame.locator('#v-ja').click();
+  await expect(frame.locator('#note')).toContainText('本ガイドは予告なく変更されることがあります');
+  await frame.locator('#v-ko').click();
+
+  // 짧은 마지막 장: 칩으로 고르면 16장, 언어를 바꿔도 16장
+  await frame.locator('#chaps button[data-c="16"]').click();
+  await expect(pressed).toHaveAttribute('data-c', '16');
+  await frame.locator('#v-ja').click();
+  await expect(pressed).toHaveAttribute('data-c', '16');
+  await expect.poll(() => topOf(16)).toBeLessThan(400);
+
+  // 스크롤바 이동 = 휠·키 입력 없이 위치만 바뀌는 스크롤
+  const scrollbarTo = (n: number) =>
+    frame.locator(`#c${n}`).evaluate((el) => {
+      const off = document.querySelector('header.top')!.getBoundingClientRect().bottom;
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - off - 8,
+        behavior: 'instant',
+      });
+    });
+  // 2장 칩으로 도착한 직후(기다리지 않고) 스크롤바로 12장에 가면 12장을 따르고, 언어를 바꿔도 12장
+  await frame.locator('#v-ko').click();
+  await scrollbarTo(3);
+  await expect(pressed).toHaveAttribute('data-c', '3');
+  const elapsed = await frame.locator('#c12').evaluate(async (c12) => {
+    const off = () => document.querySelector('header.top')!.getBoundingClientRect().bottom;
+    const c2 = document.getElementById('c2')!;
+    const t0 = performance.now();
+    document.querySelector<HTMLButtonElement>('#chaps button[data-c="2"]')!.click();
+    while (Math.abs(c2.getBoundingClientRect().top - off() - 8) > 2) {
+      await new Promise(requestAnimationFrame);
+    }
+    window.scrollTo({
+      top: c12.getBoundingClientRect().top + window.scrollY - off() - 8,
+      behavior: 'instant',
+    });
+    return performance.now() - t0;
+  });
+  expect(elapsed).toBeLessThan(1500);
+  await expect(pressed).toHaveAttribute('data-c', '12');
+  await frame.locator('#v-ja').click();
+  await expect(pressed).toHaveAttribute('data-c', '12');
+  await expect.poll(() => topOf(12)).toBeLessThan(40);
+  await expect.poll(() => topOf(12)).toBeGreaterThan(-40);
+
+  // 4장 칩으로 이동하는 도중 스크롤바로 목표를 지나 2장까지 가면 2장을 따른다
+  await frame.locator('#chaps button[data-c="4"]').click();
+  await scrollbarTo(2);
+  await expect(pressed).toHaveAttribute('data-c', '2');
+  await frame.locator('#v-ko').click();
+  await expect(pressed).toHaveAttribute('data-c', '2');
+
+  // 지원 주소는 링크
+  await expect(
+    frame.locator('#c15 a[href="https://pearsonvue.com/us/en/anthropic.html"]'),
+  ).toBeVisible();
+});
