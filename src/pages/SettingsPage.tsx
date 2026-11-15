@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useEffect, useState } from 'react';
 import {
   forgetKey,
@@ -11,6 +12,7 @@ import {
   type SyncStatus,
 } from '../lib/sync.ts';
 import { useSyncStatus } from '../lib/useRecords.ts';
+import { setThemePref, useTheme, type ThemePref } from '../lib/theme.ts';
 import { onLinkClick, paths } from '../router.ts';
 
 const time = (at: number) => new Date(at).toLocaleString('ko-KR');
@@ -53,11 +55,14 @@ export function SettingsPage() {
 
   return (
     <main className="wrap stack">
-      <nav className="crumb">
-        <a href={paths.list()} onClick={onLinkClick}>
-          ← 시험 목록
-        </a>
-      </nav>
+      <div className="crumb-row">
+        <nav className="crumb">
+          <a href={paths.list()} onClick={onLinkClick}>
+            ← 시험 목록
+          </a>
+        </nav>
+        <ThemeToggle />
+      </div>
       <header>
         <h1>기기 간 기록 동기화</h1>
         <p className="lede">
@@ -77,6 +82,7 @@ export function SettingsPage() {
       ) : (
         <Disconnected onConnect={connect} />
       )}
+      <ThemeSettings />
     </main>
   );
 }
@@ -252,5 +258,38 @@ function Disconnected({ onConnect }: { onConnect: (key: string) => void }) {
         )}
       </section>
     </>
+  );
+}
+
+const THEME_CHOICES: { value: ThemePref; label: string }[] = [
+  { value: 'system', label: '기기 설정 따르기' },
+  { value: 'light', label: '밝게' },
+  { value: 'dark', label: '어둡게' },
+];
+
+/** 화면 테마: 위쪽 전환 버튼으로 고른 값을 기기 설정 따르기로 되돌릴 수 있게 한다. 이 브라우저에만 저장한다. */
+function ThemeSettings() {
+  const { pref } = useTheme();
+  return (
+    <section className="panel stack" aria-labelledby="theme-h">
+      <h2 id="theme-h">화면 테마</h2>
+      <div className="row" role="radiogroup" aria-labelledby="theme-h">
+        {THEME_CHOICES.map((c) => (
+          <label key={c.value} className="row" style={{ gap: 6 }}>
+            <input
+              type="radio"
+              name="theme"
+              value={c.value}
+              checked={pref === c.value}
+              onChange={() => setThemePref(c.value)}
+            />
+            {c.label}
+          </label>
+        ))}
+      </div>
+      <p className="small muted" style={{ margin: 0 }}>
+        이 브라우저에만 저장하며 기기 간 동기화에는 포함하지 않습니다.
+      </p>
+    </section>
   );
 }

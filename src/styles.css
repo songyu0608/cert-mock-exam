@@ -40,6 +40,25 @@
     color-scheme: dark;
   }
 }
+/* 다크 모드 전환 버튼(ThemeToggle)으로 고른 경우: 기기 설정과 상관없이 같은 색을 쓴다. */
+:root[data-theme='dark'] {
+  --bg: #11161c;
+  --sheet: #182029;
+  --ink: #e6ebf0;
+  --muted: #9aa7b3;
+  --line: #2b3642;
+  --soft: #212b36;
+  --accent: #e9a35a;
+  --accent-ink: #0d1318;
+  --accent-soft: #3b2a17;
+  --ok: #4cc27a;
+  --ok-soft: #173324;
+  --bad: #f07466;
+  --bad-soft: #3a1d1a;
+  --warn: #e3a54a;
+  --warn-soft: #3a2c14;
+  color-scheme: dark;
+}
 
 * {
   box-sizing: border-box;
@@ -202,6 +221,10 @@ h2 {
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 22%);
   }
 }
+:root[data-theme='dark'] .vb-aws,
+:root[data-theme='dark'] .vb-github {
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 22%);
+}
 
 /* 동기화 설정: 비밀키와 등록 코드는 길어서 줄을 넘겨도 끊어 보여 준다. */
 code.key {
@@ -234,6 +257,45 @@ code.key {
 .tabs a[aria-current='page'] {
   color: var(--accent);
   border-bottom-color: var(--accent);
+}
+
+/* 다크 모드 전환 버튼: 탭 줄·위치 줄 오른쪽에 둔다. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--sheet);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--muted);
+}
+.theme-toggle svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.tabs .theme-toggle {
+  margin: 0 0 6px auto;
+  align-self: center;
+}
+.crumb-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 /* 가이드 읽기: 위 한 줄 + 나머지 높이 전체를 iframe으로 */
@@ -974,6 +1036,17 @@ details.scenario > p {
     --accent-ink: #141413;
     --accent-soft: #4a3227;
   }
+}
+:root[data-vendor='anthropic'][data-theme='dark'] {
+  --bg: #262624;
+  --sheet: #30302e;
+  --ink: #faf9f5;
+  --muted: #b0aea5;
+  --line: #45443f;
+  --soft: #3a3936;
+  --accent: #d97757;
+  --accent-ink: #141413;
+  --accent-soft: #4a3227;
 }
 :root[data-vendor='anthropic'] h1,
 :root[data-vendor='anthropic'] h2 {

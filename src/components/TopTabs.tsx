@@ -1,3 +1,4 @@
+import { ThemeToggle } from './ThemeToggle.tsx';
 import { onLinkClick, paths } from '../router.ts';
 
 /** 첫 화면의 탭: 모의고사(시험 목록), 가이드(공식 가이드 목록), 이론(이론 정리 노트 목록) */
@@ -19,6 +20,7 @@ export function TopTabs({ current }: { current: 'exams' | 'guides' | 'theory' })
           {t.label}
         </a>
       ))}
+      <ThemeToggle />
     </nav>
   );
 }

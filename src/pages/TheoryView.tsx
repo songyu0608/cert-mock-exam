@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -104,6 +105,7 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
               {g.title}
             </a>
           ))}
+          <ThemeToggle />
         </span>
       </div>
       <div className="theory-body">

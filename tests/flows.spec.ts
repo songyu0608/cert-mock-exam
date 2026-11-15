@@ -584,3 +584,31 @@ test('공식 가이드: 장 칩·스크롤바 이동 뒤 언어를 바꿔도 지
     frame.locator('#c15 a[href="https://pearsonvue.com/us/en/anthropic.html"]'),
   ).toBeVisible();
 });
+
+test('다크 모드 버튼: 테마를 바꾸고 새로고침·가이드 iframe에도 유지하며, 설정에서 기기 설정으로 되돌린다', async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: 'light' });
+  await page.goto('/');
+  const root = page.locator('html');
+  const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  const lightBg = await bg();
+  await page.getByRole('button', { name: '어두운 화면으로 바꾸기' }).click();
+  await expect(root).toHaveAttribute('data-theme', 'dark');
+  expect(await bg()).not.toBe(lightBg);
+  await page.reload();
+  await expect(root).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByRole('button', { name: '밝은 화면으로 바꾸기' })).toBeVisible();
+
+  await page.goto('/guide/sample-all-types/basics');
+  const frameRoot = page.frameLocator('iframe.guide-frame').locator('html');
+  await expect(frameRoot).toHaveAttribute('data-theme', 'dark');
+  await page.getByRole('button', { name: '밝은 화면으로 바꾸기' }).click();
+  await expect(frameRoot).toHaveAttribute('data-theme', 'light');
+
+  await page.goto('/settings');
+  await page.getByLabel('기기 설정 따르기').check();
+  await expect(root).not.toHaveAttribute('data-theme', /.*/);
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(page.getByRole('button', { name: '밝은 화면으로 바꾸기' })).toBeVisible();
+});
