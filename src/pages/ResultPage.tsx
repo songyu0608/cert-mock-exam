@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
 import { Markdown } from '../components/Markdown.tsx';
@@ -58,11 +59,14 @@ export function ResultPage({ exam, attemptId }: { exam: Exam; attemptId: string 
 
   return (
     <main className="wrap stack">
-      <nav className="crumb">
-        <a href={paths.exam(exam.id)} onClick={onLinkClick}>
-          ← {exam.code} 시험 홈
-        </a>
-      </nav>
+      <div className="crumb-row">
+        <nav className="crumb">
+          <a href={paths.exam(exam.id)} onClick={onLinkClick}>
+            ← {exam.code} 시험 홈
+          </a>
+        </nav>
+        <ThemeToggle />
+      </div>
       <header>
         <div className="label">
           {sessionLabel(attempt.session)} 결과 ·{' '}

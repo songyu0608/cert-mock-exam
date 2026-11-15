@@ -1,3 +1,4 @@
+import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
@@ -190,11 +191,14 @@ export function ExamHome({ exam }: { exam: Exam }) {
 
   return (
     <main className="wrap stack">
-      <nav className="crumb">
-        <a href={paths.list()} onClick={onLinkClick}>
-          ← 시험 목록
-        </a>
-      </nav>
+      <div className="crumb-row">
+        <nav className="crumb">
+          <a href={paths.list()} onClick={onLinkClick}>
+            ← 시험 목록
+          </a>
+        </nav>
+        <ThemeToggle />
+      </div>
       <header className="stack" style={{ gap: 8 }}>
         <div className="row">
           <VendorBadge vendor={exam.vendor} />

@@ -10,6 +10,9 @@ import '@fontsource/ibm-plex-sans-jp/600.css';
 import '@fontsource/lora/600.css';
 import './styles.css';
 import { App } from './App.tsx';
+import { startThemeSync } from './lib/theme.ts';
+
+startThemeSync();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
