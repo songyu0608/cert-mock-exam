@@ -444,8 +444,18 @@ async function expectExamScreenWithoutScenario(page: Page) {
   await page.getByRole('button', { name: '次の問題' }).click();
   await expect(pane.getByRole('heading', { name: '問題 2' })).toBeVisible();
   await expect(stem).not.toHaveText(first);
+  // 조작 문구는 일본어(lang=ja)로, 한국어 회차명만 lang=ko로 읽힌다.
+  await expect(page.locator('.sv')).toHaveAttribute('lang', 'ja');
+  await expect(page.locator('.bar-mode')).toHaveAttribute('lang', 'ko');
+  await page.getByRole('button', { name: '前の問題' }).click();
+  await expect(pane.getByRole('heading', { name: '問題 1' })).toBeVisible();
+  // レビュー의 問題 칸은 summary가 아니라 지문의 첫 문장이다(정답 단서를 보이지 않는다).
   await page.getByRole('button', { name: /^レビュー/ }).click();
-  await expect(page.locator('.sv-table tbody tr')).toHaveCount(60);
+  const rows = page.locator('.sv-table tbody tr');
+  await expect(rows).toHaveCount(60);
+  const cell = (await rows.first().locator('td').nth(1).innerText()).replace(/…$/, '');
+  const flat = (s: string) => s.replace(/\s+/g, ' ').trim();
+  expect(flat(first).startsWith(flat(cell))).toBe(true);
   await expect(page.getByRole('link', { name: '나가기' })).toHaveCount(0);
 }
 

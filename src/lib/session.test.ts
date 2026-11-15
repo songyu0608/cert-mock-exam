@@ -7,7 +7,7 @@ import {
   questionSchema,
   questionsFileSchema,
 } from '../data/schema.ts';
-import { flattenAll, flattenQuestion, itemSummary } from './items.ts';
+import { flattenAll, flattenQuestion, itemSummary, stemLead } from './items.ts';
 import {
   allocate,
   createSession,
@@ -367,6 +367,13 @@ describe('시나리오형 실전 화면(SplitSession)의 보조 기능', () => {
     expect(itemSummary({ ...item, body: { ...item.body, stem: '**짧은** 문장. 다음 문장' } })).toBe(
       '짧은 문장.',
     );
+  });
+
+  it('stemLead는 summary가 있어도 지문의 첫 문장을 쓴다(시나리오 없는 시험의 レビュー용)', () => {
+    const item = flattenQuestion(questions[0]!)[0]!;
+    expect(item.summary).toBeTruthy();
+    expect(stemLead(item)).not.toBe(item.summary);
+    expect(stemLead(item)).toBe(itemSummary({ ...item, summary: undefined }));
   });
 
   it('취소선을 그으면 그 보기의 선택을 풀고, 다시 누르면 걷는다', () => {

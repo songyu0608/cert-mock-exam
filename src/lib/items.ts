@@ -102,7 +102,11 @@ export function flattenQuestion(q: Question): Item[] {
  * 마크다운 기호는 간단히 걷어 내고, 너무 길면 자른다.
  */
 export function itemSummary(item: Item, max = 60): string {
-  if (item.summary) return item.summary;
+  return item.summary ?? stemLead(item, max);
+}
+
+/** 지문의 첫 문장(마크다운 기호를 걷어 내고 max자에서 자른다). 응시자가 이미 보는 글이라 정답 단서가 없다. */
+export function stemLead(item: Item, max = 60): string {
   const plain = item.body.stem
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/^\s*(?:#+|>)\s*/gm, '')

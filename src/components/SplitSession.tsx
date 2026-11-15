@@ -11,7 +11,7 @@ import {
   type SetStateAction,
 } from 'react';
 import type { Exam } from '../data/schema.ts';
-import { itemSummary, type Item, type ItemBody } from '../lib/items.ts';
+import { itemSummary, stemLead, type Item, type ItemBody } from '../lib/items.ts';
 import { correctCount, isTouched, type Answer } from '../lib/scoring.ts';
 import { sessionLabel, toggleStrike, type Session } from '../lib/session.ts';
 import { Markdown } from './Markdown.tsx';
@@ -213,6 +213,7 @@ export function SplitSession({
   const choiceBody =
     !item.context && (body.type === 'single' || body.type === 'multi') ? body : undefined;
   // 시나리오가 없는 시험은 왼쪽 칸 없이 한 칸으로 그린다.
+  // 이때 レビュー의 問題 칸은 summary(정답 단서가 될 수 있음) 대신 지문 첫 문장으로 문항을 가리킨다.
   const onePane = exam.scenarios.length === 0;
   const num = (
     <h2 className="sv-num" id="sv-num">
@@ -221,12 +222,15 @@ export function SplitSession({
   );
 
   return (
-    <div className="sv">
+    // 조작 문구는 시험 언어로 읽히게 하고, 한국어인 회차명만 따로 ko로 둔다.
+    <div className="sv" lang={exam.lang}>
       <header className="sv-bar" inert={confirming}>
         <div className="sv-bar-in">
           <span className="code">{exam.code}</span>
           <span className="bar-title">
-            <span className="bar-mode">{sessionLabel(session)} · </span>
+            <span className="bar-mode" lang="ko">
+              {sessionLabel(session)} ·{' '}
+            </span>
             {review ? t.review : t.pos(i + 1, total)}
           </span>
           {!review && (
@@ -332,7 +336,7 @@ export function SplitSession({
                           <span className="sv-no">{n + 1}</span>
                           {!answered && <span className="sv-unans">{t.unanswered}</span>}
                         </td>
-                        <td>{it ? itemSummary(it) : '—'}</td>
+                        <td>{it ? (onePane ? stemLead(it) : itemSummary(it)) : '—'}</td>
                         <td className="c-flag">{f ? '✓' : ''}</td>
                       </tr>
                     );
