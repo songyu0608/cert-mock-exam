@@ -504,20 +504,46 @@ test('공식 가이드: 장 칩·스크롤바 이동 뒤 언어를 바꿔도 지
   await expect(pressed).toHaveAttribute('data-c', '16');
   await expect.poll(() => topOf(16)).toBeLessThan(400);
 
-  // 2장 칩을 누른 뒤 스크롤바(휠·키 입력 없는 스크롤)로 14장까지 내려가면 14장을 따른다
+  // 스크롤바 이동 = 휠·키 입력 없이 위치만 바뀌는 스크롤
+  const scrollbarTo = (n: number) =>
+    frame.locator(`#c${n}`).evaluate((el) => {
+      const off = document.querySelector('header.top')!.getBoundingClientRect().bottom;
+      window.scrollTo({
+        top: el.getBoundingClientRect().top + window.scrollY - off - 8,
+        behavior: 'instant',
+      });
+    });
+  // 2장 칩으로 도착한 직후(기다리지 않고) 스크롤바로 12장에 가면 12장을 따르고, 언어를 바꿔도 12장
   await frame.locator('#v-ko').click();
-  await frame.locator('#chaps button[data-c="2"]').click();
-  await expect(pressed).toHaveAttribute('data-c', '2');
-  await page.waitForTimeout(1600);
-  await frame.locator('#c14').evaluate((el) => {
-    const off = document.querySelector('header.top')!.getBoundingClientRect().bottom;
-    window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - off - 8);
+  await scrollbarTo(3);
+  await expect(pressed).toHaveAttribute('data-c', '3');
+  const elapsed = await frame.locator('#c12').evaluate(async (c12) => {
+    const off = () => document.querySelector('header.top')!.getBoundingClientRect().bottom;
+    const c2 = document.getElementById('c2')!;
+    const t0 = performance.now();
+    document.querySelector<HTMLButtonElement>('#chaps button[data-c="2"]')!.click();
+    while (Math.abs(c2.getBoundingClientRect().top - off() - 8) > 2) {
+      await new Promise(requestAnimationFrame);
+    }
+    window.scrollTo({
+      top: c12.getBoundingClientRect().top + window.scrollY - off() - 8,
+      behavior: 'instant',
+    });
+    return performance.now() - t0;
   });
-  await expect(pressed).toHaveAttribute('data-c', '14');
+  expect(elapsed).toBeLessThan(1500);
+  await expect(pressed).toHaveAttribute('data-c', '12');
   await frame.locator('#v-ja').click();
-  await expect(pressed).toHaveAttribute('data-c', '14');
-  await expect.poll(() => topOf(14)).toBeLessThan(40);
-  await expect.poll(() => topOf(14)).toBeGreaterThan(-40);
+  await expect(pressed).toHaveAttribute('data-c', '12');
+  await expect.poll(() => topOf(12)).toBeLessThan(40);
+  await expect.poll(() => topOf(12)).toBeGreaterThan(-40);
+
+  // 4장 칩으로 이동하는 도중 스크롤바로 목표를 지나 2장까지 가면 2장을 따른다
+  await frame.locator('#chaps button[data-c="4"]').click();
+  await scrollbarTo(2);
+  await expect(pressed).toHaveAttribute('data-c', '2');
+  await frame.locator('#v-ko').click();
+  await expect(pressed).toHaveAttribute('data-c', '2');
 
   // 지원 주소는 링크
   await expect(
