@@ -2,12 +2,14 @@
 // 키가 없으면 아무것도 하지 않고 기록은 이 브라우저에만 남는다.
 import type { Attempt } from './session.ts';
 import {
+  applyRemoved,
   applyReset,
   clearSynced,
   loadResetAt,
   markSynced,
   mergeRemote,
   pendingAttempts,
+  pendingRemovals,
   pendingResets,
   read,
   write,
@@ -111,6 +113,8 @@ export interface RemoteAttempt {
 interface PullResponse {
   attempts: RemoteAttempt[];
   resets: { examId: string; at: number }[];
+  /** 하나씩 지운 결과. 예전 서버는 보내지 않는다. */
+  removed?: { examId: string; id: string }[];
   cursor: number;
   more: boolean;
 }
@@ -187,6 +191,16 @@ async function run(): Promise<SyncStatus> {
       markSynced(examId, [], at);
     }
 
+    // 지운 결과를 먼저 알린다. 서버는 지운 id의 결과를 다시 받지 않는다.
+    for (const { examId, ids } of pendingRemovals()) {
+      for (let i = 0; i < ids.length; i += PUSH_BATCH) {
+        const batch = ids.slice(i, i + PUSH_BATCH);
+        await api(key, 'remove', { method: 'POST', body: JSON.stringify({ examId, ids: batch }) });
+        sameKey();
+        markSynced(examId, [], 0, batch);
+      }
+    }
+
     let pushed = 0;
     const pending = pendingAttempts();
     for (let i = 0; i < pending.length; i += PUSH_BATCH) {
@@ -208,6 +222,14 @@ async function run(): Promise<SyncStatus> {
         applyReset(r.examId, r.at);
         if (loadResetAt(r.examId) < r.at) throw new SyncError(STORAGE_FULL);
         markSynced(r.examId, [], r.at);
+      }
+      const removedByExam = new Map<string, string[]>();
+      for (const r of res.removed ?? []) {
+        removedByExam.set(r.examId, [...(removedByExam.get(r.examId) ?? []), r.id]);
+      }
+      for (const [examId, ids] of removedByExam) {
+        if (!applyRemoved(examId, ids)) throw new SyncError(STORAGE_FULL);
+        markSynced(examId, [], 0, ids);
       }
       const byExam = new Map<string, RemoteAttempt[]>();
       for (const a of res.attempts) byExam.set(a.examId, [...(byExam.get(a.examId) ?? []), a]);
