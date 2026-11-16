@@ -921,6 +921,49 @@ select.sel {
   padding: 8px 8px 8px 0;
   font-variant-numeric: tabular-nums;
 }
+.history .pill {
+  white-space: nowrap;
+}
+.history .history-x {
+  width: 1%;
+  padding-right: 0;
+  text-align: right;
+}
+.x-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.x-btn:hover,
+.x-btn[aria-expanded='true'] {
+  color: var(--bad);
+  border-color: var(--line);
+  background: var(--bad-soft);
+}
+.x-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.history tr.history-confirm td {
+  border-top: 0;
+  padding: 0 0 10px;
+}
+.history-confirm .row {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--bad-soft);
+  padding: 8px 10px;
+}
 .review-item summary {
   cursor: pointer;
   display: flex;

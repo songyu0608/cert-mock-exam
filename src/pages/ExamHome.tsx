@@ -1,5 +1,5 @@
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
-import { useMemo, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
 import { inHiddenSet, type Exam } from '../data/schema.ts';
@@ -24,6 +24,7 @@ import {
   loadActive,
   loadAttempts,
   loadStats,
+  removeAttempt,
   resetExam,
   saveActive,
   wrongKeys,
@@ -56,6 +57,8 @@ export function ExamHome({ exam }: { exam: Exam }) {
   const [practiceN, setPracticeN] = useState<number | 'all'>(20);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetFailed, setResetFailed] = useState(false);
+  // 하나씩 지우기: 확인 중인 결과 id
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
   // 숨긴 회차를 뺀 문항 key. 오답 다시 풀기와 도메인별 정답률은 이것만 센다.
   const visibleKeys = useMemo(
@@ -496,35 +499,87 @@ export function ExamHome({ exam }: { exam: Exam }) {
                   <th>모드</th>
                   <th>점수</th>
                   <th>결과</th>
+                  <th>
+                    <span className="sr-only">삭제</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {attempts.map((a) => (
-                  <tr key={a.id}>
-                    <td>
-                      <a href={paths.result(exam.id, a.id)} onClick={onLinkClick}>
-                        {new Date(a.finishedAt).toLocaleString('ko-KR', {
-                          month: 'numeric',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </a>
-                    </td>
-                    <td>{sessionLabel(a.session)}</td>
-                    <td>
-                      {Math.round(a.score * 10) / 10}/{a.total} ({a.percent}%)
-                    </td>
-                    <td>
-                      {a.passed === undefined ? (
-                        '–'
-                      ) : (
-                        <span className={`pill ${a.passed ? 'ok' : 'bad'}`}>
-                          {a.passed ? '합격' : '불합격'}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
+                  <Fragment key={a.id}>
+                    <tr>
+                      <td>
+                        <a href={paths.result(exam.id, a.id)} onClick={onLinkClick}>
+                          {new Date(a.finishedAt).toLocaleString('ko-KR', {
+                            month: 'numeric',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </a>
+                      </td>
+                      <td>{sessionLabel(a.session)}</td>
+                      <td>
+                        {Math.round(a.score * 10) / 10}/{a.total} ({a.percent}%)
+                      </td>
+                      <td>
+                        {a.passed === undefined ? (
+                          '–'
+                        ) : (
+                          <span className={`pill ${a.passed ? 'ok' : 'bad'}`}>
+                            {a.passed ? '합격' : '불합격'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="history-x">
+                        <button
+                          type="button"
+                          className="x-btn"
+                          aria-label="이 기록 삭제"
+                          aria-expanded={confirmRemove === a.id}
+                          title="이 기록 삭제"
+                          onClick={() => {
+                            setConfirmRemove(confirmRemove === a.id ? null : a.id);
+                            setResetFailed(false);
+                          }}
+                        >
+                          ×
+                        </button>
+                      </td>
+                    </tr>
+                    {confirmRemove === a.id && (
+                      <tr className="history-confirm">
+                        <td colSpan={5}>
+                          <div className="row" role="group" aria-label="기록 삭제 확인">
+                            <span className="small">
+                              이 기록을 지울까요? 통계와 오답 목록에서도 빠집니다.
+                            </span>
+                            <button
+                              type="button"
+                              className="btn sm danger"
+                              onClick={() => {
+                                const ok = removeAttempt(exam.id, a.id);
+                                setResetFailed(!ok);
+                                setConfirmRemove(null);
+                                if (!ok) return;
+                                setRev((r) => r + 1);
+                                void syncNow();
+                              }}
+                            >
+                              예
+                            </button>
+                            <button
+                              type="button"
+                              className="btn sm"
+                              onClick={() => setConfirmRemove(null)}
+                            >
+                              아니오
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -571,7 +626,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
         )}
         <p className="small muted">
           {getKey()
-            ? '기록은 이 브라우저에 저장하고, 같은 비밀키를 넣은 기기와 주고받습니다. 초기화도 함께 적용됩니다.'
+            ? '기록은 이 브라우저에 저장하고, 같은 비밀키를 넣은 기기와 주고받습니다. 초기화와 지우기도 함께 적용됩니다.'
             : '기록은 이 브라우저에만 저장됩니다.'}{' '}
           <a href={paths.settings()} onClick={onLinkClick}>
             동기화 설정

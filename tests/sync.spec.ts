@@ -67,6 +67,33 @@ test('같은 키를 넣은 두 기기가 결과 기록과 초기화를 주고받
   await openExam(a, 'SAMPLE-01');
   await expect(modeCard(a, '오답 다시 풀기')).toContainText('틀린 문항 0개');
   await expect(a.locator('.history tbody tr')).toHaveCount(0);
+  // 기기 A에서 새로 푼 기록을 기기 B에서 하나만 지워도(X → 예) 기기 A에서 지워진다.
+  await card.getByRole('combobox').selectOption('all');
+  await card.getByRole('button', { name: '시작' }).click();
+  for (;;) {
+    const stem = await a.locator('.q-text').innerText();
+    if (stem.startsWith('Git에서 새 브랜치')) break;
+    await a.getByRole('button', { name: '건너뛰기' }).click();
+  }
+  await a.getByRole('radio', { name: 'git merge feature' }).check();
+  await a.getByRole('button', { name: '정답 확인' }).click();
+  await a.getByRole('button', { name: '여기까지 채점하고 끝내기' }).click();
+  await a.goto('/settings');
+  await expect(syncStatus(a)).toContainText('동기화 완료');
+
+  await b.goto('/settings');
+  await expect(syncStatus(b)).toContainText('받은 기록 1개');
+  await openExam(b, 'SAMPLE-01');
+  await expect(b.locator('.history tbody tr')).toHaveCount(1);
+  await b.getByRole('button', { name: '이 기록 삭제' }).click();
+  await b.getByRole('button', { name: '예', exact: true }).click();
+  await expect(b.locator('.history tbody tr')).toHaveCount(0);
+  await b.goto('/settings');
+  await expect(syncStatus(b)).toContainText('동기화 완료');
+
+  await openExam(a, 'SAMPLE-01');
+  await expect(modeCard(a, '오답 다시 풀기')).toContainText('틀린 문항 0개');
+  await expect(a.locator('.history tbody tr')).toHaveCount(0);
 });
 
 test('새 비밀키는 등록 코드를 보여 주고, 등록 전에는 동기화를 거부한다', async ({ browser }) => {

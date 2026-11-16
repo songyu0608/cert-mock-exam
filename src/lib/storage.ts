@@ -5,6 +5,7 @@
 // - attempts: 결과 기록 전체(답안 포함). 시험마다 최근 MAX_ATTEMPTS개만 둔다.
 // - scores: 결과마다 문항별 점수만 담은 작은 기록. 개수 제한 없이 모두 둔다.
 // - reset: 기록을 지운 시각. 이 시각 이전에 끝난 기록은 어느 기기에서 왔든 버린다.
+// - removed: 하나씩 지운 결과 id. 이 id의 기록은 어느 기기에서 왔든 버린다.
 // 문항별 통계(정답률, 오답 목록)는 저장하지 않고 scores에서 계산한다. 누적값을 저장하면
 // 두 기기의 값을 합칠 때 같은 풀이를 두 번 세게 되기 때문이다.
 import type { Attempt, Session } from './session.ts';
@@ -64,10 +65,14 @@ export const saveActive = (s: Session) => write(`active:${s.examId}`, s);
 export const clearActive = (examId: string) => write(`active:${examId}`, null);
 
 export const loadResetAt = (examId: string) => read<number>(`reset:${examId}`, 0);
+export const loadRemoved = (examId: string) => read<string[]>(`removed:${examId}`, []);
 
 export function loadAttempts(examId: string): Attempt[] {
   const at = loadResetAt(examId);
-  return read<Attempt[]>(`attempts:${examId}`, []).filter((a) => a.finishedAt > at);
+  const removed = new Set(loadRemoved(examId));
+  return read<Attempt[]>(`attempts:${examId}`, []).filter(
+    (a) => a.finishedAt > at && !removed.has(a.id),
+  );
 }
 
 export function loadAttempt(examId: string, id: string): Attempt | undefined {
@@ -96,7 +101,8 @@ export function loadScores(examId: string): ScoreEntry[] {
     // 예전 버전의 누적 통계는 결과 기록에서 다시 만들 수 있으므로 지운다.
     if (write(`scores:${examId}`, missing)) write(`stats:${examId}`, null);
   }
-  return [...list, ...missing].filter((e) => e.at > at);
+  const removed = new Set(loadRemoved(examId));
+  return [...list, ...missing].filter((e) => e.at > at && !removed.has(e.id));
 }
 
 export function computeStats(scores: readonly ScoreEntry[]): Stats {
@@ -151,7 +157,9 @@ function addScores(examId: string, entries: ScoreEntry[]): boolean {
 export function saveAttempt(a: Attempt): boolean {
   // 같은 id가 이미 저장돼 있으면(같은 세션을 두 탭에서 제출) 처음 것을 그대로 둔다.
   // 결과 기록은 바꾸지 않는다: 점수 기록과 서버(INSERT OR IGNORE)도 처음 것을 유지한다.
+  // 이미 지운 결과도 다시 넣지 않는다.
   if (loadScores(a.examId).some((e) => e.id === a.id)) return true;
+  if (loadRemoved(a.examId).includes(a.id)) return true;
   const list = [a, ...read<Attempt[]>(`attempts:${a.examId}`, [])];
   if (!writeAttempts(a.examId, list, a.id)) return false;
   addScores(a.examId, [toScoreEntry(a)]);
@@ -195,6 +203,34 @@ export function applyReset(examId: string, at: number): boolean {
 }
 
 /**
+ * 결과 기록 하나를 지운다. 지운 id를 먼저 남기고, 남기지 못하면(저장 공간 부족) 아무것도 지우지 않고
+ * false를 돌려준다. id 없이 지우면 다른 기기나 서버에서 다시 받을 때 되살아나기 때문이다.
+ * 동기화하면 다른 기기에서도 지워진다.
+ */
+export function removeAttempt(examId: string, id: string): boolean {
+  return applyRemoved(examId, [id]);
+}
+
+/** 지운 결과 id를 적용한다(이 기기에서 지웠거나 서버에서 받은 것). */
+export function applyRemoved(examId: string, ids: readonly string[]): boolean {
+  const removed = loadRemoved(examId);
+  const fresh = ids.filter((id) => !removed.includes(id));
+  if (!fresh.length) return true;
+  if (!write(`removed:${examId}`, [...removed, ...fresh])) return false;
+  const gone = new Set(fresh);
+  write(
+    `attempts:${examId}`,
+    read<Attempt[]>(`attempts:${examId}`, []).filter((a) => !gone.has(a.id)),
+  );
+  write(
+    `scores:${examId}`,
+    read<ScoreEntry[]>(`scores:${examId}`, []).filter((e) => !gone.has(e.id)),
+  );
+  notify(examId);
+  return true;
+}
+
+/**
  * 다른 기기에서 받은 결과를 합친다. 이미 있는 id는 건너뛴다.
  * body가 없으면(서버에도 점수 요약만 있는 오래된 기록) 점수 기록에만 넣는다.
  * saved가 false면 점수 기록을 저장하지 못한 것이다(저장 공간 부족). 이때는 같은 기록을 다시 받아야 한다.
@@ -205,7 +241,8 @@ export function mergeRemote(
   rows: { id: string; at: number; scores: Record<string, number>; body: Attempt | null }[],
 ): { added: number; saved: boolean } {
   const resetAt = loadResetAt(examId);
-  const fresh = rows.filter((r) => r.at > resetAt);
+  const removed = new Set(loadRemoved(examId));
+  const fresh = rows.filter((r) => r.at > resetAt && !removed.has(r.id));
   if (!fresh.length) return { added: 0, saved: true };
   loadScores(examId);
   const before = read<ScoreEntry[]>(`scores:${examId}`, []).length;
@@ -237,6 +274,8 @@ interface Synced {
   ids: string[];
   /** 서버에 있는 지운 시각 */
   reset: number;
+  /** 서버에 알린, 하나씩 지운 결과 id */
+  removed?: string[];
 }
 const loadSynced = (examId: string) => read<Synced>(`synced:${examId}`, { ids: [], reset: 0 });
 
@@ -254,14 +293,20 @@ function storedExamIds(kinds: readonly string[]): string[] {
   }
   return [...ids];
 }
-const examIdsWithRecords = () => storedExamIds(['attempts', 'scores', 'reset']);
+const examIdsWithRecords = () => storedExamIds(['attempts', 'scores', 'reset', 'removed']);
 
 /** 서버에 있다고 확인한 결과 id와 지운 시각을 남긴다. */
-export function markSynced(examId: string, ids: readonly string[], reset = 0): void {
+export function markSynced(
+  examId: string,
+  ids: readonly string[],
+  reset = 0,
+  removed: readonly string[] = [],
+): void {
   const s = loadSynced(examId);
   write(`synced:${examId}`, {
     ids: [...new Set([...s.ids, ...ids])],
     reset: Math.max(s.reset, reset),
+    removed: [...new Set([...(s.removed ?? []), ...removed])],
   });
 }
 
@@ -295,6 +340,15 @@ export function pendingResets(): { examId: string; at: number }[] {
   return examIdsWithRecords().flatMap((examId) => {
     const at = loadResetAt(examId);
     return at > loadSynced(examId).reset ? [{ examId, at }] : [];
+  });
+}
+
+/** 서버에 올릴, 하나씩 지운 결과 id */
+export function pendingRemovals(): { examId: string; ids: string[] }[] {
+  return examIdsWithRecords().flatMap((examId) => {
+    const done = new Set(loadSynced(examId).removed ?? []);
+    const ids = loadRemoved(examId).filter((id) => !done.has(id));
+    return ids.length ? [{ examId, ids }] : [];
   });
 }
 

@@ -10,7 +10,9 @@ import {
   mergeRemote,
   MAX_ATTEMPTS,
   pendingAttempts,
+  pendingRemovals,
   pendingResets,
+  removeAttempt,
   resetExam,
   saveAttempt,
   wrongKeys,
@@ -192,6 +194,35 @@ describe('기록 지우기', () => {
     mergeRemote(EXAM, [row(attempt('a2', 60, { q1: 1 }))]);
     expect(applyReset(EXAM, 40)).toBe(false);
     expect(loadAttempts(EXAM)).toHaveLength(1);
+  });
+});
+
+describe('기록 하나 지우기', () => {
+  it('지운 결과만 빠지고 통계도 다시 계산하며, 나중에 받거나 다시 저장해도 되살아나지 않는다', () => {
+    saveAttempt(attempt('a1', 10, { q1: 0 }));
+    saveAttempt(attempt('a2', 20, { q1: 1, q2: 0 }));
+    expect(removeAttempt(EXAM, 'a2')).toBe(true);
+    expect(loadAttempts(EXAM).map((a) => a.id)).toEqual(['a1']);
+    expect(loadStats(EXAM)).toEqual({ q1: { n: 1, sum: 0, last: 0, at: 10 } });
+    expect(pendingAttempts().map((p) => p.id)).toEqual(['a1']);
+    expect(pendingRemovals()).toEqual([{ examId: EXAM, ids: ['a2'] }]);
+    mergeRemote(EXAM, [row(attempt('a2', 20, { q1: 1, q2: 0 }))]);
+    saveAttempt(attempt('a2', 20, { q1: 1, q2: 0 }));
+    expect(loadAttempts(EXAM).map((a) => a.id)).toEqual(['a1']);
+    markSynced(EXAM, [], 0, ['a2']);
+    expect(pendingRemovals()).toEqual([]);
+  });
+
+  it('지운 id를 저장하지 못하면 아무것도 지우지 않는다', () => {
+    saveAttempt(attempt('a1', 10, { q1: 0 }));
+    const setItem = store.setItem.bind(store);
+    store.setItem = (k, v) => {
+      if (k.includes(':removed:')) throw new DOMException('full', 'QuotaExceededError');
+      setItem(k, v);
+    };
+    expect(removeAttempt(EXAM, 'a1')).toBe(false);
+    expect(loadAttempts(EXAM).map((a) => a.id)).toEqual(['a1']);
+    expect(loadStats(EXAM).q1?.n).toBe(1);
   });
 });
 

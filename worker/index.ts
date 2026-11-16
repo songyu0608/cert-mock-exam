@@ -108,6 +108,9 @@ async function pull(env: Env, who: string, since: number) {
   const resets = await env.DB.prepare('SELECT exam_id, at FROM resets WHERE owner = ?')
     .bind(who)
     .all<{ exam_id: string; at: number }>();
+  const removed = await env.DB.prepare('SELECT exam_id, id FROM removed WHERE owner = ?')
+    .bind(who)
+    .all<{ exam_id: string; id: string }>();
   return {
     attempts: page.map((r) => ({
       seq: r.seq,
@@ -118,6 +121,7 @@ async function pull(env: Env, who: string, since: number) {
       body: r.body ? (JSON.parse(r.body) as unknown) : null,
     })),
     resets: resets.results.map((r) => ({ examId: r.exam_id, at: r.at })),
+    removed: removed.results.map((r) => ({ examId: r.exam_id, id: r.id })),
     cursor: page.at(-1)?.seq ?? since,
     more: results.length > PAGE,
   };
@@ -143,7 +147,8 @@ export async function handleApi(req: Request, env: Env): Promise<Response> {
       if (parsed.some((a) => !a)) return json({ error: 'bad attempt' }, 400);
       const stmts = (parsed as AttemptIn[]).map((a) =>
         env.DB.prepare(
-          'INSERT OR IGNORE INTO attempts (owner, exam_id, id, finished_at, scores, body) VALUES (?, ?, ?, ?, ?, ?)',
+          // 지운 결과는 다른 기기가 다시 올려도 받지 않는다.
+          'INSERT OR IGNORE INTO attempts (owner, exam_id, id, finished_at, scores, body) SELECT ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM removed WHERE owner = ? AND id = ?)',
         ).bind(
           who,
           a.examId,
@@ -151,10 +156,36 @@ export async function handleApi(req: Request, env: Env): Promise<Response> {
           a.finishedAt,
           JSON.stringify(a.scores),
           a.body === null ? null : JSON.stringify(a.body),
+          who,
+          a.id,
         ),
       );
       if (stmts.length) await env.DB.batch(stmts);
       return json({ ok: true, count: stmts.length });
+    }
+
+    if (url.pathname === '/api/remove' && req.method === 'POST') {
+      const data = (await readJson(req)) as { examId?: unknown; ids?: unknown };
+      if (typeof data.examId !== 'string' || !ID.test(data.examId)) {
+        return json({ error: 'bad examId' }, 400);
+      }
+      const ids = Array.isArray(data.ids) ? data.ids : null;
+      if (
+        !ids ||
+        ids.length > MAX_BATCH ||
+        ids.some((id) => typeof id !== 'string' || !ID.test(id))
+      ) {
+        return json({ error: 'bad ids' }, 400);
+      }
+      const at = Date.now();
+      const stmts = (ids as string[]).flatMap((id) => [
+        env.DB.prepare(
+          'INSERT OR IGNORE INTO removed (owner, exam_id, id, at) VALUES (?, ?, ?, ?)',
+        ).bind(who, data.examId, id, at),
+        env.DB.prepare('DELETE FROM attempts WHERE owner = ? AND id = ?').bind(who, id),
+      ]);
+      if (stmts.length) await env.DB.batch(stmts);
+      return json({ ok: true, count: ids.length });
     }
 
     if (url.pathname === '/api/reset' && req.method === 'POST') {
