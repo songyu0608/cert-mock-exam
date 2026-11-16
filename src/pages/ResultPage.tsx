@@ -87,7 +87,7 @@ export function ResultPage({ exam, attemptId }: { exam: Exam; attemptId: string 
         <p className="small muted" style={{ margin: 0 }}>
           {Math.round(attempt.score * 10) / 10}/{attempt.total}문항 정답
           {attempt.passed !== undefined && ` · 합격선 ${exam.mock.passPercent}%`} · 걸린 시간{' '}
-          {duration(attempt.finishedAt - attempt.startedAt)}
+          {duration(attempt.finishedAt - attempt.startedAt - (attempt.session.pausedMs ?? 0))}
           {attempt.timedOut && ' · 시간 종료로 자동 제출'}
         </p>
         {attempt.passed !== undefined && (

@@ -117,6 +117,17 @@ test('실전: 표시, 문항 이동, 문제-해결 잠금, 제출 후 결과와 
   await expect(page.locator('.bar-title')).toContainText(`${next + 1}/${total}`);
   await expect(cells.nth(psIndex)).toBeDisabled();
 
+  // 일시정지는 나중에 보기 표시 왼쪽에 있고, 누르면 문항과 이동 칸을 가린다.
+  const navBtns = page.locator('.nav .row button');
+  await expect(navBtns.nth(0)).toHaveText('일시정지');
+  await expect(navBtns.nth(1)).toHaveText(/표시/);
+  await page.getByRole('button', { name: '일시정지' }).click();
+  await expect(page.getByRole('heading', { name: '일시정지 중' })).toBeVisible();
+  await expect(page.locator('article')).toHaveCount(0);
+  await expect(page.getByRole('region', { name: '문항 이동' })).toHaveCount(0);
+  await page.getByRole('button', { name: '재개' }).click();
+  await expect(page.locator('article')).toBeVisible();
+
   await page.getByRole('button', { name: '제출' }).last().click();
   await expect(page.getByRole('alertdialog')).toContainText('답하지 않은 문항 9개');
   await expect(page.getByRole('alertdialog')).toContainText('표시한 문항 1개');
@@ -129,6 +140,37 @@ test('실전: 표시, 문항 이동, 문제-해결 잠금, 제출 후 결과와 
   await page.getByRole('link', { name: '시험 홈', exact: true }).click();
   await expect(page.locator('.history tbody tr')).toHaveCount(1);
   await expect(page.locator('.history')).toContainText('불합격');
+});
+
+test('저장 실패 뒤 일시정지한 채로 다시 제출해도 걸린 시간에서 멈춘 시간을 뺀다', async ({
+  page,
+}) => {
+  await page.clock.install();
+  await openExam(page, 'SAMPLE-01');
+  await modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' }).click();
+  await answerSampleCorrectly(page);
+  await page.clock.fastForward('01:00');
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key: string, value: string) {
+      if (key.includes(':attempts:') && !(window as { allowSave?: boolean }).allowSave)
+        throw new DOMException('full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: '제출' }).last().click();
+  await page.getByRole('button', { name: '제출하기' }).click();
+  await expect(page.getByRole('alert')).toContainText('결과를 저장하지 못했습니다');
+  // 멈춘 채 10분이 지난 뒤 재개 없이 다시 제출한다.
+  await page.getByRole('button', { name: '일시정지' }).click();
+  await expect(page.getByRole('heading', { name: '일시정지 중' })).toBeVisible();
+  await page.clock.fastForward('10:00');
+  await page.evaluate(() => {
+    (window as { allowSave?: boolean }).allowSave = true;
+  });
+  await page.getByRole('button', { name: '다시 제출' }).click();
+  await expect(page.locator('.score .big')).toBeVisible();
+  await expect(page.getByText(/걸린 시간 1분/)).toBeVisible();
 });
 
 test('결과를 저장하지 못하면 풀던 세션을 지우지 않고 다시 제출할 수 있다', async ({ page }) => {
@@ -370,6 +412,47 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
 });
 
+test('실전 일시정지(2단): 플래그 왼쪽 버튼으로 시간을 멈추고 문제를 가리며, 다시 누르면 재개한다', async ({
+  page,
+}) => {
+  await page.clock.install();
+  await openExam(page, 'CCAR-F');
+  await modeCard(page, '실전 모의고사').getByRole('button', { name: 'S1 · A 시작' }).click();
+  const timer = page.locator('.sv-clock .timer');
+  await expect(timer).toHaveText(/^(30:00|29:5\d)$/);
+
+  // 위 상태줄에서 一時停止는 フラグ 바로 왼쪽에 있다.
+  const pause = page.locator('.sv-bar-in > button');
+  await expect(pause.nth(0)).toHaveClass(/sv-pause/);
+  await expect(pause.nth(1)).toHaveClass(/sv-flag/);
+
+  await page.getByRole('button', { name: '一時停止' }).click();
+  await expect(page.locator('.sv-pause')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.sv-pause')).toHaveText('再開');
+  await expect(page.getByRole('heading', { name: '一時停止中' })).toBeVisible();
+  await expect(page.locator('.sv-q')).toHaveCount(0);
+  await expect(page.locator('.sv-sc')).toHaveCount(0);
+  await expect(page.locator('.sv-flag')).toBeDisabled();
+  await expect(page.locator('.sv-foot')).toHaveAttribute('inert', '');
+  const frozen = await timer.innerText();
+  await page.clock.fastForward('10:00');
+  await expect(timer).toHaveText(frozen);
+
+  // 새로고침해도 멈춘 채로 남는다.
+  await page.reload();
+  await expect(page.getByRole('heading', { name: '一時停止中' })).toBeVisible();
+  await page.clock.fastForward('05:00');
+  await expect(timer).toHaveText(frozen);
+
+  // 가운데 再開 버튼으로도, 위 버튼으로도 재개한다. 재개하면 시간이 다시 준다.
+  await page.locator('.sv-paused').getByRole('button', { name: '再開' }).click();
+  await expect(page.locator('.sv-q')).toBeVisible();
+  await expect(page.locator('.sv-pause')).toHaveText('一時停止');
+  await expect(page.locator('.sv-flag')).toBeEnabled();
+  await page.clock.fastForward('01:00');
+  await expect(timer).not.toHaveText(frozen);
+});
+
 test('시나리오형 시험(CCAR-F): 무작위 조합은 시나리오 4개에서 세트 하나씩 골라 60문항을 낸다', async ({
   page,
 }) => {
@@ -487,6 +570,12 @@ async function expectExamScreenWithoutScenario(page: Page) {
   const flat = (s: string) => s.replace(/\s+/g, ' ').trim();
   expect(flat(first).startsWith(flat(cell))).toBe(true);
   await expect(page.getByRole('link', { name: '나가기' })).toHaveCount(0);
+  // 一時停止는 レビュー 화면에서도 쓸 수 있고, 멈춘 동안 표를 가린다.
+  await page.getByRole('button', { name: '一時停止' }).click();
+  await expect(page.locator('.sv-table')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '一時停止中' })).toBeVisible();
+  await page.getByRole('button', { name: '再開' }).first().click();
+  await expect(rows).toHaveCount(60);
 }
 
 test('고정 회차 시험(CCAR-P): 숨긴 1~5회는 빠지고 1회(장문)만 보이며 60문항을 실제 시험형 화면으로 낸다', async ({

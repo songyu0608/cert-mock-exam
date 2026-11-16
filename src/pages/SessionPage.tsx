@@ -5,7 +5,13 @@ import { Timer } from '../components/Timer.tsx';
 import type { Exam } from '../data/schema.ts';
 import type { Item } from '../lib/items.ts';
 import { isComplete, isTouched, type Answer } from '../lib/scoring.ts';
-import { finishSession, sessionLabel, type Session } from '../lib/session.ts';
+import {
+  finishSession,
+  pauseSession,
+  resumeSession,
+  sessionLabel,
+  type Session,
+} from '../lib/session.ts';
 import { clearActive, loadActive, saveActive, saveAttempt } from '../lib/storage.ts';
 import { syncNow } from '../lib/sync.ts';
 import { useQuestions } from '../lib/useQuestions.ts';
@@ -17,6 +23,13 @@ export function SessionPage({ exam }: { exam: Exam }) {
   const [confirming, setConfirming] = useState(false);
   const [saveFailed, setSaveFailed] = useState(false);
   const finished = useRef(false);
+  const resumeRef = useRef<HTMLButtonElement>(null);
+  const pausedAt = session?.pausedAt;
+
+  // 일시정지하면 재개 버튼으로 포커스를 옮긴다.
+  useEffect(() => {
+    if (pausedAt !== undefined) resumeRef.current?.focus();
+  }, [pausedAt]);
 
   useEffect(() => {
     if (session && !finished.current) saveActive(session);
@@ -118,6 +131,9 @@ export function SessionPage({ exam }: { exam: Exam }) {
   const unanswered = total - answeredCount;
   const flaggedCount = Object.keys(session.flagged).length;
   const progress = isMock ? answeredCount / total : checkedCount / total;
+  const paused = isMock && session.pausedAt !== undefined;
+  const togglePause = () =>
+    setSession((s) => (s ? (s.pausedAt !== undefined ? resumeSession(s) : pauseSession(s)) : s));
 
   // 시나리오형 시험(2단)과 mock.layout이 exam인 시험(1단)의 실전은 실제 시험형 화면으로 푼다.
   if (isMock && (exam.scenarios.length > 0 || exam.mock.layout === 'exam'))
@@ -145,7 +161,11 @@ export function SessionPage({ exam }: { exam: Exam }) {
             {session.current + 1}/{total}
           </span>
           {isMock && session.deadline && (
-            <Timer deadline={session.deadline} onExpire={() => finish(true)} />
+            <Timer
+              deadline={session.deadline}
+              onExpire={() => finish(true)}
+              pausedAt={session.pausedAt}
+            />
           )}
           <a className="btn sm ghost" href={paths.exam(exam.id)} onClick={onLinkClick}>
             나가기
@@ -171,91 +191,111 @@ export function SessionPage({ exam }: { exam: Exam }) {
             </div>
           </div>
         )}
-        <QuestionView
-          key={key}
-          exam={exam}
-          item={item}
-          view={view}
-          answer={answer}
-          onChange={setAnswer}
-          reveal={!isMock && checked}
-          disabled={!!session.locked[key]}
-          number={session.current + 1}
-          scenarioOpen={
-            data.itemsByKey.get(session.itemKeys[session.current - 1] ?? '')?.scenarioId !==
-            item.scenarioId
-          }
-        />
-
-        {isMock && item.noReturn && !session.locked[key] && (
-          <p className="note small">
-            <b>주의</b> · 이 문항은 답한 뒤 다른 문항으로 넘어가면 돌아올 수 없습니다.
-          </p>
-        )}
-
-        {isMock ? (
-          <MockNav
-            session={session}
-            item={item}
-            go={go}
-            onFlag={() =>
-              setSession((s) => {
-                if (!s) return s;
-                const flagged = { ...s.flagged };
-                if (flagged[key]) delete flagged[key];
-                else flagged[key] = true;
-                return { ...s, flagged };
-              })
-            }
-            onSubmit={() => setConfirming(true)}
-          />
+        {paused ? (
+          // 일시정지 중에는 문항과 이동 칸을 가린다(멈춘 시간에 문제를 읽지 않게).
+          <section className="panel stack paused-panel" aria-labelledby="paused-h">
+            <h2 id="paused-h">일시정지 중</h2>
+            <p className="muted">
+              남은 시간이 멈춰 있습니다. 문항은 재개할 때까지 보이지 않습니다.
+            </p>
+            <div>
+              <button type="button" className="btn primary" onClick={togglePause} ref={resumeRef}>
+                재개
+              </button>
+            </div>
+          </section>
         ) : (
-          <div className="nav">
-            <button
-              type="button"
-              className="btn"
-              onClick={() => go(session.current - 1)}
-              disabled={session.current === 0}
-            >
-              이전
-            </button>
-            <span className="row">
-              {!checked ? (
-                <>
-                  <button
-                    type="button"
-                    className="btn ghost"
-                    onClick={() => go(session.current + 1)}
-                    disabled={session.current === total - 1}
-                  >
-                    건너뛰기
-                  </button>
-                  <button
-                    type="button"
-                    className="btn primary"
-                    disabled={!isComplete(answer)}
-                    onClick={() =>
-                      setSession((s) => (s ? { ...s, checked: { ...s.checked, [key]: true } } : s))
-                    }
-                  >
-                    정답 확인
-                  </button>
-                </>
-              ) : session.current < total - 1 ? (
+          <>
+            <QuestionView
+              key={key}
+              exam={exam}
+              item={item}
+              view={view}
+              answer={answer}
+              onChange={setAnswer}
+              reveal={!isMock && checked}
+              disabled={!!session.locked[key]}
+              number={session.current + 1}
+              scenarioOpen={
+                data.itemsByKey.get(session.itemKeys[session.current - 1] ?? '')?.scenarioId !==
+                item.scenarioId
+              }
+            />
+
+            {isMock && item.noReturn && !session.locked[key] && (
+              <p className="note small">
+                <b>주의</b> · 이 문항은 답한 뒤 다른 문항으로 넘어가면 돌아올 수 없습니다.
+              </p>
+            )}
+
+            {isMock ? (
+              <MockNav
+                session={session}
+                item={item}
+                go={go}
+                onFlag={() =>
+                  setSession((s) => {
+                    if (!s) return s;
+                    const flagged = { ...s.flagged };
+                    if (flagged[key]) delete flagged[key];
+                    else flagged[key] = true;
+                    return { ...s, flagged };
+                  })
+                }
+                onSubmit={() => setConfirming(true)}
+                onPause={session.deadline ? togglePause : undefined}
+              />
+            ) : (
+              <div className="nav">
                 <button
                   type="button"
-                  className="btn primary"
-                  onClick={() => go(session.current + 1)}
+                  className="btn"
+                  onClick={() => go(session.current - 1)}
+                  disabled={session.current === 0}
                 >
-                  다음
+                  이전
                 </button>
-              ) : (
-                <button type="button" className="btn primary" onClick={() => finish()}>
-                  결과 보기
-                </button>
-              )}
-            </span>
-          </div>
+                <span className="row">
+                  {!checked ? (
+                    <>
+                      <button
+                        type="button"
+                        className="btn ghost"
+                        onClick={() => go(session.current + 1)}
+                        disabled={session.current === total - 1}
+                      >
+                        건너뛰기
+                      </button>
+                      <button
+                        type="button"
+                        className="btn primary"
+                        disabled={!isComplete(answer)}
+                        onClick={() =>
+                          setSession((s) =>
+                            s ? { ...s, checked: { ...s.checked, [key]: true } } : s,
+                          )
+                        }
+                      >
+                        정답 확인
+                      </button>
+                    </>
+                  ) : session.current < total - 1 ? (
+                    <button
+                      type="button"
+                      className="btn primary"
+                      onClick={() => go(session.current + 1)}
+                    >
+                      다음
+                    </button>
+                  ) : (
+                    <button type="button" className="btn primary" onClick={() => finish()}>
+                      결과 보기
+                    </button>
+                  )}
+                </span>
+              </div>
+            )}
+          </>
         )}
 
         {!isMock && (
@@ -269,7 +309,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
           </div>
         )}
 
-        {isMock && confirming && (
+        {isMock && confirming && !paused && (
           <div className="confirm stack" role="alertdialog" aria-labelledby="confirm-h">
             <b id="confirm-h">제출하면 채점하고 끝납니다.</b>
             <span className="small">
@@ -297,12 +337,15 @@ function MockNav({
   go,
   onFlag,
   onSubmit,
+  onPause,
 }: {
   session: Session;
   item: Item;
   go: (i: number) => void;
   onFlag: () => void;
   onSubmit: () => void;
+  /** 제한 시간이 있을 때만: 타이머를 멈춘다(재개는 일시정지 화면에서). */
+  onPause?: () => void;
 }) {
   const total = session.itemKeys.length;
   const i = session.current;
@@ -318,14 +361,21 @@ function MockNav({
         >
           이전
         </button>
-        <button
-          type="button"
-          className={`btn${session.flagged[item.key] ? ' on' : ''}`}
-          aria-pressed={!!session.flagged[item.key]}
-          onClick={onFlag}
-        >
-          {session.flagged[item.key] ? '표시 해제' : '나중에 보기 표시'}
-        </button>
+        <span className="row">
+          {onPause && (
+            <button type="button" className="btn" onClick={onPause}>
+              일시정지
+            </button>
+          )}
+          <button
+            type="button"
+            className={`btn${session.flagged[item.key] ? ' on' : ''}`}
+            aria-pressed={!!session.flagged[item.key]}
+            onClick={onFlag}
+          >
+            {session.flagged[item.key] ? '표시 해제' : '나중에 보기 표시'}
+          </button>
+        </span>
         {i < total - 1 ? (
           <button type="button" className="btn primary" onClick={() => go(i + 1)}>
             다음

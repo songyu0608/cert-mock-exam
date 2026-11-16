@@ -41,6 +41,10 @@ export interface Session {
   struck?: Record<string, number[]>;
   /** 시나리오형 실전 화면: 남은 시간을 숨겼는지 */
   timerHidden?: boolean;
+  /** 실전 모드 일시정지를 시작한 시각(ms). 있으면 일시정지 중이고 남은 시간이 줄지 않는다. */
+  pausedAt?: number;
+  /** 지금까지 일시정지한 시간 합(ms). 결과의 소요 시간에서 뺀다. */
+  pausedMs?: number;
 }
 
 export interface DomainResult {
@@ -335,6 +339,24 @@ export function createSession(
   };
 }
 
+/** 실전 모드 타이머를 멈춘다. 제한 시간이 없거나 이미 멈췄으면 그대로 둔다. */
+export function pauseSession(session: Session, now = Date.now()): Session {
+  if (!session.deadline || session.pausedAt !== undefined) return session;
+  return { ...session, pausedAt: now };
+}
+
+/** 멈춘 타이머를 다시 움직인다. 멈춘 시간만큼 제한 시각을 미룬다. */
+export function resumeSession(session: Session, now = Date.now()): Session {
+  if (session.pausedAt === undefined) return session;
+  const { pausedAt, ...rest } = session;
+  const d = Math.max(0, now - pausedAt);
+  return {
+    ...rest,
+    ...(rest.deadline ? { deadline: rest.deadline + d } : {}),
+    pausedMs: (rest.pausedMs ?? 0) + d,
+  };
+}
+
 /**
  * 보기 하나에 취소선을 긋거나 걷는다(시나리오형 실전 화면). option은 원래 보기 번호.
  * 취소선을 그은 보기는 고를 수 없으므로, 이미 골랐다면 선택도 푼다.
@@ -368,10 +390,13 @@ export function gradedKeys(session: Session): string[] {
 export function finishSession(
   exam: Exam,
   itemsByKey: Map<string, Item>,
-  session: Session,
+  active: Session,
   opts: { now?: number; timedOut?: boolean } = {},
 ): Attempt {
   const now = opts.now ?? Date.now();
+  // 일시정지한 채로 제출하면(저장 실패 뒤 다시 제출 등) 지금까지 멈춘 구간도 pausedMs에 넣어 둔다.
+  // 결과 기록은 저장한 뒤 바꾸지 않으므로 저장 전에 정리한다.
+  const session = resumeSession(active, now);
   const keys = gradedKeys(session);
   const itemScores: Record<string, number> = {};
   const byDomain: Record<string, DomainResult> = Object.fromEntries(
