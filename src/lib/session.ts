@@ -41,6 +41,10 @@ export interface Session {
   struck?: Record<string, number[]>;
   /** 시나리오형 실전 화면: 남은 시간을 숨겼는지 */
   timerHidden?: boolean;
+  /** 실전 모드 일시정지를 시작한 시각(ms). 있으면 일시정지 중이고 남은 시간이 줄지 않는다. */
+  pausedAt?: number;
+  /** 지금까지 일시정지한 시간 합(ms). 결과의 소요 시간에서 뺀다. */
+  pausedMs?: number;
 }
 
 export interface DomainResult {
@@ -332,6 +336,24 @@ export function createSession(
     ...(mode === 'mock' && opts.minutes
       ? { deadline: now + Math.round(opts.minutes * 60_000) }
       : {}),
+  };
+}
+
+/** 실전 모드 타이머를 멈춘다. 제한 시간이 없거나 이미 멈췄으면 그대로 둔다. */
+export function pauseSession(session: Session, now = Date.now()): Session {
+  if (!session.deadline || session.pausedAt !== undefined) return session;
+  return { ...session, pausedAt: now };
+}
+
+/** 멈춘 타이머를 다시 움직인다. 멈춘 시간만큼 제한 시각을 미룬다. */
+export function resumeSession(session: Session, now = Date.now()): Session {
+  if (session.pausedAt === undefined) return session;
+  const { pausedAt, ...rest } = session;
+  const d = Math.max(0, now - pausedAt);
+  return {
+    ...rest,
+    ...(rest.deadline ? { deadline: rest.deadline + d } : {}),
+    pausedMs: (rest.pausedMs ?? 0) + d,
   };
 }
 

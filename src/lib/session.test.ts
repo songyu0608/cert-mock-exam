@@ -20,6 +20,8 @@ import {
   pickMockQuestions,
   pickScenarioMock,
   pickSetMock,
+  pauseSession,
+  resumeSession,
   sessionLabel,
   singleScenarioSets,
   toggleStrike,
@@ -91,6 +93,25 @@ describe('세션 채점', () => {
     expect(a.percent).toBe(100);
     expect(a.passed).toBe(true);
     expect(s.deadline! - s.startedAt).toBe(90 * 60_000);
+  });
+  it('일시정지: 멈춘 시간만큼 제한 시각을 미루고, 멈춘 시간 합을 남긴다', () => {
+    const { exam, questions } = load('aws-aib-c01');
+    const s = createSession(exam, questions.slice(0, 3), 'mock', { minutes: 10, now: 0 });
+    const p = pauseSession(s, 60_000);
+    expect(p.pausedAt).toBe(60_000);
+    // 이미 멈췄으면 다시 눌러도 시각이 바뀌지 않는다.
+    expect(pauseSession(p, 90_000)).toBe(p);
+    const r = resumeSession(p, 360_000);
+    expect(r.pausedAt).toBeUndefined();
+    expect(r.deadline).toBe(10 * 60_000 + 300_000);
+    expect(r.pausedMs).toBe(300_000);
+    const r2 = resumeSession(pauseSession(r, 400_000), 420_000);
+    expect(r2.deadline).toBe(10 * 60_000 + 320_000);
+    expect(r2.pausedMs).toBe(320_000);
+    // 멈추지 않았으면 재개해도 그대로, 제한 시간이 없는 세션은 멈추지 않는다.
+    expect(resumeSession(s, 1)).toBe(s);
+    const practice = createSession(exam, questions.slice(0, 3), 'practice');
+    expect(pauseSession(practice, 1)).toBe(practice);
   });
   it('연습 모드는 정답 확인한 문항만 채점', () => {
     const { exam, questions } = load('aws-aib-c01');

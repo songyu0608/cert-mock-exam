@@ -1399,7 +1399,8 @@ details.callout[open] > summary.callout-title {
   min-width: 5.2em;
   text-align: center;
 }
-.sv-flag {
+.sv-flag,
+.sv-pause {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1415,12 +1416,19 @@ details.callout[open] > summary.callout-title {
 .sv-flag:hover {
   border-color: var(--warn);
 }
-.sv-flag svg {
+.sv-flag:disabled {
+  opacity: 0.45;
+  cursor: default;
+  border-color: var(--line);
+}
+.sv-flag svg,
+.sv-pause svg {
   width: 14px;
   height: 14px;
   flex: none;
 }
-.sv-flag svg path {
+.sv-flag svg path,
+.sv-pause svg path {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.6;
@@ -1434,6 +1442,54 @@ details.callout[open] > summary.callout-title {
 }
 .sv-flag[aria-pressed='true'] svg path {
   fill: currentColor;
+}
+/* 일시정지: 플래그 왼쪽 버튼. 멈춘 동안은 강조색으로 바뀌고 아이콘이 재생(▶)이 된다. */
+.sv-pause:hover {
+  border-color: var(--accent);
+}
+.sv-pause svg path {
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.sv-pause[aria-pressed='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.sv-pause[aria-pressed='true'] svg path {
+  fill: currentColor;
+}
+.timer.paused {
+  color: var(--muted);
+}
+.sv-paused {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px max(16px, env(safe-area-inset-right)) 40px max(16px, env(safe-area-inset-left));
+}
+.sv-paused-in {
+  max-width: 420px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.sv-paused-in h2 {
+  margin: 0;
+  font-size: 22px;
+}
+.sv-paused-in p {
+  margin: 0;
+  color: var(--muted);
+}
+.sv-foot.off .sv-foot-in {
+  opacity: 0.45;
 }
 .sv-alert {
   flex: none;
@@ -1825,6 +1881,13 @@ details.callout[open] > summary.callout-title {
   .sv-clock {
     order: 2;
     flex-basis: 100%;
+  }
+  /* 좁은 화면은 一時停止를 아이콘만 두어 진행 위치(問題 N / M)가 잘리지 않게 한다. */
+  .sv-pause-t {
+    display: none;
+  }
+  .sv-pause {
+    padding: 5px 9px;
   }
   .sv-clock .sv-tv {
     margin-left: auto;

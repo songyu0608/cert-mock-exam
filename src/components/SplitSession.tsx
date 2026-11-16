@@ -1,7 +1,7 @@
 // 시나리오형 시험(예: CCAR-F)과 mock.layout이 exam인 시험(예: CCAO-F, CCAR-P)의 실전 모의고사 화면.
 // 시나리오형은 왼쪽에 지금 문항 번호와 시나리오, 오른쪽에 문제와 보기를 둔다(2단).
 // 시나리오가 없는 시험은 한 칸에 문항 번호, 문제, 보기를 둔다(1단).
-// 위의 フラグ·残り時間, 보기 취소선, 아래의 レビュー·이전·다음은 두 경우 모두 같다.
+// 위의 一時停止·フラグ·残り時間, 보기 취소선, 아래의 レビュー·이전·다음은 두 경우 모두 같다.
 import {
   useEffect,
   useLayoutEffect,
@@ -13,7 +13,13 @@ import {
 import type { Exam } from '../data/schema.ts';
 import { itemSummary, stemLead, type Item, type ItemBody } from '../lib/items.ts';
 import { correctCount, isTouched, type Answer } from '../lib/scoring.ts';
-import { sessionLabel, toggleStrike, type Session } from '../lib/session.ts';
+import {
+  pauseSession,
+  resumeSession,
+  sessionLabel,
+  toggleStrike,
+  type Session,
+} from '../lib/session.ts';
 import { Markdown } from './Markdown.tsx';
 import { QuestionView } from './QuestionView.tsx';
 import { Timer } from './Timer.tsx';
@@ -29,6 +35,10 @@ const LABELS = {
     show: '表示',
     hide: '非表示',
     flag: 'フラグ',
+    pause: '一時停止',
+    resume: '再開',
+    pausedTitle: '一時停止中',
+    pausedBody: '残り時間は止まっています。問題は再開するまで表示されません。',
     review: 'レビュー',
     prev: '前の問題',
     next: '次の問題',
@@ -65,6 +75,10 @@ const LABELS = {
     show: '표시',
     hide: '숨기기',
     flag: '플래그',
+    pause: '일시정지',
+    resume: '재개',
+    pausedTitle: '일시정지 중',
+    pausedBody: '남은 시간이 멈춰 있습니다. 문항은 재개할 때까지 보이지 않습니다.',
     review: '검토',
     prev: '이전 문항',
     next: '다음 문항',
@@ -146,6 +160,8 @@ export function SplitSession({
     ? exam.scenarios.find((s) => s.id === item.scenarioId)
     : undefined;
   const prevLocked = i > 0 && !!session.locked[session.itemKeys[i - 1]!];
+  const paused = session.pausedAt !== undefined;
+  const resumeRef = useRef<HTMLButtonElement>(null);
 
   // 문항을 옮기면 문제 칸은 맨 위로, 시나리오가 바뀌면 시나리오 칸도 맨 위로.
   useLayoutEffect(() => {
@@ -185,6 +201,11 @@ export function SplitSession({
     return () => document.removeEventListener('keydown', onKey);
   }, [confirming]);
 
+  // 일시정지하면 재개 버튼으로 포커스를 옮긴다(가려진 문제 칸에 포커스가 남지 않게).
+  useEffect(() => {
+    if (paused) resumeRef.current?.focus();
+  }, [paused]);
+
   const openReview = () => {
     setConfirming(false);
     setReview(true);
@@ -206,6 +227,8 @@ export function SplitSession({
       else f[key] = true;
       return { ...s, flagged: f };
     });
+  const togglePause = () =>
+    setSession((s) => (s ? (s.pausedAt !== undefined ? resumeSession(s) : pauseSession(s)) : s));
   const toggleTimer = () => setSession((s) => (s ? { ...s, timerHidden: !s.timerHidden } : s));
   const strike = (option: number) => setSession((s) => (s ? toggleStrike(s, key, option) : s));
 
@@ -233,8 +256,29 @@ export function SplitSession({
             </span>
             {review ? t.review : t.pos(i + 1, total)}
           </span>
+          {session.deadline && (
+            <button
+              type="button"
+              className="sv-pause"
+              aria-pressed={paused}
+              aria-label={paused ? t.resume : t.pause}
+              title={paused ? t.resume : t.pause}
+              onClick={togglePause}
+            >
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                {paused ? <path d="M4.5 2.5v11l9-5.5z" /> : <path d="M4.5 2.5v11M11.5 2.5v11" />}
+              </svg>
+              <span className="sv-pause-t">{paused ? t.resume : t.pause}</span>
+            </button>
+          )}
           {!review && (
-            <button type="button" className="sv-flag" aria-pressed={flagged} onClick={toggleFlag}>
+            <button
+              type="button"
+              className="sv-flag"
+              aria-pressed={flagged}
+              disabled={paused}
+              onClick={toggleFlag}
+            >
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M3.5 14.5V2h8.5l-2 3 2 3H3.5" />
               </svg>
@@ -249,6 +293,7 @@ export function SplitSession({
                 onExpire={onExpire}
                 hidden={!!session.timerHidden}
                 label={t.left}
+                pausedAt={session.pausedAt}
               />
               <button
                 type="button"
@@ -275,7 +320,18 @@ export function SplitSession({
         </div>
       )}
 
-      {review ? (
+      {paused ? (
+        // 일시정지 중에는 문제·시나리오·レビュー를 가린다(멈춘 시간에 문제를 읽지 않게).
+        <main className="sv-paused" inert={confirming} aria-labelledby="sv-paused-h">
+          <div className="sv-paused-in">
+            <h2 id="sv-paused-h">{t.pausedTitle}</h2>
+            <p>{t.pausedBody}</p>
+            <button type="button" className="btn primary" ref={resumeRef} onClick={togglePause}>
+              {t.resume}
+            </button>
+          </div>
+        </main>
+      ) : review ? (
         <main
           className="sv-review"
           ref={reviewRef}
@@ -419,7 +475,7 @@ export function SplitSession({
         </main>
       )}
 
-      <footer className="sv-foot" inert={confirming}>
+      <footer className={`sv-foot${paused ? ' off' : ''}`} inert={confirming || paused}>
         {review ? (
           <div className="sv-foot-in">
             <span className="sv-sp" />
