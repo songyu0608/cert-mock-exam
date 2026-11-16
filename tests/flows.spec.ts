@@ -142,6 +142,37 @@ test('실전: 표시, 문항 이동, 문제-해결 잠금, 제출 후 결과와 
   await expect(page.locator('.history')).toContainText('불합격');
 });
 
+test('저장 실패 뒤 일시정지한 채로 다시 제출해도 걸린 시간에서 멈춘 시간을 뺀다', async ({
+  page,
+}) => {
+  await page.clock.install();
+  await openExam(page, 'SAMPLE-01');
+  await modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' }).click();
+  await answerSampleCorrectly(page);
+  await page.clock.fastForward('01:00');
+  await page.evaluate(() => {
+    const original = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key: string, value: string) {
+      if (key.includes(':attempts:') && !(window as { allowSave?: boolean }).allowSave)
+        throw new DOMException('full', 'QuotaExceededError');
+      return original.call(this, key, value);
+    };
+  });
+  await page.getByRole('button', { name: '제출' }).last().click();
+  await page.getByRole('button', { name: '제출하기' }).click();
+  await expect(page.getByRole('alert')).toContainText('결과를 저장하지 못했습니다');
+  // 멈춘 채 10분이 지난 뒤 재개 없이 다시 제출한다.
+  await page.getByRole('button', { name: '일시정지' }).click();
+  await expect(page.getByRole('heading', { name: '일시정지 중' })).toBeVisible();
+  await page.clock.fastForward('10:00');
+  await page.evaluate(() => {
+    (window as { allowSave?: boolean }).allowSave = true;
+  });
+  await page.getByRole('button', { name: '다시 제출' }).click();
+  await expect(page.locator('.score .big')).toBeVisible();
+  await expect(page.getByText(/걸린 시간 1분/)).toBeVisible();
+});
+
 test('결과를 저장하지 못하면 풀던 세션을 지우지 않고 다시 제출할 수 있다', async ({ page }) => {
   await openExam(page, 'SAMPLE-01');
   await modeCard(page, '실전 모의고사').getByRole('button', { name: '시작' }).click();

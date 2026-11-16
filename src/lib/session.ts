@@ -390,10 +390,13 @@ export function gradedKeys(session: Session): string[] {
 export function finishSession(
   exam: Exam,
   itemsByKey: Map<string, Item>,
-  session: Session,
+  active: Session,
   opts: { now?: number; timedOut?: boolean } = {},
 ): Attempt {
   const now = opts.now ?? Date.now();
+  // 일시정지한 채로 제출하면(저장 실패 뒤 다시 제출 등) 지금까지 멈춘 구간도 pausedMs에 넣어 둔다.
+  // 결과 기록은 저장한 뒤 바꾸지 않으므로 저장 전에 정리한다.
+  const session = resumeSession(active, now);
   const keys = gradedKeys(session);
   const itemScores: Record<string, number> = {};
   const byDomain: Record<string, DomainResult> = Object.fromEntries(
