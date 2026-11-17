@@ -6,7 +6,7 @@ tags: ["ccar-f", "비교", "도메인2", "도메인3"]
 
 | 대상 | 프로젝트 범위(팀 공유, 버전 관리) | 사용자 범위(본인만) |
 |---|---|---|
-| 지시 | .claude/CLAUDE.md 또는 루트 CLAUDE.md | ~/.claude/CLAUDE.md |
+| 지침 | .claude/CLAUDE.md 또는 루트 CLAUDE.md | ~/.claude/CLAUDE.md |
 | 슬래시 명령 | .claude/commands/ | ~/.claude/commands/ |
 | 스킬 | .claude/skills/ | ~/.claude/skills/ (개인 변형은 다른 이름으로) |
 | MCP 서버 | .mcp.json (${ENV} 확장) | ~/.claude.json |
