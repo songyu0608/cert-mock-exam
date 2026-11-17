@@ -1,9 +1,8 @@
 ---
 lab: true
-title_provisional: true
 ---
 
-# 54. Practice: BUILD - ShopAssist Agentic System
+# 54. Practice: BUILD - ShopAssist Becomes an Agentic System
 
 So far, our tools answer anyone who asks. Give them an order number, and they open the order. Now ShopAssist becomes an agentic system: one loop, a check in our code before every tool call, and a handoff to a person. This matters because a loop that runs any tool at any time will, sooner or later, act for a customer nobody has checked.
 
