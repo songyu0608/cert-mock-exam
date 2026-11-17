@@ -1,8 +1,4 @@
----
-title_provisional: true
----
-
-# 9. How to Use the Labs
+# 9. How to Use the Course Labs
 
 Starting from the next lesson, this course uses labs. A lab is a coding exercise that runs inside the course, in your browser.
 
