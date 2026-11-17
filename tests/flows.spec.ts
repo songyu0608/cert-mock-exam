@@ -692,8 +692,15 @@ test('공식 가이드: 장 칩·스크롤바 이동 뒤 언어를 바꿔도 지
   await expect.poll(() => topOf(12)).toBeGreaterThan(-40);
 
   // 4장 칩으로 이동하는 도중 스크롤바로 목표를 지나 2장까지 가면 2장을 따른다
+  // 장 경계가 아니라 2장 한가운데로 간다. 진행 중이던 부드러운 스크롤이 instant 이동 뒤에도 한 프레임
+  // 더 움직여(느린 CI에서 십수 px) 2장 머리 바로 위, 즉 1장으로 판정되는 일이 있었다.
   await frame.locator('#chaps button[data-c="4"]').click();
-  await scrollbarTo(2);
+  await frame.locator('#c2').evaluate((c2) => {
+    const off = document.querySelector('header.top')!.getBoundingClientRect().bottom;
+    const c3 = document.getElementById('c3')!;
+    const mid = (c2.getBoundingClientRect().top + c3.getBoundingClientRect().top) / 2;
+    window.scrollTo({ top: mid + window.scrollY - off, behavior: 'instant' });
+  });
   await expect(pressed).toHaveAttribute('data-c', '2');
   await frame.locator('#v-ko').click();
   await expect(pressed).toHaveAttribute('data-c', '2');
