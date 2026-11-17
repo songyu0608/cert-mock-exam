@@ -40,4 +40,5 @@ choi(GitHub: `songyu0608`)가 혼자 쓰는 자격증 모의고사 사이트. �
 - 기록 저장은 `src/lib/storage.ts`만 거친다. 기기 간 동기화는 `src/lib/sync.ts`(브라우저)와 `worker/`(API), `migrations/`(D1 테이블).
 - 결과 기록은 한 번 만들면 바꾸지 않는다(합집합으로 합치므로). 문항별 통계는 저장하지 않고 점수 기록에서 계산한다.
 - D1 테이블을 바꿀 때는 기존 migration을 고치지 않고 새 파일(`migrations/000N_….sql`)을 추가한다.
+- 이론 노트·슬라이드 번역의 용어는 [`docs/translation-glossary.md`](docs/translation-glossary.md)를 참고한다(권장안이며, 문맥상 더 자연스러운 표현을 우선한다).
 - 저장소는 Public이다. API 토큰 등 비밀 값은 커밋하지 않는다. 배포 비밀 값은 GitHub Actions 시크릿에 둔다.
