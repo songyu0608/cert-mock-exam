@@ -16,3 +16,26 @@ scripts/
 - 제목 캡처가 없어 임시 제목을 붙인 파일은 `title_provisional: true` frontmatter로 표시하고, 실제 제목을 받으면 파일 이름과 함께 고친다.
 - 원문은 단어를 바꾸지 않는다. 자막처럼 끊긴 줄만 문장·문단으로 이어 붙인다.
 - 번역 용어는 [`docs/translation-glossary.md`](../../../docs/translation-glossary.md)를 참고하되 자연스러운 한국어를 우선한다.
+
+## 섹션
+
+Udemy 강의의 섹션 이름과 강의 번호 범위.
+
+| 섹션 | 강의 | 이름 |
+| --- | --- | --- |
+| 1 | 3~8 | Foundations |
+| 2 | 9~15 | Working with the Claude API |
+| 3 | 16~21 | Prompt Engineering and Evaluation |
+| 4 | 22~33 | Structured Output and Extraction |
+| 5 | 34~43 | Tools, MCP, and Agentic Loop |
+| 6 | 44~54 | The Support Agent |
+| 7 | 55~66 | Multi-Agent Systems |
+| 8 | 67~87 | Claude Code Configuration and Workflows |
+| 9 | 88~94 | Claude Code in CI and Review Architectures |
+| 10 | 95~98 | Exam Readiness (All Domains) |
+| 11 | 99~102 | Beyond the Exam (Bonus, not on the Exam) |
+| 12 | 103~106 | Basics for Non-Developers |
+| 13 | 107~117 | Instructor Interview: From Exam Prep to Production Practice |
+
+- 98강은 강의가 아니라 자료 안내(CCAR-F Quick Reference PDF)다.
+- 99강(How Exam Questions Reason)은 내용상 97강에서 바로 이어지고 시험 대비 내용이지만, 받은 섹션 범위대로 11에 둔다.
