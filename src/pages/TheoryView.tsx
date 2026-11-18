@@ -9,7 +9,7 @@ import { byName, folderLabel, remarkObsidian, toMarkdown } from '../lib/theory.t
 import { onLinkClick, paths } from '../router.ts';
 
 const plugins = [[remarkGfm, { singleTilde: false }], remarkObsidian] as const;
-const PROP_LABEL: Record<string, string> = { aliases: '별칭', tags: '태그' };
+const PROP_LABEL: Record<string, string> = { aliases: '별칭', tags: '태그', lab: '강의 유형' };
 
 function useTheory(examId: string, theoryId: string): { notes?: Note[]; error?: string } {
   const [notes, setNotes] = useState<Note[]>();
@@ -246,7 +246,7 @@ function NoteArticle({
           {note.props.map(([k, v]) => (
             <div key={k}>
               <dt>{PROP_LABEL[k] ?? k}</dt>
-              <dd>{Array.isArray(v) ? v.join(', ') : v}</dd>
+              <dd>{k === 'lab' && v === 'true' ? '실습' : Array.isArray(v) ? v.join(', ') : v}</dd>
             </div>
           ))}
         </dl>

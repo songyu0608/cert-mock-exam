@@ -129,7 +129,7 @@
     {
       "id": "lectures-ko",
       "title": "강의 스크립트(한국어)",
-      "description": "3~8강 · 시험 형식, Claude와 에이전트의 작동 원리, ShopAssist와 실무 시나리오",
+      "description": "3~12강 · 시험 형식과 실무 시나리오, Claude와 에이전트의 원리, 첫 API 요청부터 채팅 화면 연결까지",
       "home": "03 시험 형식",
       "lang": "ko"
     }
