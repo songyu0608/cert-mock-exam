@@ -170,18 +170,22 @@ h2 {
 .crumb a:hover {
   color: var(--accent);
 }
-.note-home {
+.site-home {
   display: inline-grid;
   place-items: center;
+  flex: none;
+  color: var(--muted);
   width: 44px;
   height: 44px;
-  margin-right: 6px;
   border: 1px solid var(--line);
   border-radius: 8px;
   vertical-align: middle;
 }
-.note-home:hover,
-.note-home:focus-visible {
+.crumb .site-home {
+  margin-inline-end: 6px;
+}
+.site-home:hover,
+.site-home:focus-visible {
   background: var(--accent-soft);
   border-color: var(--accent);
 }
@@ -1254,6 +1258,9 @@ details.scenario > p {
 
 /* 노트 본문 */
 @media print {
+  .site-home {
+    display: none;
+  }
   body:has(.study-notes) {
     background: white;
     color: black;

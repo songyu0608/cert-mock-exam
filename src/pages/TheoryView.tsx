@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -94,26 +95,7 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
     <div className={isStudyNote ? 'theory study-notes' : 'theory'}>
       <div className="guide-bar">
         <nav className="crumb" aria-label="위치">
-          {isStudyNote && (
-            <a
-              className="note-home"
-              href={paths.list()}
-              onClick={onLinkClick}
-              aria-label="사이트 홈"
-              title="사이트 홈"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </a>
-          )}
+          <HomeLink />
           <a href={isStudyNote ? paths.notes() : paths.theories()} onClick={onLinkClick}>
             {isStudyNote ? '노트' : '이론'}
           </a>{' '}

@@ -15,6 +15,19 @@ test.afterEach(async ({ page }) => {
 // 같은 코드의 한국어판과 일본어판이 함께 있어 이름까지 맞춘다.
 const AIB_KO = /AIB-C01 AWS Certified AI Business Strategist(?! \(日本語\))/;
 
+test('홈을 제외한 각 탭에서 집 아이콘으로 시험 목록에 돌아간다', async ({ page }) => {
+  await page.goto('/');
+  const home = page.getByRole('link', { name: '사이트 홈', exact: true });
+  for (const name of ['가이드', '이론', '노트']) {
+    const tabs = page.getByRole('navigation', { name: '화면' });
+    await expect(home).toHaveCount(0);
+    await tabs.getByRole('link', { name, exact: true }).click();
+    await expect(home).toHaveAttribute('href', '/');
+    await home.click();
+    await expect(page).toHaveURL('/');
+  }
+});
+
 test('시험 목록에 AWS 시험이 모두 보이고, 주소로 바로 들어가도 열린다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('link', { name: /AIB-C01/ })).toHaveCount(2);
@@ -408,7 +421,7 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('.score .big')).toBeVisible();
 
   // 시험 목록으로 돌아가면 업체 테마를 지운다.
-  await page.goto('/');
+  await page.getByRole('link', { name: '사이트 홈', exact: true }).click();
   await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
 });
 

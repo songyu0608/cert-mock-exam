@@ -2,6 +2,7 @@
 // 시나리오형은 왼쪽에 지금 문항 번호와 시나리오, 오른쪽에 문제와 보기를 둔다(2단).
 // 시나리오가 없는 시험은 한 칸에 문항 번호, 문제, 보기를 둔다(1단).
 // 위의 一時停止·フラグ·残り時間, 보기 취소선, 아래의 レビュー·이전·다음은 두 경우 모두 같다.
+import { HomeLink } from './HomeLink.tsx';
 import {
   useEffect,
   useLayoutEffect,
@@ -29,6 +30,7 @@ const KEYS = 'ABCDEFGHIJKLMNOP';
 // 화면 문구는 시험 언어를 따른다(일본어 시험은 실제 시험처럼 일본어).
 const LABELS = {
   ja: {
+    home: 'サイトのホーム',
     pos: (n: number, total: number) => `問題 ${n} / ${total}`,
     num: (n: number) => `問題 ${n}`,
     left: '残り時間',
@@ -69,6 +71,7 @@ const LABELS = {
     unstrike: (k: string) => `選択肢 ${k} の取り消し線を外す`,
   },
   ko: {
+    home: '사이트 홈',
     pos: (n: number, total: number) => `문항 ${n} / ${total}`,
     num: (n: number) => `문항 ${n}`,
     left: '남은 시간',
@@ -249,6 +252,7 @@ export function SplitSession({
     <div className="sv" lang={exam.lang}>
       <header className="sv-bar" inert={confirming}>
         <div className="sv-bar-in">
+          <HomeLink label={t.home} />
           <span className="code">{exam.code}</span>
           <span className="bar-title">
             <span className="bar-mode" lang="ko">

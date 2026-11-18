@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { TopTabs } from '../components/TopTabs.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
 import { exams } from '../data/exams.ts';
@@ -9,7 +10,10 @@ export function GuideList() {
   return (
     <main className="wrap stack">
       <header>
-        <h1>자격증 모의고사</h1>
+        <div className="row">
+          <HomeLink />
+          <h1>자격증 모의고사</h1>
+        </div>
         <p className="lede">시험별 공식 가이드를 읽습니다.</p>
       </header>
       <TopTabs current="guides" />
