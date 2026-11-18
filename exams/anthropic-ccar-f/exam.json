@@ -125,6 +125,13 @@
       "description": "分野別の理論、概念カード、技術リファレンス、シナリオ、比較、暗記表とフラッシュカード",
       "home": "CCAR-F ダッシュボード",
       "lang": "ja"
+    },
+    {
+      "id": "lectures-ko",
+      "title": "강의 스크립트(한국어)",
+      "description": "7강 · ShopAssist의 도구와 환불 처리 규칙",
+      "home": "07 ShopAssist 소개 - 도구와 규칙",
+      "lang": "ko"
     }
   ],
   "sets": [

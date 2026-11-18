@@ -1205,6 +1205,11 @@ details.scenario > p {
 }
 
 /* 노트 본문 */
+.theory-note img {
+  max-width: 100%;
+  height: auto;
+}
+
 .theory-note h1 {
   margin: 4px 0 12px;
 }
