@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="448" viewBox="0 0 520 448" role="img" aria-labelledby="title desc">
+  <title id="title">ShopAssist의 환불 처리 흐름</title>
+  <desc id="desc">Claude가 요청하면 코드가 고객 신원과 금액을 확인한다. 미확인 고객은 환불을 보류하고, 500달러 초과 건은 상담원에게 넘긴다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#47645b"/></marker>
+  </defs>
+  <rect width="520" height="448" rx="14" fill="#f4f7f4"/>
+  <g stroke="#47645b" stroke-width="2" fill="none" marker-end="url(#arrow)">
+    <path d="M145 80v45"/><path d="M262 159h44"/><path d="M145 192v62"/>
+    <path d="M262 289h44"/><path d="M145 322v56"/>
+  </g>
+  <g fill="#fff" stroke="#71867e" stroke-width="1.5">
+    <rect x="28" y="24" width="234" height="56" rx="9" fill="#d9eee5"/>
+    <rect x="28" y="126" width="234" height="66" rx="9"/>
+    <rect x="28" y="256" width="234" height="66" rx="9"/>
+    <rect x="309" y="126" width="186" height="66" rx="9" fill="#f7ebd9"/>
+    <rect x="309" y="256" width="186" height="66" rx="9" fill="#f7ebd9"/>
+    <rect x="28" y="380" width="234" height="48" rx="9" fill="#d9eee5"/>
+  </g>
+  <g font-family="'Malgun Gothic',sans-serif" fill="#1c372d" text-anchor="middle" font-size="19">
+    <text x="145" y="59" font-weight="bold">Claude가 환불 요청</text>
+    <text x="145" y="165">고객 신원 확인</text>
+    <text x="145" y="296">환불 금액 확인</text>
+    <text x="402" y="151" font-size="16">신원 미확인</text><text x="402" y="177" font-weight="bold">환불 보류</text>
+    <text x="402" y="282" font-size="16">500달러 초과</text><text x="402" y="307" font-weight="bold">상담원에게 전달</text>
+    <text x="145" y="411" font-weight="bold">환불 실행</text>
+  </g>
+  <g font-family="'Malgun Gothic',sans-serif" fill="#36584b" font-size="16">
+    <text x="159" y="110">코드에서 검사</text><text x="159" y="228">신원 확인 완료</text>
+    <text x="159" y="355">500달러 이하 · 반품 정책 충족</text>
+  </g>
+</svg>
