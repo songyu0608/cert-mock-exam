@@ -1,0 +1,13 @@
+<section id="l55-05" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">실제로 줄이기</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">줄이기는 필드를 버릴 뿐, 값을 바꾸지 않는다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED">KEEP = [<span style="color:#A9C4A2">"status"</span>, <span style="color:#A9C4A2">"items"</span>, <span style="color:#A9C4A2">"amount"</span>, <span style="color:#A9C4A2">"delivered_on"</span>, <span style="color:#A9C4A2">"return_window"</span>]<br><br><span style="color:#E5C07B">def</span> post_tool_use(result):<br>&#160;&#160;&#160;&#160;result = plain_words(result)<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> {k: result[k] <span style="color:#E5C07B">for</span> k <span style="color:#E5C07B">in</span> KEEP}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">PostToolUse 훅의 스케치입니다. 줄여도 모든 값은 그대로이고, 이번 결정에 쓰지 않는 것만 버립니다.</p>
+</div>
+<aside>원문 제목: Trimming drops fields, not values (TRIMMING IN PRACTICE). 코드(영문 유지) 의미: 남길 필드(status, items, amount, delivered_on, return_window)를 정하고, post_tool_use에서 결과를 평이한 표현으로 바꾼 뒤 그 필드만 돌려준다. 캡션: A sketch of a PostToolUse hook: trimming leaves every value unchanged and only drops what this decision does not use.</aside>
+</section>

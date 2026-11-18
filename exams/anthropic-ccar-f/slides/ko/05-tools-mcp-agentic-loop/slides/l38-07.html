@@ -1,0 +1,33 @@
+<section id="l38-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">Alex의 사례</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">1~2라운드: tool_use가 두 번</h2>
+<x-connector x1="389" y1="424" x2="389" y2="900" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="960" y1="424" x2="960" y2="900" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="1530" y1="424" x2="1530" y2="900" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<div style="position:absolute;left:198px;top:312px;width:382px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Code" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">애플리케이션</p>
+</div>
+<div style="position:absolute;left:770px;top:312px;width:380px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Cloud" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">Claude</p>
+</div>
+<div style="position:absolute;left:1340px;top:312px;width:380px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Tool" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">도구</p>
+</div>
+<p style="position:absolute;left:397px;top:470px;width:555px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#25282D">tool_use: get_customer</p>
+<x-connector x1="958" y1="512" x2="393" y2="512" head="end" style="color:#8A9099;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:397px;top:542px;width:1125px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">get_customer(email)</p>
+<x-connector x1="391" y1="584" x2="1526" y2="584" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:397px;top:614px;width:1125px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;text-align:center;color:#25282D">고객 ID 확인됨</p>
+<x-connector x1="1528" y1="656" x2="393" y2="656" head="end" style="color:#8A9099;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:397px;top:686px;width:555px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#25282D">tool_use ×2: lookup_order</p>
+<x-connector x1="958" y1="728" x2="393" y2="728" head="end" style="color:#8A9099;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:397px;top:758px;width:1125px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">lookup_order: 재킷</p>
+<x-connector x1="391" y1="800" x2="1526" y2="800" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:397px;top:830px;width:1125px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">lookup_order: 램프</p>
+<x-connector x1="391" y1="872" x2="1526" y2="872" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:106px;top:920px;width:1708px;font-size:30px;font-style:italic;color:#5F6670">두 라운드 모두 stop_reason: tool_use로 끝납니다.</p>
+<aside>원문 제목: Rounds 1 and 2: tool_use twice (ALEX'S CASE). Claude → app: tool_use: get_customer / app → Tool: get_customer(email) / Tool → app: customer ID verified / Claude → app: tool_use x2: lookup_order / app → Tool: lookup_order: jacket / app → Tool: lookup_order: lamp. 캡션: Both rounds end with stop_reason: tool_use.</aside>
+</section>

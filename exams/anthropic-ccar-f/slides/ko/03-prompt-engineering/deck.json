@@ -1,0 +1,141 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-09T14:12:00Z"
+  },
+  "lists": "css",
+  "title": "CCAR-F 섹션 3. 프롬프트 엔지니어링과 평가 (한국어판)",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "l18",
+    "l18-01",
+    "l18-02",
+    "l18-03",
+    "l18-04",
+    "l18-05",
+    "l18-06",
+    "l18-07",
+    "l18-08",
+    "l19",
+    "l19-01",
+    "l19-02",
+    "l19-03",
+    "l19-04",
+    "l19-05",
+    "l19-06",
+    "l19-07",
+    "l19-08",
+    "l20",
+    "l20-01",
+    "l20-02",
+    "l20-03",
+    "l20-04",
+    "l20-05",
+    "l20-06",
+    "l20-07",
+    "l20-08",
+    "l20-09",
+    "l20-10",
+    "l20-11",
+    "l20-12",
+    "l20-13",
+    "l20-14",
+    "l21",
+    "l21-01",
+    "l21-02",
+    "l21-03",
+    "l21-04",
+    "l21-05",
+    "l21-06",
+    "l21-07",
+    "l21-08",
+    "l21-09",
+    "l21-10",
+    "l21-11",
+    "l21-12",
+    "l21-13",
+    "l21-14",
+    "l22",
+    "l22-01",
+    "l22-02",
+    "l22-03",
+    "l22-04",
+    "l22-05",
+    "l22-06",
+    "l22-07",
+    "l22-08",
+    "l22-09",
+    "l23",
+    "l23-01",
+    "l23-02",
+    "l23-03",
+    "l23-04",
+    "l23-05",
+    "l23-06",
+    "l23-07",
+    "l23-08",
+    "l23-09",
+    "l23-10",
+    "l24",
+    "l24-01",
+    "l24-02",
+    "l24-03",
+    "l24-04",
+    "l24-05",
+    "l24-06",
+    "l24-07",
+    "l24-08",
+    "l24-09"
+  ],
+  "sections": {
+    "s0": {
+      "description": "표지",
+      "start": "cover"
+    },
+    "s18": {
+      "description": "18강. Git과 풀 리퀘스트 (비개발자용)",
+      "start": "l18"
+    },
+    "s19": {
+      "description": "19강. 풀 리퀘스트의 CI 검사 (비개발자용)",
+      "start": "l19"
+    },
+    "s20": {
+      "description": "20강. 오탐을 줄이는 명시적 기준",
+      "start": "l20"
+    },
+    "s21": {
+      "description": "21강. 형식과 판단을 위한 few-shot",
+      "start": "l21"
+    },
+    "s22": {
+      "description": "22강. 추출을 위한 few-shot 예시",
+      "start": "l22"
+    },
+    "s23": {
+      "description": "23강. 시험 관점: 기준에 관한 결정",
+      "start": "l23"
+    },
+    "s24": {
+      "description": "24강. 시험 관점: 예시에 관한 결정",
+      "start": "l24"
+    }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap"
+    },
+    "noto-sans-kr": {
+      "family": "Noto Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

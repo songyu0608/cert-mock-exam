@@ -1,0 +1,13 @@
+<section id="l92-08" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">Claude Code에서</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">새 세션에서 리뷰한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED"><span style="color:#8A9099"># Run 1: writes the code (session A)</span><br>claude <span style="color:#A9C4A2">-p</span> <span style="color:#A9C4A2">"Add partial refunds"</span><br><br><span style="color:#8A9099"># Run 2: reviews it in a new session (session B)</span><br>git <span style="color:#A9C4A2">diff main</span> | claude <span style="color:#A9C4A2">-p</span> <span style="color:#A9C4A2">"Review this diff"</span><br><br><span style="color:#8A9099"># Never resume session A to review:</span><br><span style="color:#8A9099"># &#160;&#160;claude --resume &lt;session-A&gt; ...</span><br><span style="color:#8A9099"># Never fork it - a fork copies the history:</span><br><span style="color:#8A9099"># &#160;&#160;claude --resume &lt;session-A&gt; --fork-session</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">한 인스턴스가 쓰고, 두 번째 인스턴스가 확인합니다. 같은 모델이어도 됩니다. 독립성은 컨텍스트에서 나옵니다.</p>
+</div>
+<aside>원문 제목: Review in a new session (IN CLAUDE CODE). 코드(영문 유지) 의미: 1회차 실행은 세션 A에서 코드를 작성. 2회차는 git diff main 결과를 새 세션 B의 claude -p에 넘겨 리뷰. 리뷰하려고 세션 A를 resume하지 말 것. 포크도 하지 말 것(포크는 기록을 복사함). 캡션: One instance writes, a second checks. The same model is fine - independence comes from the context.</aside>
+</section>

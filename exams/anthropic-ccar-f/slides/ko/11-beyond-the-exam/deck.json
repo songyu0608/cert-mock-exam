@@ -1,0 +1,103 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-10T05:40:00Z"
+  },
+  "lists": "css",
+  "title": "CCAR-F 섹션 11. 시험 너머 (한국어판)",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "l103",
+    "l103-01",
+    "l103-02",
+    "l103-03",
+    "l103-04",
+    "l103-05",
+    "l103-06",
+    "l103-07",
+    "l103-08",
+    "l103-09",
+    "l103-10",
+    "l103-11",
+    "l103-12",
+    "l103-13",
+    "l103-14",
+    "l104",
+    "l104-01",
+    "l104-02",
+    "l104-03",
+    "l104-04",
+    "l104-05",
+    "l104-06",
+    "l104-07",
+    "l104-08",
+    "l104-09",
+    "l104-10",
+    "l104-11",
+    "l105",
+    "l105-01",
+    "l105-02",
+    "l105-03",
+    "l105-04",
+    "l105-05",
+    "l105-06",
+    "l105-07",
+    "l105-08",
+    "l105-09",
+    "l105-10",
+    "l105-11",
+    "l105-12",
+    "l105-13",
+    "l105-14",
+    "l106",
+    "l106-01",
+    "l106-02",
+    "l106-03",
+    "l106-04",
+    "l106-05",
+    "l106-06",
+    "l106-07",
+    "l106-08",
+    "l106-09",
+    "l106-10"
+  ],
+  "sections": {
+    "s0": {
+      "description": "표지",
+      "start": "cover"
+    },
+    "s103": {
+      "description": "103강. 시험 문제는 어떻게 추론하는가: 결정 루틴과 학습 계획",
+      "start": "l103"
+    },
+    "s104": {
+      "description": "104강. 시험 범위 밖: RAG와 문서에 근거한 답변",
+      "start": "l104"
+    },
+    "s105": {
+      "description": "105강. 시험 범위 밖: 트레이스로 Claude 애플리케이션 디버깅",
+      "start": "l105"
+    },
+    "s106": {
+      "description": "106강. 시험 범위 밖: 프롬프트 인젝션과 신뢰할 수 없는 콘텐츠",
+      "start": "l106"
+    }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap"
+    },
+    "noto-sans-kr": {
+      "family": "Noto Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

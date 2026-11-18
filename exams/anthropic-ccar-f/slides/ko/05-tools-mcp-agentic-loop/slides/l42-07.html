@@ -1,0 +1,34 @@
+<section id="l42-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">해결책 3: 시스템 프롬프트</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">키워드 하나가 Claude를 잘못 이끈다</h2>
+<p style="position:absolute;left:106px;top:244px;width:1708px;font-size:30px;font-style:italic;color:#25282D">“고객이 주문을 언급하면 lookup_order를 사용하세요.”</p>
+<x-connector x1="286" y1="424" x2="286" y2="930" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="735" y1="424" x2="735" y2="930" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="1184" y1="424" x2="1184" y2="930" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="1634" y1="424" x2="1634" y2="930" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<div style="position:absolute;left:106px;top:312px;width:360px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Users" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">Alex</p>
+</div>
+<div style="position:absolute;left:555px;top:312px;width:360px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Cloud" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">Claude</p>
+</div>
+<div style="position:absolute;left:1004px;top:312px;width:360px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Search" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#25282D">lookup_order</p>
+</div>
+<div style="position:absolute;left:1454px;top:312px;width:360px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Users" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#C4613F">get_customer</p>
+</div>
+<p style="position:absolute;left:294px;top:490px;width:433px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;font-weight:700;text-align:center;color:#C4613F">주문 문의 + 이메일</p>
+<x-connector x1="288" y1="532" x2="731" y2="532" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:743px;top:598px;width:433px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">lookup_order(email)</p>
+<x-connector x1="737" y1="640" x2="1180" y2="640" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:743px;top:706px;width:433px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;text-align:center;color:#25282D">주문 ID + 고객 ID 필요</p>
+<x-connector x1="1182" y1="748" x2="739" y2="748" head="end" style="color:#8A9099;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:743px;top:814px;width:883px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;font-weight:700;text-align:center;color:#C4613F">올바른 첫 단계</p>
+<x-connector x1="737" y1="856" x2="1630" y2="856" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<aside>원문 제목: One keyword can send Claude wrong (FIX 3 - THE SYSTEM PROMPT). 인용: "When the customer mentions an order, use lookup_order." Alex → Claude: order question + email / Claude → lookup_order: lookup_order(email) / lookup_order → Claude: needs order ID + customer ID / Claude → get_customer: the right first step. "주문"이라는 단어에 묶인 지침 때문에 Claude가 올바른 첫 단계(get_customer) 대신 lookup_order를 부릅니다.</aside>
+</section>

@@ -1,0 +1,28 @@
+<section id="l62-10" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">병렬로 실행할 수 있는 것</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">의존하는 작업은 차례를 기다린다</h2>
+<x-connector x1="586" y1="395" x2="760" y2="480" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="586" y1="595" x2="760" y2="510" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="1240" y1="495" x2="1374" y2="495" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<div style="position:absolute;left:106px;top:320px;width:480px;height:150px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Globe" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#25282D">웹 검색</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">1번째 턴, 병렬</p></div>
+</div>
+<div style="position:absolute;left:106px;top:520px;width:480px;height:150px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Book" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#25282D">문서 분석</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">1번째 턴, 병렬</p></div>
+</div>
+<div style="position:absolute;left:760px;top:420px;width:480px;height:150px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Settings" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#25282D">종합</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">이후 턴, 둘 다 필요</p></div>
+</div>
+<div style="position:absolute;left:1374px;top:420px;width:440px;height:150px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Chat" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#C4613F">보고서</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">이후 턴, 종합 필요</p></div>
+</div>
+<div style="position:absolute;left:106px;top:778px;width:1708px;height:162px;display:flex;align-items:center;gap:36px;background:#1B1E24;border-radius:12px;padding:0 60px">
+<div style="width:88px;height:88px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%"><x-icon name="CheckCircle" style="color:#F4F5F7;width:38px;height:38px"></x-icon></div>
+<p style="font-size:32px;color:#F4F5F7">독립적인 작업은 병렬로 실행합니다. 앞선 결과가 필요한 작업은 기다립니다.</p>
+</div>
+<aside>원문 제목: Dependent work waits its turn (WHAT CAN RUN IN PARALLEL). Web search (Turn 1 - in parallel) + Document analysis (Turn 1 - in parallel) → Synthesis (Later turn - needs both) → Report (Later turn - needs synthesis). 하단: Independent work runs in parallel. Work that needs earlier results waits.</aside>
+</section>

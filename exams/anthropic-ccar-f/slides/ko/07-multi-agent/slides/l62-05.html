@@ -1,0 +1,13 @@
+<section id="l62-05" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">허용 도구</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">코디네이터에게는 Task 허용이 필요하다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#8A9099"># Exam: "Task". Current SDK releases: "Agent".</span><br>MODEL = <span style="color:#A9C4A2">"claude-sonnet-5-5"</span><br><br>coordinator = ClaudeAgentOptions(<br>&#160;&#160;&#160;&#160;model=MODEL,<br>&#160;&#160;&#160;&#160;system_prompt=<span style="color:#A9C4A2">"You coordinate research on lamp returns."</span>,<br>&#160;&#160;&#160;&#160;allowed_tools=[<span style="color:#A9C4A2">"Task"</span>],<br>)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">allowed_tools에 Task가 없으면, 코디네이터는 계획은 세워도 서브에이전트를 시작할 수 없습니다.</p>
+</div>
+<aside>원문 제목: The coordinator needs Task allowed (ALLOWED TOOLS). 코드(영문 유지) 의미: 주석 - 시험에서는 "Task", 현재 SDK 릴리스에서는 "Agent". 코디네이터 옵션: 모델, 시스템 프롬프트 "램프 반품에 관한 리서치를 조율한다", 허용 도구 Task. 캡션: Without Task in allowed_tools, the coordinator can plan but cannot start a subagent. (코드 속 모델명과 API 이름은 원문 그대로이며 검증하지 않음)</aside>
+</section>

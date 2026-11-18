@@ -1,0 +1,13 @@
+<section id="l35-05" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">결정 1 - 파싱</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">도구 스키마가 파싱을 보장한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED">tool = {<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"name"</span>: <span style="color:#A9C4A2">"record_invoice"</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"strict"</span>: <span style="color:#E8907A">True</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"input_schema"</span>: {<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"object"</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"properties"</span>: {<span style="color:#E5C07B">"supplier"</span>: {<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"string"</span>},<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"total"</span>: {<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"number"</span>}},<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"required"</span>: [<span style="color:#A9C4A2">"supplier"</span>, <span style="color:#A9C4A2">"total"</span>],<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"additionalProperties"</span>: <span style="color:#E8907A">False</span>,<br>&#160;&#160;&#160;&#160;},<br>}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">strict 도구 사용: Claude가 청구서 스키마를 채웁니다. structured outputs도 같은 보장을 줍니다.</p>
+</div>
+<aside>원문 제목: A tool schema guarantees parsing (DECISION 1 - PARSING). 코드(영문 유지) 의미: strict를 켠 record_invoice 도구. supplier(문자열)와 total(숫자)이 필수이고, 그 밖의 필드는 허용하지 않음(additionalProperties: False). 캡션: Strict tool use: Claude fills the invoice schema. Structured outputs give the same guarantee.</aside>
+</section>

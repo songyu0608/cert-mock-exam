@@ -1,0 +1,13 @@
+<section id="l9-13" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:80px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">파이프라인에서 실행</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">키보드 앞에는 아무도 없다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:48px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:27px;line-height:1.6;color:#E8EAED"><span style="color:#8A9099"># A CI step that runs on every pull request</span><br>claude -p <span style="color:#A9C4A2">"Review this diff. Report only real bugs, with file and line."</span> \<br>&#160;&#160;--output-format json &gt; review.json<br><br><span style="color:#8A9099"># The next step reads the result with a script</span><br>jq -r <span style="color:#A9C4A2">'.result'</span> review.json</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">질문에 답해 줄 사람이 없는 상태에서 리뷰를 실행하는 한 가지 방법입니다.</p>
+</div>
+<aside>원문 제목: Nobody at the keyboard (RUNNING IN A PIPELINE). 코드(영문 유지) 의미: 모든 풀 리퀘스트마다 실행되는 CI 단계. claude -p로 "이 diff를 리뷰하라. 실제 버그만 파일과 줄과 함께 보고하라"를 실행하고 JSON으로 review.json에 저장. 다음 단계는 스크립트(jq)로 결과를 읽음. 캡션: One way to run a review with no one there to answer questions.</aside>
+</section>

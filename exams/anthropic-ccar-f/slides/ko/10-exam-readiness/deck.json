@@ -1,0 +1,90 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-10T02:30:00Z"
+  },
+  "lists": "css",
+  "title": "CCAR-F 섹션 10. 시험 준비 (전 도메인) (한국어판)",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "l99",
+    "l99-01",
+    "l99-02",
+    "l99-03",
+    "l99-04",
+    "l99-05",
+    "l99-06",
+    "l99-07",
+    "l99-08",
+    "l99-09",
+    "l99-10",
+    "l99-11",
+    "l99-12",
+    "l99-13",
+    "l99-14",
+    "l99-15",
+    "l100",
+    "l100-01",
+    "l100-02",
+    "l100-03",
+    "l100-04",
+    "l100-05",
+    "l100-06",
+    "l100-07",
+    "l100-08",
+    "l100-09",
+    "l100-10",
+    "l100-11",
+    "l100-12",
+    "l100-13",
+    "l101",
+    "l101-01",
+    "l101-02",
+    "l101-03",
+    "l101-04",
+    "l101-05",
+    "l101-06",
+    "l101-07",
+    "l101-08",
+    "l101-09",
+    "l101-10",
+    "l101-11",
+    "l101-12",
+    "l101-13"
+  ],
+  "sections": {
+    "s0": {
+      "description": "표지",
+      "start": "cover"
+    },
+    "s99": {
+      "description": "99강. 핵심 구분: 에이전트, 도구, 컨텍스트",
+      "start": "l99"
+    },
+    "s100": {
+      "description": "100강. 핵심 구분: Claude Code",
+      "start": "l100"
+    },
+    "s101": {
+      "description": "101강. 핵심 구분: 프롬프트, 출력",
+      "start": "l101"
+    }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap"
+    },
+    "noto-sans-kr": {
+      "family": "Noto Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

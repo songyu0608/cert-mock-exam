@@ -1,0 +1,13 @@
+<section id="l30-06" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">예시: Alex의 재킷</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">타입이 유효해도 틀릴 수 있다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED">extraction = {<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"order_number"</span>: <span style="color:#A9C4A2">"ORD-12345678"</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"item"</span>: <span style="color:#A9C4A2">"jacket"</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"order_date"</span>: <span style="color:#A9C4A2">"2026-09-12"</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"delivery_date"</span>: <span style="color:#A9C4A2">"Sept 3rd"</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"reason"</span>: <span style="color:#A9C4A2">"wrong size"</span>,<br>}<br><br><span style="color:#8A9099"># check 1: delivery_date is before order_date → FAIL</span><br><span style="color:#8A9099"># check 2: delivery_date is not YYYY-MM-DD → FAIL</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">날짜가 서로 바뀌었고 하나는 형식이 틀렸습니다. 스키마는 둘 다 받아들이고, 우리 검사만 이것을 잡아냅니다.</p>
+</div>
+<aside>원문 제목: Valid types can still be wrong (EXAMPLE: ALEX'S JACKET). 코드(영문 유지) 의미: 추출 결과 - 주문일 2026-09-12, 배송일 "Sept 3rd", 사유 사이즈 불일치. 검사 1: 배송일이 주문일보다 앞섬 → 실패 / 검사 2: 배송일이 YYYY-MM-DD 형식이 아님 → 실패. 캡션: The dates are swapped and one is badly written. The schema accepts both; only our own checks catch it.</aside>
+</section>

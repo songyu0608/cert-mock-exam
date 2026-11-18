@@ -1,0 +1,13 @@
+<section id="l101-03" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">프롬프트: 기준</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">보고할 것과 건너뛸 것을 이름으로 댄다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED">REVIEW_PROMPT = <span style="color:#A9C4A2">"""<br>Report: bugs, security problems.<br>Skip: minor style, local patterns.<br>Severity (definition + example each):<br>- critical: query built from user input<br>- minor: unused import<br>"""</span><br><br>DISABLED = [<span style="color:#A9C4A2">"naming"</span>]&#160;&#160;<span style="color:#8A9099"># noisy, fix first</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">모호한 "조심하라"는 Claude가 한계를 추측하게 만듭니다. 명시적 기준이 추측을 없앱니다.</p>
+</div>
+<aside>원문 제목: Name what to report and skip (PROMPTS: CRITERIA). 프롬프트(영문 유지) 의미: 보고: 버그, 보안 문제. 건너뛰기: 사소한 스타일, 국지적 패턴. 심각도(각각 정의와 예시): critical은 사용자 입력으로 만든 쿼리, minor는 쓰이지 않는 import. DISABLED: naming 범주는 시끄러우니 먼저 고칠 것. 캡션: Vague caution makes Claude guess the limit. Explicit criteria remove the guess.</aside>
+</section>

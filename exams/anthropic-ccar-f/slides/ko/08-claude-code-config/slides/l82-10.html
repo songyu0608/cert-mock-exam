@@ -1,0 +1,13 @@
+<section id="l82-10" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">셋째: 엣지 케이스</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">정확한 테스트 하나가 수정을 고정한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED"><span style="color:#8A9099"># one specific test for one edge case</span><br><span style="color:#E5C07B">def</span> test_null_delivery_date_stays_null():<br>&#160;&#160;&#160;&#160;old = {<span style="color:#A9C4A2">"id"</span>: <span style="color:#A9C4A2">"RF-1042"</span>, <span style="color:#A9C4A2">"delivered_at"</span>: <span style="color:#E8907A">None</span>, <span style="color:#A9C4A2">"amount"</span>: <span style="color:#A9C4A2">"12"</span>}<br>&#160;&#160;&#160;&#160;expected = {<span style="color:#A9C4A2">"id"</span>: <span style="color:#A9C4A2">"RF-1042"</span>, <span style="color:#A9C4A2">"delivered_at"</span>: <span style="color:#E8907A">None</span>, <span style="color:#A9C4A2">"amount_cents"</span>: <span style="color:#E8907A">1200</span>}<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">assert</span> convert(old) == expected<br><br><span style="color:#8A9099"># run it: the failure shows exactly where the output differs</span><br><span style="color:#8A9099"># fix that one path - the test stays in the suite</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">테스트가 스위트에 남으므로, 버그가 조용히 되돌아오지 못합니다.</p>
+</div>
+<aside>원문 제목: One exact test pins the fix (THIRD: AN EDGE CASE). 코드(영문 유지) 의미: 엣지 케이스 하나를 위한 테스트 - delivered_at이 None인 옛 레코드를 변환하면 delivered_at은 None 그대로, amount_cents는 1200. 주석: 실행하면 실패가 출력이 다른 곳을 정확히 보여 줌 / 그 경로 하나만 고치고, 테스트는 스위트에 남김. 캡션: The test stays in the suite, so the bug cannot quietly come back.</aside>
+</section>

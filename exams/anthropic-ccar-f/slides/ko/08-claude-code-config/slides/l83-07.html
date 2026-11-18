@@ -1,0 +1,13 @@
+<section id="l83-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">습관 2: 메시지당 문제 수</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">문제 다섯 개 중 두 개가 연결돼 있다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED"><span style="color:#E5C07B">def</span> lookup_order(order_id, customer_id):<br>&#160;&#160;&#160;&#160;key = order_id<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> key <span style="color:#E5C07B">in</span> cache:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> cache[key]<br>&#160;&#160;&#160;&#160;order = order_service.get(order_id)<br>&#160;&#160;&#160;&#160;check_owner(order, customer_id)<br>&#160;&#160;&#160;&#160;cache[key] = order<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> order<br><br><span style="color:#E5C07B">def</span> on_refund(order_id):<br>&#160;&#160;&#160;&#160;cache.pop(order_id, <span style="color:#A9C4A2">None</span>)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">리뷰에서 문제 다섯 개가 나왔고, 그중 두 개는 같은 캐시 키를 공유합니다.</p>
+</div>
+<aside>원문 제목: Two of five problems are linked (HABIT TWO: PROBLEMS PER MESSAGE). 코드(영문 유지) 의미: lookup_order는 order_id만 캐시 키로 씀. 캐시에 있으면 소유자 확인(check_owner) 없이 바로 반환. on_refund는 order_id 키로 캐시를 지움. 캡션: A review finds five problems - two of them share one cache key.</aside>
+</section>

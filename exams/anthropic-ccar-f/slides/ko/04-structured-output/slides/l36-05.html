@@ -1,0 +1,13 @@
+<section id="l36-05" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">제품 관련 참고</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">코드에서는: auto, strict, 그리고 확인</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED">MODEL = <span style="color:#A9C4A2">"claude-sonnet-5-5"</span><br><span style="color:#8A9099"># any / forced tool: 400 error on current models</span><br>response = client.messages.create(<br>&#160;&#160;&#160;&#160;model=MODEL, max_tokens=<span style="color:#E8907A">1024</span>, messages=messages,<br>&#160;&#160;&#160;&#160;system=<span style="color:#A9C4A2">"Extract the fields by calling extract_invoice."</span>,<br>&#160;&#160;&#160;&#160;tools=TOOLS,&#160;&#160;<span style="color:#8A9099"># each tool defined with "strict": true</span><br>&#160;&#160;&#160;&#160;tool_choice={<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"auto"</span>},<br>)<br><span style="color:#E5C07B">if not</span> any(b.type == <span style="color:#A9C4A2">"tool_use"</span> <span style="color:#E5C07B">for</span> b <span style="color:#E5C07B">in</span> response.content):<br>&#160;&#160;&#160;&#160;handle_missing_tool_call(response)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">시험: 호출은 필수. 코드: strict 도구를 쓰고, 호출이 없으면 잡아내야 할 실패로 처리.</p>
+</div>
+<aside>원문 제목: In code: auto, strict, then check (THE PRODUCT NOTE). 코드(영문 유지) 의미: any와 강제 도구는 현재 모델에서 400 오류(원문의 주장). tool_choice는 auto로 두고, 각 도구는 strict로 정의하며, 시스템 프롬프트로 extract_invoice 호출을 지시. 응답에 tool_use 블록이 없으면 누락된 도구 호출로 처리. 캡션: Exam: the call is required. Code: a strict tool, and a missing call is a failure you catch.</aside>
+</section>

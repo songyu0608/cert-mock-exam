@@ -1,0 +1,13 @@
+<section id="l63-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">제약이 있는 도구</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">좁은 도구는 호출마다 확인한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED">ALLOWED_HOSTS = {<span style="color:#A9C4A2">"reports.supplier.example"</span>, <span style="color:#A9C4A2">"reviews.example"</span>}<br><br><span style="color:#E5C07B">def</span> load_document(url: str) -&gt; str:<br>&#160;&#160;&#160;&#160;host = urlparse(url).hostname<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> host <span style="color:#E5C07B">not in</span> ALLOWED_HOSTS:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#8A9099"># the check lives inside the tool</span><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">raise</span> ValueError(<span style="color:#A9C4A2">"Not a real document address"</span>)<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> download(url)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">무엇이든 할 수 있는 도구보다, 올바른 일만 할 수 있는 도구를 택합니다.</p>
+</div>
+<aside>원문 제목: A narrow tool checks every call (A CONSTRAINED TOOL). 코드(영문 유지) 의미: 허용 호스트 목록을 두고, load_document는 URL의 호스트가 목록에 없으면 "실제 문서 주소가 아님" 오류를 낸다(확인은 도구 안에 있음). 통과하면 내려받는다. 캡션: Prefer a tool that can only do the right thing over a tool that can do anything.</aside>
+</section>

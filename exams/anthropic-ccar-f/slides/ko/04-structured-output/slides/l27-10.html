@@ -1,0 +1,13 @@
+<section id="l27-10" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">현재 코드, 방법 1</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">auto와 strict 도구 조합이 동작한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED">extract_metadata = {<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"name"</span>: <span style="color:#A9C4A2">"extract_metadata"</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"strict"</span>: <span style="color:#E8907A">True</span>,<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">"input_schema"</span>: METADATA_SCHEMA}<br><br>response = client.messages.create(<br>&#160;&#160;&#160;&#160;model=MODEL, max_tokens=<span style="color:#E8907A">1024</span>,<br>&#160;&#160;&#160;&#160;system=<span style="color:#A9C4A2">"Call extract_metadata for every attachment."</span>,<br>&#160;&#160;&#160;&#160;tools=[extract_metadata],<br>&#160;&#160;&#160;&#160;tool_choice={<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"auto"</span>},<br>&#160;&#160;&#160;&#160;messages=messages)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">auto에서는 여전히 텍스트 답변이 나올 수 있습니다 - tool_use 블록이 돌아왔는지 확인하세요.</p>
+</div>
+<aside>원문 제목: Auto plus a strict tool works (CURRENT CODE, OPTION 1). 코드(영문 유지) 의미: strict 옵션을 켠 extract_metadata 도구를 정의하고, 시스템 프롬프트로 "모든 첨부 파일에 extract_metadata를 호출하라"고 지시하며, tool_choice는 auto로 둔다. 캡션: A text reply is still possible with auto - check that a tool_use block came back.</aside>
+</section>

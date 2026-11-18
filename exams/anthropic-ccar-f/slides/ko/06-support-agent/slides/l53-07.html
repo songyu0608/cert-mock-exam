@@ -1,0 +1,13 @@
+<section id="l53-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">두 번째: 신뢰도 점수</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">신뢰도 점수는 트리거가 아니다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#8A9099"># A tempting rule - not a good one</span><br>SYSTEM += <span style="color:#A9C4A2">"Rate your confidence from 1 to 10."</span><br><br>score = reply.confidence&#160;&#160;&#160;<span style="color:#8A9099"># Claude's own opinion</span><br><br><span style="color:#E5C07B">if</span> score &lt; <span style="color:#E8907A">6</span>:<br>&#160;&#160;&#160;&#160;escalate_to_human(case)<br><span style="color:#E5C07B">else</span>:<br>&#160;&#160;&#160;&#160;send(reply)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">점수는 Claude가 자신에 대해 내린 의견일 뿐이며, 캘리브레이션이 잘 되어 있지 않습니다.</p>
+</div>
+<aside>원문 제목: A confidence score is no trigger (2 - CONFIDENCE SCORE). 코드(영문 유지) 의미: 솔깃하지만 좋지 않은 규칙. 시스템 프롬프트에 "신뢰도를 1~10으로 평가하라"를 추가하고, 점수(Claude 자신의 의견)가 6 미만이면 사람에게 에스컬레이션, 아니면 답변을 보낸다. 캡션: The score is only Claude's opinion of itself, and it is poorly calibrated.</aside>
+</section>

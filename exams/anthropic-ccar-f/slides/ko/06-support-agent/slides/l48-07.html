@@ -1,0 +1,13 @@
+<section id="l48-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">둘째, 도구</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">작업에 필요한 도구만 허용한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED"><span style="color:#8A9099">// TypeScript</span><br><span style="color:#E5C07B">const</span> options = { <span style="color:#E5C07B">allowedTools</span>: [<br>&#160;&#160;<span style="color:#A9C4A2">"mcp__store__get_customer"</span>, <span style="color:#A9C4A2">"mcp__store__lookup_order"</span>,<br>&#160;&#160;<span style="color:#A9C4A2">"mcp__store__process_refund"</span>, <span style="color:#A9C4A2">"mcp__store__escalate_to_human"</span>,<br>] };<br><br><span style="color:#8A9099"># Python</span><br>options = ClaudeAgentOptions(allowed_tools=[<br>&#160;&#160;<span style="color:#A9C4A2">"mcp__store__get_customer"</span>, <span style="color:#A9C4A2">"mcp__store__lookup_order"</span>,<br>&#160;&#160;<span style="color:#A9C4A2">"mcp__store__process_refund"</span>, <span style="color:#A9C4A2">"mcp__store__escalate_to_human"</span>,<br>])</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">지원 에이전트에는 도구 네 개만 줍니다. 환불 대화에 셸은 필요 없고, 도구가 적을수록 Claude가 고르기 쉽습니다.</p>
+</div>
+<aside>원문 제목: Allow only the tools the job needs (SECOND, THE TOOLS). 코드(영문 유지) 의미: TypeScript와 Python에서 각각 허용 도구 목록에 스토어 MCP 서버의 도구 네 개(get_customer, lookup_order, process_refund, escalate_to_human)만 넣는다. 도구 이름은 mcp__서버이름__도구이름 형식이다. 캡션: A support agent gets four tools - no shell in a refund conversation, and fewer tools make Claude's choice easier.</aside>
+</section>

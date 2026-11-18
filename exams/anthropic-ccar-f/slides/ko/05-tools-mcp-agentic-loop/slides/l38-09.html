@@ -1,0 +1,13 @@
+<section id="l38-09" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">둘째, 대화 기록</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">매 라운드마다 대화 기록 전체를 다시 보낸다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED">messages = [{<span style="color:#A9C4A2">"role"</span>: <span style="color:#A9C4A2">"user"</span>, <span style="color:#A9C4A2">"content"</span>: <span style="color:#A9C4A2">"My jacket arrived damaged..."</span>}]<br><br>response = client.messages.create(<br>&#160;&#160;&#160;&#160;model=MODEL, max_tokens=<span style="color:#E8907A">1024</span>, tools=TOOLS, messages=messages,<br>)<br><br><span style="color:#8A9099"># stop_reason is "tool_use": add two messages</span><br>messages.append({<span style="color:#A9C4A2">"role"</span>: <span style="color:#A9C4A2">"assistant"</span>, <span style="color:#A9C4A2">"content"</span>: response.content})<br>messages.append({<span style="color:#A9C4A2">"role"</span>: <span style="color:#A9C4A2">"user"</span>, <span style="color:#A9C4A2">"content"</span>: tool_results})</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">API는 아무것도 기억하지 않으므로, 모든 호출이 대화 전체를 담아 보냅니다.</p>
+</div>
+<aside>원문 제목: Every round resends the history (SECOND, THE HISTORY). 코드(영문 유지) 의미: 사용자 메시지 "My jacket arrived damaged..."(재킷이 파손되어 도착했어요)로 기록을 시작해 요청을 보낸다. 주석 "stop_reason is tool_use: add two messages"는 "stop_reason이 tool_use이면 메시지 두 개를 추가한다"는 뜻으로, Claude의 응답 전체(assistant)와 도구 결과(user)를 차례로 추가한다. 캡션: The API remembers nothing, so every call carries the whole conversation.</aside>
+</section>
