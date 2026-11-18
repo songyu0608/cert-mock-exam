@@ -487,6 +487,7 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.guide-bar')).toBeHidden();
   await expect(page.locator('.theory-nav')).toBeHidden();
+  await expect(page.locator('.note-pagination')).toBeHidden();
   await expect(page.locator('.theory-note h1')).toBeVisible();
   const notePath = '/theory/anthropic-ccar-f/lectures-ko/';
   await page.goto(notePath + encodeURIComponent('07 shopassist 소개 - 도구와 규칙'));
@@ -494,6 +495,31 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await page.goto(notePath + encodeURIComponent('99 없는 노트'));
   await expect(page.getByRole('heading', { name: '노트를 찾을 수 없습니다' })).toBeVisible();
   await expect(page).toHaveTitle('CCAR-F 정리노트');
+});
+
+test('정리노트 하단에서 목록 순서대로 이전·다음 노트를 읽는다', async ({ page }) => {
+  const home = '/theory/anthropic-ccar-f/lectures-ko';
+  await page.goto(home);
+  const pager = page.getByRole('navigation', { name: '정리노트 이동' });
+  const previous = pager.getByRole('link', { name: /이전 노트/ });
+  const next = pager.getByRole('link', { name: /다음 노트/ });
+  await expect(next).toContainText('04 LLM은 메시지를 어떻게 읽고 답할까');
+  await expect(previous).toHaveCount(0);
+  await next.click();
+  await expect(page).toHaveTitle(/정리노트 04/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(next).toContainText('05 Claude 앱과 API');
+  await expect(previous).toContainText('03 시험 형식');
+  await previous.click();
+  await expect(page).toHaveURL(home);
+
+  const toggle = page.getByRole('button', { name: /^노트 목록/ });
+  if (await toggle.isVisible()) await toggle.click();
+  const entries = page.locator('.theory-nav').getByRole('link');
+  const penultimate = await entries.nth(-2).innerText();
+  await entries.last().click();
+  await expect(previous).toContainText(penultimate);
+  await expect(next).toHaveCount(0);
 });
 
 test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동작한다', async ({ page }) => {
@@ -504,6 +530,7 @@ test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동�
   await expect(page).toHaveURL(/\/theory\/sample-all-types\/ko$/);
   const note = page.locator('.theory-note');
   await expect(note.getByRole('heading', { name: '견본 이론 홈' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: '정리노트 이동' })).toHaveCount(0);
   await expect(note.locator('.callout-info .callout-title')).toHaveText('이 보관함');
   const quote = note.locator('details.callout-quote');
   await expect(quote.getByText('접혀 있는 본문')).toBeHidden();

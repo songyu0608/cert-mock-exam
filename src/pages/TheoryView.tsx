@@ -1,5 +1,5 @@
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { hasQuestions } from '../data/exams.ts';
@@ -58,6 +58,8 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
           [f, list.sort((a, b) => isHome(a) - isHome(b) || byName(a.name, b.name))] as const,
       );
   }, [notes, theory.home]);
+  const readingOrder = isStudyNote ? folders.flatMap(([, list]) => list) : [];
+  const position = current ? readingOrder.indexOf(current) : -1;
 
   const q = query.trim().toLowerCase();
   const found = q
@@ -80,6 +82,13 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
       {n.name}
     </a>
   );
+  const pageLink = (n: Note | undefined, rel: 'prev' | 'next') =>
+    n && (
+      <a href={hrefOf(n.name)} rel={rel} onClick={go}>
+        <span className="small muted">{rel === 'prev' ? '← 이전 노트' : '다음 노트 →'}</span>
+        <strong>{n.name}</strong>
+      </a>
+    );
 
   return (
     <div className={isStudyNote ? 'theory study-notes' : 'theory'}>
@@ -197,7 +206,14 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
               return n && hrefOf(n.name);
             }}
             hrefOf={hrefOf}
-          />
+          >
+            {position >= 0 && readingOrder.length > 1 && (
+              <nav className="note-pagination" aria-label="정리노트 이동">
+                {pageLink(readingOrder[position - 1], 'prev')}
+                {pageLink(readingOrder[position + 1], 'next')}
+              </nav>
+            )}
+          </NoteArticle>
         )}
       </div>
     </div>
@@ -210,12 +226,14 @@ function NoteArticle({
   notes,
   resolve,
   hrefOf,
+  children,
 }: {
   lang: string;
   note: Note;
   notes: Note[];
   resolve: (name: string) => string | undefined;
   hrefOf: (name: string) => string;
+  children: ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
   const [cardsOpen, setCardsOpen] = useState(false);
@@ -298,6 +316,7 @@ function NoteArticle({
           </p>
         </section>
       )}
+      {children}
     </main>
   );
 }
