@@ -1205,6 +1205,32 @@ details.scenario > p {
 }
 
 /* 노트 본문 */
+@media print {
+  body:has(.study-notes) {
+    background: white;
+    color: black;
+  }
+  .study-notes {
+    --ink: black;
+    --muted: #444;
+    --soft: #eee;
+    --line: #aaa;
+  }
+  .study-notes .guide-bar,
+  .study-notes .theory-nav,
+  .study-notes .theory-backlinks {
+    display: none;
+  }
+  .study-notes .theory-body {
+    display: block;
+    padding: 0;
+  }
+  .study-notes img,
+  .study-notes tr {
+    break-inside: avoid;
+  }
+}
+
 .theory-note img {
   max-width: 100%;
   height: auto;

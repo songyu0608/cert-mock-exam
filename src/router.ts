@@ -7,6 +7,7 @@ export type Route =
   | { name: 'guides' }
   | { name: 'guide'; examId: string; guideId: string }
   | { name: 'theories' }
+  | { name: 'notes' }
   | { name: 'theory'; examId: string; theoryId?: string; note?: string }
   | { name: 'exam'; examId: string }
   | { name: 'play'; examId: string }
@@ -21,6 +22,7 @@ export function parse(pathname: string): Route {
   if (p.length === 3 && p[0] === 'guide' && p[1] && p[2])
     return { name: 'guide', examId: p[1], guideId: p[2] };
   if (p.length === 1 && p[0] === 'theory') return { name: 'theories' };
+  if (p.length === 1 && p[0] === 'notes') return { name: 'notes' };
   if (p.length === 2 && p[0] === 'theory' && p[1]) return { name: 'theory', examId: p[1] };
   // /theory/<시험>/<보관함>/<노트>. 예전 주소 /theory/<시험>/<노트>는 화면에서 첫 보관함의 노트로 처리한다.
   if (p.length === 3 && p[0] === 'theory' && p[1] && p[2])
@@ -43,6 +45,7 @@ export const paths = {
   guide: (examId: string, guideId: string) =>
     `/guide/${encodeURIComponent(examId)}/${encodeURIComponent(guideId)}`,
   theories: () => '/theory',
+  notes: () => '/notes',
   theory: (examId: string, theoryId?: string, note?: string) =>
     ['/theory', examId, theoryId, theoryId && note]
       .filter((s): s is string => !!s)

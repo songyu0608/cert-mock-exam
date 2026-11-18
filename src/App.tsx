@@ -38,6 +38,12 @@ export function App() {
     const guide =
       route.name === 'guide' ? exam?.guides.find((g) => g.id === route.guideId) : undefined;
     const theory = theoryOf(exam, route);
+    if (exam && theory?.theory.tab === 'notes') {
+      // 브라우저가 PDF 저장 시 제안하는 파일명에도 현재 노트 번호와 제목을 사용한다.
+      const name = (theory.note ?? theory.theory.home).replace(/^(\d+)\s+/, '$1 - ');
+      document.title = `${exam.code} 정리노트 ${name}`;
+      return;
+    }
     document.title = guide
       ? `${exam?.code} ${guide.title} · 자격증 모의고사`
       : theory
@@ -64,7 +70,8 @@ export function App() {
   if (route.name === 'guides') return <GuideList />;
   if (exam && route.name === 'guide')
     return <GuideView key={`${exam.id}/${route.guideId}`} exam={exam} guideId={route.guideId} />;
-  if (route.name === 'theories') return <TheoryList />;
+  if (route.name === 'theories' || route.name === 'notes')
+    return <TheoryList tab={route.name === 'notes' ? 'notes' : 'theory'} />;
   const theory = theoryOf(exam, route);
   if (exam && theory)
     return (

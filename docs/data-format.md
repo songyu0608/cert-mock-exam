@@ -38,7 +38,7 @@ exams/
 | `scenarios[]`  | 아니요 | 문항이 딸린 공통 지문 `{ id: "1", name, description }`. 문항의 `scenarioId`가 가리킨다                                                                                                                                                                                                                                                   |
 | `sets[]`       | 아니요 | 회차 `{ id: "1", name, scenarios?, hidden? }`. 실전 모드는 회차를 골라 시작한다. 시나리오형 시험에서 `scenarios`(시나리오 id 목록)가 없으면 무작위로 고른다. 시나리오가 없는 시험의 회차는 고정 세트. `hidden: true`인 회차는 실전 목록·연습·오답 다시 풀기·도메인별 정답률에서 빠지고, 문항과 기록은 남는다(모든 회차를 숨길 수는 없다) |
 | `guides[]`     | 아니요 | 읽기 자료 `{ id, title, description? }`. 파일은 `guides/<id>.html`(완결된 HTML 한 장). 첫 화면 "가이드" 탭과 시험 홈에 링크가 생긴다                                                                                                                                                                                                     |
-| `theories[]`   | 아니요 | 이론 노트 보관함 `{ id, title, description?, home, lang? }`. 파일은 `theory/<id>/<폴더>/<노트>.md`(Obsidian 보관함 그대로), `home`은 첫 화면 노트 이름, `lang`(`ko` 기본, `ja`, `en`)은 본문 언어. 한 시험에 여러 개(예: 한국어판·일본어판)를 둘 수 있다. 첫 화면 "이론" 탭과 시험 홈에 링크가 생긴다                                    |
+| `theories[]`   | 아니요 | 이론 노트 보관함 `{ id, title, description?, home, lang? }`. 파일은 `theory/<id>/<폴더>/<노트>.md`(Obsidian 보관함 그대로), `home`은 첫 화면 노트 이름, `lang`(`ko` 기본, `ja`, `en`)은 본문 언어. 한 시험에 여러 개(예: 한국어판·일본어판)를 둘 수 있다. 첫 화면 탭(`tab`: 기본 `theory`, 정리노트는 `notes`)과 시험 홈에 링크가 생긴다 |
 
 ## questions.json
 
@@ -72,6 +72,8 @@ exams/
 `shuffle`은 기본 `true`. "모두 해당" 같은 보기가 있으면 `false`로 둔다.
 
 ## 이론 노트
+
+보관함에 `"tab": "notes"`를 지정하면 첫 화면의 ‘노트’ 탭에 표시한다. 생략하면 ‘이론’ 탭에 표시한다. 정리노트의 파일 이름은 `07 제목.md`처럼 번호와 제목을 띄어 쓴다. 브라우저의 PDF 저장 기본 이름은 `시험 코드 정리노트 07 - 제목.pdf` 형식이다.
 
 `theory/` 아래 마크다운은 Obsidian 보관함을 그대로 넣는다(Prettier도 건드리지 않는다). 화면에 그릴 때만 다음을 바꾼다. 코드는 `src/lib/theory.ts`.
 

@@ -30,6 +30,7 @@ function useTheory(examId: string, theoryId: string): { notes?: Note[]; error?: 
 /** 이론 노트 읽기: 왼쪽(좁은 화면은 위) 노트 목록과 검색, 오른쪽 노트 본문 */
 export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory; note?: string }) {
   const { notes, error } = useTheory(exam.id, theory.id);
+  const isStudyNote = theory.tab === 'notes';
   const [query, setQuery] = useState('');
   const [navOpen, setNavOpen] = useState(false);
 
@@ -76,11 +77,11 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
   );
 
   return (
-    <div className="theory">
+    <div className={isStudyNote ? 'theory study-notes' : 'theory'}>
       <div className="guide-bar">
         <nav className="crumb" aria-label="위치">
-          <a href={paths.theories()} onClick={onLinkClick}>
-            이론
+          <a href={isStudyNote ? paths.notes() : paths.theories()} onClick={onLinkClick}>
+            {isStudyNote ? '노트' : '이론'}
           </a>{' '}
           /{' '}
           <a href={paths.theory(exam.id, theory.id)} onClick={onLinkClick}>
@@ -88,6 +89,11 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
           </a>
         </nav>
         <span className="row small">
+          {isStudyNote && current && (
+            <button type="button" className="btn sm" onClick={() => window.print()}>
+              인쇄 / PDF 저장
+            </button>
+          )}
           {hasQuestions(exam.id) && (
             <a href={paths.exam(exam.id)} onClick={onLinkClick}>
               모의고사 풀기
