@@ -6,4 +6,6 @@ exams/**/questions.json
 exams/*/guides/
 # 이론 노트는 사용자가 만든 Obsidian 보관함 원본이라 손대지 않는다
 exams/*/theory/
+# 강의 스크립트 원문·번역은 줄바꿈까지 원본 그대로 둔다
+exams/*/scripts/
 tests/fixtures/exams/*/theory/

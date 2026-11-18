@@ -1,0 +1,25 @@
+# 23. tool_choice: auto, any and Forced
+
+ShopAssist has just made its first tool call. Claude asked for lookup order, our code ran it, and Claude answered with the result. This lesson is about one setting in the request, called tool choice. It controls whether Claude may answer in text, must call a tool, or must call one specific tool. This matters because some steps in our application must always produce data. A friendly sentence is not enough there.
+
+Here is the scene. Customers often attach a document to a support email. It may be an invoice, a return form or a delivery note. We want ShopAssist to read each attachment and turn it into fields that our code can store. For each kind of document, we define one extraction tool. An extraction tool is a tool whose only job is to receive fields. Its input schema is the shape we want, and our code saves whatever Claude sends. So for this step, a plain text reply is useless. We need a tool call every time.
+
+The most important thing to remember is this. Tool choice decides whether a tool call is optional, required, or fixed to one tool. The exam names three settings. First, auto. Second, any. Third, a forced tool. After that, we look at what the current models accept, and what to answer on the exam.
+
+First, auto. This is the default. Claude may call a tool, or it may answer in text. That is right for the support chat. When Alex asks about the return policy, Claude answers from its instructions. When Alex asks where the jacket is, Claude asks for lookup order. But auto fits extraction badly. Claude may write, "This looks like an invoice from March," and call nothing. Then our code has no fields to save.
+
+Second, any. With any, Claude must call a tool, but it chooses which one. On the exam, this is the answer when several extraction schemas exist and the document type is unknown. We have three extraction tools: one for invoices, one for return forms and one for delivery notes. We do not know in advance which document the customer attached. So we give Claude all three tools and set tool choice to any. Claude reads the document, picks the matching tool, and fills its schema. A conversational reply is no longer possible.
+
+Third, a forced tool. Here we name one tool, and Claude must call exactly that tool. The exam's example is a tool called extract metadata. Metadata is data about the document: its type, its date, and the order it mentions. We want this extraction to run before any enrichment step. Enrichment means adding data from other systems, for example the order details from lookup order. So in the first request, we force extract metadata. The exam's form of this setting is on screen.
+
+Now one detail matters. Tool choice applies to one request only. After Claude calls a tool, our application runs it. Then it sends the result back to Claude in a new request that carries the whole conversation. We call that a follow-up request, and each request sets its own tool choice. So the forced tool runs first, and the next steps happen in follow-up requests. There we switch back to auto. Claude can then decide whether it needs lookup order or already has enough. We should not force one tool and expect it to drive the whole chain. Forcing only fixes the first step. The rest happens in the follow-up requests.
+
+A fourth value, none, also exists. Its short definition is on screen.
+
+Now the current product. The exam teaches auto, any and forced, and on the exam those are the answers. When a step must return a tool call, answer any. When one particular extraction must run first, answer a forced tool. But the current Opus, Sonnet and Fable models reject any and a forced tool with an error. Auto and none still work. The exact model versions are on screen.
+
+So in your code, you choose one of two options. The first option is auto with a strict tool. You set strict to true on the tool definition. Then, whenever Claude calls that tool, its input always matches the schema. Your instruction also names the tool, for example: "Call extract metadata for every attachment." With auto, a text reply is still possible. So your code checks that a tool call actually came back. The second option is structured outputs. You pass the schema as the output format, and Claude's answer itself follows that schema. We should not copy the exam's any setting into code for the current models. The request fails with an error. Give the exam's answer on the exam, and use the current pattern in your code.
+
+Let's recap. With auto, Claude may answer in text or call a tool. With any, Claude must call a tool, but it picks which one, so any fits an unknown document type. A forced tool makes Claude call one named tool first. Later steps run in follow-up requests, and each request has its own tool choice. On the exam, the answer is any or a forced tool. In current code, use auto with a strict tool and an instruction that names it, or use structured outputs.
+
+So for every request, decide one thing: may Claude talk, must it call some tool, or must it call this one tool? Next, we make Claude's answer itself follow a schema.
