@@ -488,6 +488,12 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await expect(page.locator('.guide-bar')).toBeHidden();
   await expect(page.locator('.theory-nav')).toBeHidden();
   await expect(page.locator('.theory-note h1')).toBeVisible();
+  const notePath = '/theory/anthropic-ccar-f/lectures-ko/';
+  await page.goto(notePath + encodeURIComponent('07 shopassist 소개 - 도구와 규칙'));
+  await expect(page).toHaveTitle('CCAR-F 정리노트 07 - ShopAssist 소개 - 도구와 규칙');
+  await page.goto(notePath + encodeURIComponent('99 없는 노트'));
+  await expect(page.getByRole('heading', { name: '노트를 찾을 수 없습니다' })).toBeVisible();
+  await expect(page).toHaveTitle('CCAR-F 정리노트');
 });
 
 test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동작한다', async ({ page }) => {

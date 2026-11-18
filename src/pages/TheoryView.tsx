@@ -36,6 +36,11 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
 
   const index = useMemo(() => new Map(notes?.map((n) => [n.name.toLowerCase(), n])), [notes]);
   const current = index.get((note ?? theory.home).toLowerCase());
+  useEffect(() => {
+    if (!isStudyNote) return;
+    const title = current?.name.replace(/^(\d+)\s+/, '$1 - ');
+    document.title = title ? `${exam.code} 정리노트 ${title}` : `${exam.code} 정리노트`;
+  }, [current, exam.code, isStudyNote]);
   const hrefOf = (name: string) =>
     name.toLowerCase() === theory.home.toLowerCase()
       ? paths.theory(exam.id, theory.id)
