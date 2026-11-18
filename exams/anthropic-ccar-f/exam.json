@@ -129,8 +129,8 @@
     {
       "id": "lectures-ko",
       "title": "강의 스크립트(한국어)",
-      "description": "7강 · ShopAssist의 도구와 환불 처리 규칙",
-      "home": "07 ShopAssist 소개 - 도구와 규칙",
+      "description": "3~8강 · 시험 형식, Claude와 에이전트의 작동 원리, ShopAssist와 실무 시나리오",
+      "home": "03 시험 형식",
       "lang": "ko"
     }
   ],
