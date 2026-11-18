@@ -9,7 +9,7 @@ import { byName, folderLabel, remarkObsidian, toMarkdown } from '../lib/theory.t
 import { onLinkClick, paths } from '../router.ts';
 
 const plugins = [[remarkGfm, { singleTilde: false }], remarkObsidian] as const;
-const PROP_LABEL: Record<string, string> = { aliases: '별칭', tags: '태그' };
+const PROP_LABEL: Record<string, string> = { aliases: '별칭', tags: '태그', lab: '노트 유형' };
 
 function useTheory(examId: string, theoryId: string): { notes?: Note[]; error?: string } {
   const [notes, setNotes] = useState<Note[]>();
@@ -30,11 +30,17 @@ function useTheory(examId: string, theoryId: string): { notes?: Note[]; error?: 
 /** 이론 노트 읽기: 왼쪽(좁은 화면은 위) 노트 목록과 검색, 오른쪽 노트 본문 */
 export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory; note?: string }) {
   const { notes, error } = useTheory(exam.id, theory.id);
+  const isStudyNote = theory.tab === 'notes';
   const [query, setQuery] = useState('');
   const [navOpen, setNavOpen] = useState(false);
 
   const index = useMemo(() => new Map(notes?.map((n) => [n.name.toLowerCase(), n])), [notes]);
   const current = index.get((note ?? theory.home).toLowerCase());
+  useEffect(() => {
+    if (!isStudyNote) return;
+    const title = current?.name.replace(/^(\d+)\s+/, '$1 - ');
+    document.title = title ? `${exam.code} 정리노트 ${title}` : `${exam.code} 정리노트`;
+  }, [current, exam.code, isStudyNote]);
   const hrefOf = (name: string) =>
     name.toLowerCase() === theory.home.toLowerCase()
       ? paths.theory(exam.id, theory.id)
@@ -76,11 +82,11 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
   );
 
   return (
-    <div className="theory">
+    <div className={isStudyNote ? 'theory study-notes' : 'theory'}>
       <div className="guide-bar">
         <nav className="crumb" aria-label="위치">
-          <a href={paths.theories()} onClick={onLinkClick}>
-            이론
+          <a href={isStudyNote ? paths.notes() : paths.theories()} onClick={onLinkClick}>
+            {isStudyNote ? '노트' : '이론'}
           </a>{' '}
           /{' '}
           <a href={paths.theory(exam.id, theory.id)} onClick={onLinkClick}>
@@ -88,6 +94,11 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
           </a>
         </nav>
         <span className="row small">
+          {isStudyNote && current && (
+            <button type="button" className="btn sm" onClick={() => window.print()}>
+              인쇄 / PDF 저장
+            </button>
+          )}
           {hasQuestions(exam.id) && (
             <a href={paths.exam(exam.id)} onClick={onLinkClick}>
               모의고사 풀기
@@ -246,7 +257,7 @@ function NoteArticle({
           {note.props.map(([k, v]) => (
             <div key={k}>
               <dt>{PROP_LABEL[k] ?? k}</dt>
-              <dd>{Array.isArray(v) ? v.join(', ') : v}</dd>
+              <dd>{k === 'lab' && v === 'true' ? '실습' : Array.isArray(v) ? v.join(', ') : v}</dd>
             </div>
           ))}
         </dl>

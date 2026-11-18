@@ -38,6 +38,8 @@ export function App() {
     const guide =
       route.name === 'guide' ? exam?.guides.find((g) => g.id === route.guideId) : undefined;
     const theory = theoryOf(exam, route);
+    // 정리노트 제목은 TheoryView가 실제로 찾은 노트 이름으로 정한다.
+    if (theory?.theory.tab === 'notes') return;
     document.title = guide
       ? `${exam?.code} ${guide.title} · 자격증 모의고사`
       : theory
@@ -64,7 +66,8 @@ export function App() {
   if (route.name === 'guides') return <GuideList />;
   if (exam && route.name === 'guide')
     return <GuideView key={`${exam.id}/${route.guideId}`} exam={exam} guideId={route.guideId} />;
-  if (route.name === 'theories') return <TheoryList />;
+  if (route.name === 'theories' || route.name === 'notes')
+    return <TheoryList tab={route.name === 'notes' ? 'notes' : 'theory'} />;
   const theory = theoryOf(exam, route);
   if (exam && theory)
     return (

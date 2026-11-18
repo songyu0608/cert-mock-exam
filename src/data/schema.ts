@@ -71,6 +71,7 @@ export const examSchema = z
             title: text,
             description: z.string().optional(),
             home: text,
+            tab: z.enum(['theory', 'notes']).optional(),
             lang: z.enum(['ko', 'ja', 'en']).default('ko'),
           })
           .strict(),

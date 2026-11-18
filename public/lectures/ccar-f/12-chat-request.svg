@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="540" height="340" viewBox="0 0 540 340" role="img" aria-labelledby="title desc">
+  <title id="title">ShopAssist 채팅 메시지의 왕복 경로</title>
+  <desc id="desc">위에서 아래로 시간을 따라 읽는다. 브라우저와 Claude API 사이에서 Python 서버가 대화 기록을 관리하고 API를 호출한다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#47645b"/></marker>
+  </defs>
+  <rect width="540" height="340" rx="14" fill="#f4f7f4"/>
+  <g stroke="#71867e" stroke-width="1.5">
+    <rect x="14" y="16" width="128" height="48" rx="9" fill="#fff"/>
+    <rect x="196" y="16" width="148" height="48" rx="9" fill="#d9eee5"/>
+    <rect x="398" y="16" width="128" height="48" rx="9" fill="#fff"/>
+    <path d="M78 66v250 M270 66v250 M462 66v250" stroke-dasharray="4 5"/>
+  </g>
+  <g stroke="#47645b" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M78 123h188"/><path d="M270 180h188"/><path d="M462 240H274"/><path d="M270 300H82"/>
+  </g>
+  <g text-anchor="middle" fill="#1c372d" font-family="'Malgun Gothic',sans-serif">
+    <g font-size="19" font-weight="bold">
+      <text x="78" y="47">브라우저</text><text x="270" y="47">Python 서버</text><text x="462" y="47">Claude API</text>
+    </g>
+    <g font-size="17">
+      <text x="174" y="109">메시지 · POST /chat</text>
+      <text x="366" y="166">시스템 지침과 대화 기록</text>
+      <text x="366" y="226">응답과 토큰 사용량</text>
+      <text x="174" y="286">답변 · 입력 토큰 수</text>
+    </g>
+  </g>
+</svg>
