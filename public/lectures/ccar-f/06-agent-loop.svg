@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 362" width="480" height="362" role="img" aria-labelledby="title desc">
+  <title id="title">에이전트 루프에서 Claude와 애플리케이션의 역할</title>
+  <desc id="desc">Claude가 도구를 요청하면 애플리케이션이 검사하고 허용된 호출을 실행한다. 결과가 Claude에 돌아가면 다음 도구를 요청하거나 답변을 마친다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#47645b"/></marker>
+  </defs>
+  <rect width="480" height="362" rx="14" fill="#f4f7f4"/>
+  <g fill="none" stroke="#47645b" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M166 96v60"/><path d="M166 229v53"/><path d="M300 310h48V61h-46"/>
+  </g>
+  <g stroke="#71867e" stroke-width="1.5">
+    <rect x="32" y="24" width="268" height="72" rx="9" fill="#d9eee5"/>
+    <rect x="32" y="158" width="268" height="71" rx="9" fill="#fff"/>
+    <rect x="32" y="284" width="268" height="52" rx="9" fill="#fff"/>
+  </g>
+  <g font-family="'Malgun Gothic',sans-serif" text-anchor="middle" fill="#1c372d">
+    <text x="166" y="52" font-size="18" font-weight="bold">Claude</text>
+    <text x="166" y="79" font-size="18">도구 요청 또는 답변 마무리</text>
+    <text x="166" y="186" font-size="18" font-weight="bold">애플리케이션</text>
+    <text x="166" y="213" font-size="18">권한·입력·규칙 검사</text>
+    <text x="166" y="317" font-size="19">도구 실행</text>
+  </g>
+  <g font-family="'Malgun Gothic',sans-serif" fill="#36584b" font-size="17">
+    <text x="180" y="134">도구가 필요할 때</text><text x="180" y="263">허용된 호출</text>
+    <text x="360" y="176">실행 결과를</text><text x="360" y="201">대화에 추가</text>
+  </g>
+</svg>
