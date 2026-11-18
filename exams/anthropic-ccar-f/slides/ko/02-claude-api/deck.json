@@ -1,0 +1,66 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-09T14:05:00Z"
+  },
+  "lists": "css",
+  "title": "CCAR-F 섹션 2. Claude API 활용 (한국어판)",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "l15",
+    "l15-01",
+    "l15-02",
+    "l15-03",
+    "l15-04",
+    "l15-05",
+    "l15-06",
+    "l15-07",
+    "l15-08",
+    "l15-09",
+    "l15-10",
+    "l15-11",
+    "l15-12",
+    "l16",
+    "l16-01",
+    "l16-02",
+    "l16-03",
+    "l16-04",
+    "l16-05",
+    "l16-06",
+    "l16-07",
+    "l16-08",
+    "l16-09",
+    "l16-10"
+  ],
+  "sections": {
+    "s0": {
+      "description": "표지",
+      "start": "cover"
+    },
+    "s15": {
+      "description": "15강. 모델, effort, max_tokens",
+      "start": "l15"
+    },
+    "s16": {
+      "description": "16강. 같은 질문, 다른 답",
+      "start": "l16"
+    }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap"
+    },
+    "noto-sans-kr": {
+      "family": "Noto Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

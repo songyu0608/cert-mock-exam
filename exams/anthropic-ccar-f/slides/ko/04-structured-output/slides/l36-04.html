@@ -1,0 +1,13 @@
+<section id="l36-04" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">시험의 정답</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">모르는 유형에는 any, 첫 단계에는 강제</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED"><span style="color:#8A9099"># The exam's form of tool_choice (fragment)</span><br><span style="color:#8A9099"># 1. Unknown document type: Claude must call a tool</span><br>tool_choice = {<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"any"</span>}<br><br><span style="color:#8A9099"># 2. Metadata must run first: force that one tool</span><br>tool_choice = {<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"tool"</span>, <span style="color:#E5C07B">"name"</span>: <span style="color:#A9C4A2">"extract_metadata"</span>}<br><br><span style="color:#8A9099"># 3. Follow-up requests, enrichment</span><br>tool_choice = {<span style="color:#E5C07B">"type"</span>: <span style="color:#A9C4A2">"auto"</span>}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">모르는 유형에는 도구 호출을 필수로, 첫 추출은 강제하고, 그다음 auto로 돌아갑니다.</p>
+</div>
+<aside>원문 제목: Any for unknown, forced for first (THE EXAM'S ANSWER). 코드(영문 유지) 의미: 시험 형식의 tool_choice(일부). 1. 문서 유형을 모름: 반드시 도구를 호출 → any / 2. 메타데이터를 먼저 실행: 그 도구 하나를 강제 / 3. 후속 요청, 보강 → auto. 캡션: Required tool call for unknown types; force the first extraction, then go back to auto.</aside>
+</section>

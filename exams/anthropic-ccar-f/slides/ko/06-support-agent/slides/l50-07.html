@@ -1,0 +1,13 @@
+<section id="l50-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">훅 설정</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">이 훅은 도구 하나만 지킨다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED"><span style="color:#E5C07B">async def</span> check_refund(input_data, tool_use_id, context):<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> input_data[<span style="color:#A9C4A2">"tool_input"</span>][<span style="color:#A9C4A2">"amount"</span>] > <span style="color:#E8907A">500</span>:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> {<span style="color:#A9C4A2">"hookSpecificOutput"</span>: {<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"hookEventName"</span>: <span style="color:#A9C4A2">"PreToolUse"</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"permissionDecision"</span>: <span style="color:#A9C4A2">"deny"</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"permissionDecisionReason"</span>: <span style="color:#A9C4A2">"Over $500: escalate to a person"</span>}}<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> {}<br><br>hooks = {<span style="color:#A9C4A2">"PreToolUse"</span>: [HookMatcher(<br>&#160;&#160;&#160;&#160;matcher=<span style="color:#A9C4A2">"mcp__store__process_refund"</span>, hooks=[check_refund])]}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">훅을 도구 하나에만 붙이는 한 가지 방법입니다. 백엔드도 이런 환불은 거부합니다.</p>
+</div>
+<aside>원문 제목: The hook guards one tool only (THE HOOK CONFIGURATION). 코드(영문 유지) 의미: check_refund 함수는 도구 입력의 amount가 500을 넘으면 PreToolUse 결과로 permissionDecision "deny"(거부)와 이유 "Over $500: escalate to a person"($500 초과: 사람에게 에스컬레이션)을 반환하고, 아니면 빈 객체를 반환한다. HookMatcher의 matcher로 mcp__store__process_refund 도구에만 이 훅을 연결한다. 캡션: One way to attach a hook to a single tool. The backend also refuses such a refund.</aside>
+</section>

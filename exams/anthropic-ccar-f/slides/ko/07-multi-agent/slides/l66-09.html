@@ -1,0 +1,28 @@
+<section id="l66-09" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">안티패턴 2</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">전부 멈추면 작업이 낭비된다</h2>
+<x-connector x1="546" y1="580" x2="760" y2="490" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<p style="position:absolute;left:593px;top:520px;width:120px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;line-height:40px;text-align:center;color:#C4613F;background:#F4F5F7">timeout</p>
+<x-connector x1="1200" y1="470" x2="1374" y2="470" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<div style="position:absolute;left:106px;top:300px;width:440px;height:160px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Search" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">웹 검색</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">완료</p></div>
+</div>
+<div style="position:absolute;left:106px;top:510px;width:440px;height:160px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Book" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">문서 분석</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">시간 초과</p></div>
+</div>
+<div style="position:absolute;left:760px;top:380px;width:440px;height:180px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:60px;height:60px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Warning" style="color:#D97757;width:26px;height:26px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">최상위 핸들러</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">실행 전체를 중단</p></div>
+</div>
+<div style="position:absolute;left:1374px;top:380px;width:440px;height:180px;display:flex;align-items:center;gap:22px;background:#1B1E24;border-radius:12px;padding:0 26px">
+<div style="width:60px;height:60px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%"><x-icon name="Lightning" style="color:#F0B39E;width:26px;height:26px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#F4F5F7">실행 중단</h3><p style="font-size:24px;line-height:1.4;color:#C9CDD3">끝난 작업이 사라짐</p></div>
+</div>
+<div style="position:absolute;left:106px;top:778px;width:1708px;height:162px;display:flex;align-items:center;gap:36px;background:#1B1E24;border-radius:12px;padding:0 60px">
+<div style="width:88px;height:88px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%"><x-icon name="Warning" style="color:#F4F5F7;width:38px;height:38px"></x-icon></div>
+<p style="font-size:32px;color:#F4F5F7">실패를 숨기는 것과 전부 멈추는 것은 모두 안티패턴입니다.</p>
+</div>
+<aside>원문 제목: Stopping everything wastes work (ANTI-PATTERN 2). Web search (Finished) / Document analysis (Timed out) → timeout → Top-level handler (Stops the whole run) → Run stopped (Finished work lost). 하단: Hiding a failure and stopping everything are both anti-patterns.</aside>
+</section>

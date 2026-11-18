@@ -1,0 +1,13 @@
+<section id="l92-03" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">부분 환불</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">자기 리뷰가 실제 버그를 놓쳤다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED">LIMIT = <span style="color:#A9C4A2">500</span><br><br><span style="color:#E5C07B">def</span> partial_refund(order, amount):<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> amount &gt; LIMIT:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">raise</span> ValueError(<span style="color:#A9C4A2">"over limit"</span>)<br>&#160;&#160;&#160;&#160;order.refund(amount)<br><br>partial_refund(order, <span style="color:#A9C4A2">300</span>)<br>partial_refund(order, <span style="color:#A9C4A2">300</span>)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">한도는 주문 합계가 아니라 환불 한 건마다 확인됩니다. 600이 돌려지는데 아무도 보지 못합니다.</p>
+</div>
+<aside>원문 제목: The self-review missed a real bug (PARTIAL REFUNDS). 코드(영문 유지) 의미: 한도 500. partial_refund는 이번 환불 금액만 한도와 비교하므로 300을 두 번 환불하면 둘 다 통과해 합계 600이 환불됨. 캡션: The limit is checked on each refund, not on the order total: 600 goes back and no person sees it.</aside>
+</section>

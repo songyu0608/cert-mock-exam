@@ -1,0 +1,13 @@
+<section id="l78-09" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">직접 실행</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">작고 명확한 수정은 바로 실행한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#E5C07B">def</span> check_delivery_date(delivery_date, today):<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> delivery_date <span style="color:#E5C07B">is</span> <span style="color:#A9C4A2">None</span>:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> <span style="color:#A9C4A2">None</span><br><br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> delivery_date &gt; today:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">raise</span> ValueError(<span style="color:#A9C4A2">"Delivery date is in the future"</span>)<br><br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> delivery_date</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">명확하고 범위가 정해진 변경: 계획을 세워 봐야 스택 트레이스가 말하는 내용을 되풀이할 뿐입니다.</p>
+</div>
+<aside>원문 제목: A small, clear fix goes direct (DIRECT EXECUTION). 코드(영문 유지) 의미: check_delivery_date - 배송일이 None이면 None 반환(충돌 수정), 배송일이 오늘보다 뒤면 "배송일이 미래임" 오류, 그 외에는 배송일 반환. 캡션: A clear, scoped change: a plan would only repeat what the stack trace says.</aside>
+</section>

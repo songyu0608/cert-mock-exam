@@ -1,0 +1,13 @@
+<section id="l20-08" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">SHOPASSIST 예시</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">코드와 모순되는 주석을 지적한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#E5C07B">def</span> handle_refund(order, refund_amount):<br>&#160;&#160;&#160;&#160;<span style="color:#8A9099"># Refunds above $5000 go to a persn</span><br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> refund_amount &gt; <span style="color:#A9C4A2">5000</span>:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;send_to_human(order, refund_amount)<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> <span style="color:#A9C4A2">"A teammate will review this refund."</span><br><br>&#160;&#160;&#160;&#160;issue_refund(order, refund_amount)<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> <span style="color:#A9C4A2">"Your refund is on its way."</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">주석은 500이라고 하는데 코드는 5000을 검사합니다: 봇이 보고합니다. 철자 실수만 있다면 건너뜁니다.</p>
+</div>
+<aside>원문 제목: Flag comments that contradict code (A SHOPASSIST EXAMPLE). 캡션: The comment says 500, the code checks 5000: the bot reports it. A spelling mistake alone is skipped. 주의: 원본 슬라이드 코드의 주석도 “$5000”으로 적혀 있어 캡션(주석은 500)과 맞지 않습니다. 원본 그대로 옮겼습니다. persn은 의도된 철자 오류입니다.</aside>
+</section>

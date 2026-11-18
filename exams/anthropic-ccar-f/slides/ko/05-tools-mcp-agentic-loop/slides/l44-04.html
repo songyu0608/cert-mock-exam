@@ -1,0 +1,13 @@
+<section id="l44-04" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">결과 하나에 메시지 둘</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">메시지 하나는 Alex에게, 하나는 로그에</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED">{<br>&#160;&#160;<span style="color:#E5C07B">"isError"</span>: <span style="color:#E8907A">true</span>,<br>&#160;&#160;<span style="color:#E5C07B">"errorCategory"</span>: <span style="color:#A9C4A2">"business"</span>,<br>&#160;&#160;<span style="color:#E5C07B">"isRetryable"</span>: <span style="color:#E8907A">false</span>,<br>&#160;&#160;<span style="color:#E5C07B">"customerMessage"</span>: <span style="color:#A9C4A2">"Delivered over 30 days ago - outside our return window."</span>,<br>&#160;&#160;<span style="color:#E5C07B">"logMessage"</span>: <span style="color:#A9C4A2">"refund-service: rule 30d, delivered 2026-08-29, asked 2026-10-13"</span><br>}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">첫 번째 메시지는 Claude가 그대로 전합니다. 두 번째는 스토어 로그로 가며, Alex는 보지 못합니다.</p>
+</div>
+<aside>원문 제목: One message for Alex, one for logs (TWO MESSAGES IN ONE RESULT). JSON(영문 유지) 의미: 오류 true, 범주 business, 재시도 불가. customerMessage(고객용): "30일도 더 전에 배송되어 반품 기한을 지났습니다." logMessage(로그용): "refund-service: 30일 규칙, 2026-08-29 배송, 2026-10-13 요청". 캡션: Claude passes the first message on. The second goes to the store's logs - Alex never sees it.</aside>
+</section>

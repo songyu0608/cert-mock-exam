@@ -1,0 +1,30 @@
+<section id="l80-06" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">기법 2: 래퍼</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">래퍼가 라이브러리를 숨긴다</h2>
+<x-connector x1="486" y1="560" x2="600" y2="560" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<p style="position:absolute;left:508px;top:540px;width:70px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;font-weight:700;line-height:40px;text-align:center;color:#C4613F;background:#F4F5F7">호출</p>
+<x-connector x1="1040" y1="560" x2="1294" y2="370" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="1040" y1="560" x2="1294" y2="550" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="1040" y1="560" x2="1294" y2="730" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<div style="position:absolute;left:106px;top:470px;width:380px;height:180px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Chart" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#25282D">금액 코드</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">결제 제공자를 직접 호출하지 않음</p></div>
+</div>
+<div style="position:absolute;left:600px;top:470px;width:440px;height:180px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Lock" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#25282D">래퍼 모듈</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">결제 제공자를 숨김</p></div>
+</div>
+<div style="position:absolute;left:1294px;top:300px;width:520px;height:140px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Key" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#C4613F">전액 환불</h3><p style="font-size:24px;line-height:1.4;color:#5F6670"></p></div>
+</div>
+<div style="position:absolute;left:1294px;top:480px;width:520px;height:140px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Activity" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#C4613F">부분 환불</h3><p style="font-size:24px;line-height:1.4;color:#5F6670"></p></div>
+</div>
+<div style="position:absolute;left:1294px;top:660px;width:520px;height:140px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Warning" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:30px;font-weight:700;color:#C4613F">취소된 청구</h3><p style="font-size:24px;line-height:1.4;color:#5F6670"></p></div>
+</div>
+<aside>원문 제목: A wrapper hides the library (TECHNIQUE TWO: THE WRAPPER). Amount code (Never calls the provider) → calls → Wrapper module (Hides the payment provider) → Full refund / Partial refund / Cancelled charge.</aside>
+</section>

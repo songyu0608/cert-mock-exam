@@ -1,0 +1,13 @@
+<section id="l20-10" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">둘째: 심각도</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">수준마다 코드 예시를 붙인다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#8A9099"># critical: money or customer data is at risk</span><br>amount = customer_message.refund_amount<br><br><span style="color:#8A9099"># major: customers get a wrong result</span><br>deadline = order.order_date + timedelta(days=<span style="color:#A9C4A2">30</span>)<br><br><span style="color:#8A9099"># minor: a rare case, no money at risk</span><br>latest_order = orders[<span style="color:#A9C4A2">0</span>]</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">정의와 구체적인 예시가 있으면 Claude가 새 코드를 실제 사례와 비교할 수 있습니다.</p>
+</div>
+<aside>원문 제목: Each level gets a code example (SECOND: SEVERITY). 주석(영문 유지) 의미: critical = 돈이나 고객 데이터가 위험함 / major = 고객이 잘못된 결과를 받음 / minor = 드문 경우, 돈은 위험하지 않음. 캡션: A definition plus a concrete example lets Claude compare new code with something real.</aside>
+</section>

@@ -1,0 +1,13 @@
+<section id="l101-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">출력: 스키마 설계</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">스키마는 의미가 아니라 형태를 정한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED">INVOICE_SCHEMA = {<br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"total"</span>: {<span style="color:#A9C4A2">"type"</span>: <span style="color:#A9C4A2">"number"</span>},<br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"po_number"</span>: {<span style="color:#A9C4A2">"type"</span>: [<span style="color:#A9C4A2">"string"</span>, <span style="color:#A9C4A2">"null"</span>]},<br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"category"</span>: {<span style="color:#A9C4A2">"enum"</span>: [<span style="color:#A9C4A2">"hardware"</span>, <span style="color:#A9C4A2">"software"</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"unclear"</span>, <span style="color:#A9C4A2">"other"</span>]},<br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"category_detail"</span>: {<span style="color:#A9C4A2">"type"</span>: [<span style="color:#A9C4A2">"string"</span>, <span style="color:#A9C4A2">"null"</span>]},<br>}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">항목 합이 총액과 맞는지는 내 코드가 비교합니다. 없을 수 있는 값은 nullable로, 범주에는 "unclear"나 "other"를 더하세요.</p>
+</div>
+<aside>원문 제목: A schema sets shape, not meaning (OUTPUT: SCHEMA DESIGN). 스키마(영문 유지) 의미: total은 숫자, po_number는 문자열 또는 null, category는 hardware/software/unclear/other 중 하나, category_detail은 문자열 또는 null. 캡션: Your code compares the lines with the total. Make missing values nullable; add 'unclear' or 'other'.</aside>
+</section>

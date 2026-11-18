@@ -1,0 +1,13 @@
+<section id="l41-08" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">다시 쓴 get_customer</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">get_customer는 자기 경계를 밝힌다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E8EAED">GET_CUSTOMER_DESCRIPTION = (<br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Finds a customer by email, phone number or full name. "</span><br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Returns a verified customer ID. "</span><br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Use at the start of a case, or when the customer is not verified yet. "</span><br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Example: a customer gives an email and asks about a refund. "</span><br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"If several match, returns all of them; ask for another identifier. "</span><br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"No match returns an empty result, not an error. "</span><br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Does not accept order numbers - for an order, use lookup_order."</span><br>)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">확장한 설명: 하는 일과 반환값, 입력, 예외 상황, 그리고 어디까지인지.</p>
+</div>
+<aside>원문 제목: get_customer states its boundary (GET_CUSTOMER, REWRITTEN). 설명(영문 유지) 의미: 이메일, 전화번호, 전체 이름으로 고객을 찾는다. 검증된 고객 ID를 반환한다. 사례를 시작할 때나 고객이 아직 검증되지 않았을 때 쓴다. 예: 고객이 이메일을 주고 환불을 문의한다. 여러 명이 일치하면 모두 반환하니, 다른 식별자를 요청한다. 일치하는 고객이 없으면 오류가 아니라 빈 결과를 반환한다. 주문 번호는 받지 않으니, 주문은 lookup_order를 쓴다. 캡션: An expanded description: what it does and returns, inputs, edge cases, and where it ends.</aside>
+</section>

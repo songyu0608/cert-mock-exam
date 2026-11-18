@@ -1,0 +1,13 @@
+<section id="l21-10" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">셋째 역할: 대조 쌍</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">닮은 두 경우, 경계 하나</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#E5C07B">def</span> find_orders(email):<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">try</span>:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;orders = search_orders(email)<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">except</span> TimeoutError:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#8A9099"># the order service timed out</span><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> []<br><br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span> orders</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">결과는 같지만 의미는 다릅니다: 일치하는 항목이 없는 것은 정상이고, 타임아웃은 실패입니다.</p>
+</div>
+<aside>원문 제목: Two lookalikes, one boundary (THIRD JOB: CONTRASTING PAIRS). 코드(영문 유지): 주문 서비스 타임아웃 시 빈 목록을 반환. 캡션: Same result, different meaning: no match is normal, a timeout is a failure.</aside>
+</section>

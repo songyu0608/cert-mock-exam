@@ -1,0 +1,32 @@
+<section id="l56-02" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">첫 번째 결정</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">신원 확인을 건너뛴 호출</h2>
+<x-connector x1="389" y1="424" x2="389" y2="750" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="960" y1="424" x2="960" y2="750" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="1530" y1="424" x2="1530" y2="750" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<div style="position:absolute;left:198px;top:312px;width:382px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Users" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">고객</p>
+</div>
+<div style="position:absolute;left:770px;top:312px;width:380px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Cloud" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">ShopAssist</p>
+</div>
+<div style="position:absolute;left:1340px;top:312px;width:380px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Database" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">주문 백엔드</p>
+</div>
+<p style="position:absolute;left:397px;top:438px;width:555px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;font-weight:700;text-align:center;color:#C4613F">“ORD-1042는 어디 있나요?”</p>
+<x-connector x1="391" y1="480" x2="956" y2="480" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:968px;top:518px;width:554px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">lookup_order(ORD-1042)</p>
+<x-connector x1="962" y1="560" x2="1526" y2="560" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:968px;top:598px;width:554px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;text-align:center;color:#25282D">다른 계정의 주문</p>
+<x-connector x1="1528" y1="640" x2="964" y2="640" head="end" style="color:#8A9099;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:397px;top:678px;width:555px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;text-align:center;color:#25282D">주문 상세</p>
+<x-connector x1="958" y1="720" x2="393" y2="720" head="end" style="color:#25282D;border-width:2px;border-style:dashed"></x-connector>
+<div style="position:absolute;left:106px;top:778px;width:1708px;height:162px;display:flex;align-items:center;gap:36px;background:#1B1E24;border-radius:12px;padding:0 60px">
+<div style="width:88px;height:88px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%"><x-icon name="Warning" style="color:#F4F5F7;width:38px;height:38px"></x-icon></div>
+<p style="font-size:32px;color:#F4F5F7">그 호출에 쓰인 고객 ID는 어떤 신원 확인도 거치지 않은 것이었습니다.</p>
+</div>
+<aside>원문 제목: A call skipped the identity check (FIRST DECISION). Customer → ShopAssist: Where is ORD-1042? / ShopAssist → Order backend: lookup_order(ORD-1042) / Order backend → ShopAssist: belongs to another account / ShopAssist → Customer: order details. 하단: The customer ID in that call came from no identity check.</aside>
+</section>

@@ -1,0 +1,13 @@
+<section id="l62-06" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">둘째: 에이전트 정의</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">서브에이전트마다 정의가 있다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED">agents = {<br>&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"document-analysis"</span>: AgentDefinition(<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;description=<span style="color:#A9C4A2">"Reads the store&#39;s tickets and supplier reports. "</span><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Use it for facts from the store&#39;s own files."</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;prompt=<span style="color:#A9C4A2">"Read the support tickets and supplier reports. "</span><br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#A9C4A2">"Give every finding its source and its date."</span>,<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;tools=[<span style="color:#A9C4A2">"Read"</span>, <span style="color:#A9C4A2">"Grep"</span>],<br>&#160;&#160;&#160;&#160;),<br>}</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">description, prompt, tools: 에이전트 정의 하나를 이루는 세 부분입니다.</p>
+</div>
+<aside>원문 제목: Each helper has a definition (SECOND: AGENT DEFINITIONS). 코드(영문 유지) 의미: document-analysis 에이전트 정의. description - 스토어의 티켓과 공급업체 보고서를 읽는다. 스토어 자체 파일의 사실이 필요할 때 쓴다. prompt - 지원 티켓과 공급업체 보고서를 읽어라. 모든 조사 결과에 출처와 날짜를 붙여라. tools - Read, Grep. 캡션: Description, prompt and tools: three parts of one agent definition.</aside>
+</section>

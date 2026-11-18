@@ -1,0 +1,13 @@
+<section id="l90-07" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">두 번째 결정</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">모든 핸들러가 요청 ID를 로그로 남긴다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#E5C07B">def</span> handle_payment_failed(event):<br>&#160;&#160;&#160;&#160;logger.info(<span style="color:#A9C4A2">"request_id=%s"</span>, event.request_id)<br>&#160;&#160;&#160;&#160;order = load_order(event.order_id)<br>&#160;&#160;&#160;&#160;<span style="color:#E5C07B">if</span> order <span style="color:#E5C07B">is</span> <span style="color:#A9C4A2">None</span>:<br>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;<span style="color:#E5C07B">return</span><br>&#160;&#160;&#160;&#160;order.mark_payment_failed()<br>&#160;&#160;&#160;&#160;notify_customer(order)<br>&#160;&#160;&#160;&#160;save(order)</p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">핸들러 약 40개가 여러 폴더에 흩어져 있습니다. 변경은 빠짐없어야 하고 증명돼야 합니다.</p>
+</div>
+<aside>원문 제목: Every handler logs a request ID (SECOND DECISION). 코드(영문 유지) 의미: 결제 실패 핸들러가 첫 줄에서 request_id를 로그로 남기고, 주문을 불러와 없으면 끝냄. 있으면 결제 실패로 표시하고 고객에게 알리고 저장함. 캡션: About forty handlers in many folders; the change must be complete and proven.</aside>
+</section>

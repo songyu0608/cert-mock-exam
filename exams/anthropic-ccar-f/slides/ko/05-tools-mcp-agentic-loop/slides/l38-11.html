@@ -1,0 +1,29 @@
+<section id="l38-11" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">병렬 도구 호출</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">요청 둘, 사용자 메시지 하나</h2>
+<x-connector x1="389" y1="424" x2="389" y2="900" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="960" y1="424" x2="960" y2="900" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<x-connector x1="1530" y1="424" x2="1530" y2="900" head="none" style="color:#B8BDC4;border-width:2px;border-style:dashed"></x-connector>
+<div style="position:absolute;left:198px;top:312px;width:382px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Code" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">애플리케이션</p>
+</div>
+<div style="position:absolute;left:770px;top:312px;width:380px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Cloud" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#C4613F">Claude</p>
+</div>
+<div style="position:absolute;left:1340px;top:312px;width:380px;height:112px;display:flex;align-items:center;gap:20px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 24px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Tool" style="color:#D97757;width:30px;height:30px"></x-icon></div>
+<p style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">도구</p>
+</div>
+<p style="position:absolute;left:397px;top:506px;width:555px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;text-align:center;color:#25282D">tool_use ×2: lookup_order</p>
+<x-connector x1="958" y1="548" x2="393" y2="548" head="end" style="color:#8A9099;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:397px;top:602px;width:1125px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">lookup_order: 재킷</p>
+<x-connector x1="391" y1="644" x2="1526" y2="644" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:397px;top:698px;width:1125px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:700;text-align:center;color:#C4613F">lookup_order: 램프</p>
+<x-connector x1="391" y1="740" x2="1526" y2="740" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:397px;top:794px;width:555px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;font-weight:700;text-align:center;color:#C4613F">사용자 메시지 1개: 결과 2개</p>
+<x-connector x1="391" y1="836" x2="956" y2="836" head="end" style="color:#E7A58D;border-width:2px"></x-connector>
+<p style="position:absolute;left:106px;top:920px;width:1708px;font-size:30px;font-style:italic;color:#5F6670">요청이 두 개 든 응답 하나에는, 결과 두 개를 담은 메시지 하나로 답합니다.</p>
+<aside>원문 제목: Two requests, one user message (PARALLEL TOOL CALLS). Claude → app: tool_use x2: lookup_order / app → Tool: lookup_order: jacket / app → Tool: lookup_order: lamp / app → Claude: 1 user message: 2 results. 캡션: One response with two requests gets one message with two results.</aside>
+</section>

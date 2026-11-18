@@ -1,0 +1,149 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-09T14:45:00Z"
+  },
+  "lists": "css",
+  "title": "CCAR-F 섹션 5. 도구, MCP, 에이전트 루프 (한국어판)",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "l38",
+    "l38-01",
+    "l38-02",
+    "l38-03",
+    "l38-04",
+    "l38-05",
+    "l38-06",
+    "l38-07",
+    "l38-08",
+    "l38-09",
+    "l38-10",
+    "l38-11",
+    "l38-12",
+    "l38-13",
+    "l38-14",
+    "l39",
+    "l39-01",
+    "l39-02",
+    "l39-03",
+    "l39-04",
+    "l39-05",
+    "l39-06",
+    "l39-07",
+    "l39-08",
+    "l41",
+    "l41-01",
+    "l41-02",
+    "l41-03",
+    "l41-04",
+    "l41-05",
+    "l41-06",
+    "l41-07",
+    "l41-08",
+    "l41-09",
+    "l41-10",
+    "l41-11",
+    "l42",
+    "l42-01",
+    "l42-02",
+    "l42-03",
+    "l42-04",
+    "l42-05",
+    "l42-06",
+    "l42-07",
+    "l42-08",
+    "l42-09",
+    "l42-10",
+    "l43",
+    "l43-01",
+    "l43-02",
+    "l43-03",
+    "l43-04",
+    "l43-05",
+    "l43-06",
+    "l43-07",
+    "l43-08",
+    "l43-09",
+    "l43-10",
+    "l43-11",
+    "l44",
+    "l44-01",
+    "l44-02",
+    "l44-03",
+    "l44-04",
+    "l44-05",
+    "l44-06",
+    "l44-07",
+    "l44-08",
+    "l44-09",
+    "l44-10",
+    "l46",
+    "l46-01",
+    "l46-02",
+    "l46-03",
+    "l46-04",
+    "l46-05",
+    "l46-06",
+    "l46-07",
+    "l46-08",
+    "l46-09",
+    "l46-10",
+    "l46-11",
+    "l46-12",
+    "l46-13",
+    "l46-14",
+    "l46-15",
+    "l46-16"
+  ],
+  "sections": {
+    "s0": {
+      "description": "표지",
+      "start": "cover"
+    },
+    "s38": {
+      "description": "38강. stop_reason으로 도는 에이전트 루프",
+      "start": "l38"
+    },
+    "s39": {
+      "description": "39강. 에이전트 루프가 멈추는 때",
+      "start": "l39"
+    },
+    "s41": {
+      "description": "41강. Claude가 도구를 고르는 방식",
+      "start": "l41"
+    },
+    "s42": {
+      "description": "42강. 이름 바꾸기, 나누기, 키워드 트리거",
+      "start": "l42"
+    },
+    "s43": {
+      "description": "43강. 구조화된 도구 오류",
+      "start": "l43"
+    },
+    "s44": {
+      "description": "44강. 고객 메시지와 빈 결과",
+      "start": "l44"
+    },
+    "s46": {
+      "description": "46강. MCP: 서버, 도구, 리소스",
+      "start": "l46"
+    }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap"
+    },
+    "noto-sans-kr": {
+      "family": "Noto Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

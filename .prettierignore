@@ -8,4 +8,6 @@ exams/*/guides/
 exams/*/theory/
 # 강의 스크립트 원문·번역은 줄바꿈까지 원본 그대로 둔다
 exams/*/scripts/
+# 슬라이드 사본은 claude.ai 아티팩트 원본 형식 그대로 둔다
+exams/*/slides/
 tests/fixtures/exams/*/theory/

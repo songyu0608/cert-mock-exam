@@ -1,0 +1,29 @@
+<section id="l41-01" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">루프 안의 도구 네 개</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">Claude가 네 도구 중 두 개를 헷갈린다</h2>
+<x-connector x1="648" y1="622" x2="1142" y2="380" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="648" y1="622" x2="1142" y2="534" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="648" y1="622" x2="1142" y2="688" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="648" y1="622" x2="1142" y2="842" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<div style="position:absolute;left:160px;top:466px;width:488px;height:312px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Cloud" style="color:#D97757;width:28px;height:28px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">Claude</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">도구 하나를 고름</p></div>
+</div>
+<div style="position:absolute;left:1142px;top:320px;width:640px;height:120px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Users" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#C4613F">get_customer</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">고객을 찾는다</p></div>
+</div>
+<div style="position:absolute;left:1142px;top:474px;width:640px;height:120px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:3px solid #D97757;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Database" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#C4613F">lookup_order</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">주문을 찾는다</p></div>
+</div>
+<div style="position:absolute;left:1142px;top:628px;width:640px;height:120px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Check" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#25282D">process_refund</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">주문을 환불한다</p></div>
+</div>
+<div style="position:absolute;left:1142px;top:782px;width:640px;height:120px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:56px;height:56px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Chat" style="color:#D97757;width:24px;height:24px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#25282D">escalate_to_human</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">사람에게 넘긴다</p></div>
+</div>
+<aside>원문 제목: Claude mixes up two of four tools (FOUR TOOLS IN THE LOOP). Claude (Picks one tool) → get_customer (Finds a customer), lookup_order (Finds an order), process_refund (Refunds an order), escalate_to_human (Hands off to a person). 강조된 두 도구 get_customer와 lookup_order가 헷갈리는 쌍입니다.</aside>
+</section>

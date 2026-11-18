@@ -1,0 +1,13 @@
+<section id="l97-04" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">그럴듯해 보이는 두 가지 해결책</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">타임아웃도, 프롬프트 한 줄도 실패한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.6;color:#E8EAED"><span style="color:#8A9099"># Fix 2: ask for JSON in the prompt</span><br>claude <span style="color:#A9C4A2">"Review this pull request. Answer in JSON."</span><br><br><span style="color:#8A9099"># Most runs: JSON</span><br><span style="color:#8A9099"># One run: a prose paragraph</span><br><span style="color:#8A9099"># &#160;&#160;the script cannot parse it</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">어느 해결책도 작업이 실행되는 방식을 바꾸지 못합니다. 기다림이 짧아질 뿐이고, JSON은 요청이지 보장이 아닙니다.</p>
+</div>
+<aside>원문 제목: A timeout or a prompt line fails (TWO FIXES THAT LOOK REASONABLE). 코드(영문 유지) 의미: 해결책 2는 프롬프트에서 JSON으로 답하라고 요청하는 것. 대부분은 JSON이 오지만 한 번은 산문 문단이 와서 스크립트가 파싱하지 못함. (해결책 1은 타임아웃을 거는 것.) 캡션: Neither fix changes how the job runs: a wait only gets shorter, and JSON is a request, not a guarantee.</aside>
+</section>

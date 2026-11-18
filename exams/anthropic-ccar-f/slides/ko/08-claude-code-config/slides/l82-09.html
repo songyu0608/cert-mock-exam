@@ -1,0 +1,13 @@
+<section id="l82-09" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">셋째: 엣지 케이스</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">null 날짜는 null로 남아야 한다</h2>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;flex-direction:column;background:#161920;border-radius:16px;padding:44px 64px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E8EAED"><span style="color:#8A9099"># an old refund, paid before the item was delivered</span><br>{<span style="color:#E5C07B">"id"</span>: <span style="color:#A9C4A2">"RF-1042"</span>, <span style="color:#E5C07B">"delivered_at"</span>: <span style="color:#E8907A">null</span>, <span style="color:#E5C07B">"amount"</span>: <span style="color:#A9C4A2">"12"</span>}<br><br><span style="color:#8A9099"># what the script wrote</span><br>{<span style="color:#E5C07B">"id"</span>: <span style="color:#A9C4A2">"RF-1042"</span>, <span style="color:#E5C07B">"delivered_at"</span>: <span style="color:#A9C4A2">"2026-10-14"</span>, <span style="color:#E5C07B">"amount_cents"</span>: <span style="color:#E8907A">1200</span>}<br><br><span style="color:#8A9099"># a made-up date: the 30-day return window starts on the wrong day</span><br><span style="color:#8A9099"># "handle missing dates properly" - today? a default? skip the record?</span></p>
+</div>
+<p style="font-size:30px;font-style:italic;color:#5F6670">ShopAssist는 주문에서 읽지 않은 배송일을 말하지 않습니다.</p>
+</div>
+<aside>원문 제목: A null date must stay null (THIRD: AN EDGE CASE). 코드(영문 유지) 의미: 상품 배송 전에 지급된 옛 환불 RF-1042, delivered_at은 null. 스크립트는 delivered_at에 "2026-10-14"를 써 넣음. 주석: 지어낸 날짜 때문에 30일 반품 기간이 엉뚱한 날 시작됨 / "빠진 날짜를 제대로 처리하라" - 오늘 날짜? 기본값? 레코드 건너뛰기? 캡션: ShopAssist never states a delivery date it did not read from an order.</aside>
+</section>

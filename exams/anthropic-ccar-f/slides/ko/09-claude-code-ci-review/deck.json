@@ -1,0 +1,130 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-09T23:58:00Z"
+  },
+  "lists": "css",
+  "title": "CCAR-F 섹션 9. CI와 리뷰 아키텍처의 Claude Code (한국어판)",
+  "cover": "cover",
+  "order": [
+    "cover",
+    "l92",
+    "l92-01",
+    "l92-02",
+    "l92-03",
+    "l92-04",
+    "l92-05",
+    "l92-06",
+    "l92-07",
+    "l92-08",
+    "l92-09",
+    "l93",
+    "l93-01",
+    "l93-02",
+    "l93-03",
+    "l93-04",
+    "l93-05",
+    "l93-06",
+    "l93-07",
+    "l93-08",
+    "l93-09",
+    "l93-10",
+    "l94",
+    "l94-01",
+    "l94-02",
+    "l94-03",
+    "l94-04",
+    "l94-05",
+    "l94-06",
+    "l94-07",
+    "l94-08",
+    "l94-09",
+    "l94-10",
+    "l95",
+    "l95-01",
+    "l95-02",
+    "l95-03",
+    "l95-04",
+    "l95-05",
+    "l95-06",
+    "l95-07",
+    "l95-08",
+    "l95-09",
+    "l95-10",
+    "l95-11",
+    "l95-12",
+    "l95-13",
+    "l97",
+    "l97-01",
+    "l97-02",
+    "l97-03",
+    "l97-04",
+    "l97-05",
+    "l97-06",
+    "l97-07",
+    "l97-08",
+    "l97-09",
+    "l97-10",
+    "l97-11",
+    "l97-12",
+    "l98",
+    "l98-01",
+    "l98-02",
+    "l98-03",
+    "l98-04",
+    "l98-05",
+    "l98-06",
+    "l98-07",
+    "l98-08",
+    "l98-09",
+    "l98-10",
+    "l98-11",
+    "l98-12"
+  ],
+  "sections": {
+    "s0": {
+      "description": "표지",
+      "start": "cover"
+    },
+    "s92": {
+      "description": "92강. 독립적인 리뷰",
+      "start": "l92"
+    },
+    "s93": {
+      "description": "93강. 다중 패스 리뷰",
+      "start": "l93"
+    },
+    "s94": {
+      "description": "94강. CI의 Claude Code: -p와 JSON",
+      "start": "l94"
+    },
+    "s95": {
+      "description": "95강. CI 리뷰와 테스트를 위한 컨텍스트",
+      "start": "l95"
+    },
+    "s97": {
+      "description": "97강. CI 사례: 파이프라인과 컨텍스트",
+      "start": "l97"
+    },
+    "s98": {
+      "description": "98강. CI 사례: 리뷰 품질",
+      "start": "l98"
+    }
+  },
+  "faces": {
+    "noto-serif-kr": {
+      "family": "Noto Serif KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700;900&display=swap"
+    },
+    "noto-sans-kr": {
+      "family": "Noto Sans KR",
+      "href": "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap"
+    }
+  },
+  "designSystems": []
+}

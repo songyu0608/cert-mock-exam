@@ -1,0 +1,26 @@
+<section id="l39-04" style="background:#F4F5F7;color:#25282D;font-family:'Noto Sans KR', Arial, sans-serif;padding:88px 106px 106px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:26px;font-weight:700;letter-spacing:6px;color:#C4613F">잘못된 방식 2: 아무 텍스트</p>
+<h2 style="font-family:'Noto Serif KR', Georgia, serif;font-size:68px;font-weight:700;line-height:1.2;color:#25282D">텍스트가 있다고 답변인 것은 아니다</h2>
+<x-connector x1="546" y1="610" x2="670" y2="610" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="1110" y1="570" x2="1342" y2="470" head="end" style="color:#6B7280;border-width:2px"></x-connector>
+<x-connector x1="1110" y1="650" x2="1342" y2="820" head="end" style="color:#6B7280;border-width:2px;border-style:dashed"></x-connector>
+<p style="position:absolute;left:1176px;top:500px;width:100px;font-family:'Noto Sans KR', Arial, sans-serif;font-size:24px;font-weight:700;line-height:40px;text-align:center;color:#C4613F;background:#F4F5F7">답변</p>
+<div style="position:absolute;left:106px;top:480px;width:440px;height:260px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Cloud" style="color:#D97757;width:28px;height:28px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">Claude</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">텍스트 + lookup_order 블록</p></div>
+</div>
+<div style="position:absolute;left:670px;top:480px;width:440px;height:260px;display:flex;align-items:center;gap:22px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:0 26px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%;background:#FBF1EC"><x-icon name="Activity" style="color:#D97757;width:28px;height:28px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D">루프</h3><p style="font-size:24px;line-height:1.4;color:#5F6670">텍스트가 있으면 최종 답변으로 봄</p></div>
+</div>
+<div style="position:absolute;left:1342px;top:300px;width:472px;height:360px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:#FFFFFF;border:1px solid #E4E6EA;border-radius:12px;box-shadow:0 4px 16px rgba(30,35,45,0.07);padding:18px">
+<img src="../assets/3409a45835416e62d7a537f407136dc3.png" alt="노트북으로 채팅하는 고객 일러스트" style="width:160px;height:152px;object-fit:contain">
+<h3 style="font-family:'Noto Serif KR', Georgia, serif;font-size:32px;font-weight:700;color:#25282D;text-align:center">Alex</h3>
+<p style="font-size:24px;line-height:1.4;color:#5F6670;text-align:center">첫 줄만 보게 됨</p>
+</div>
+<div style="position:absolute;left:1342px;top:720px;width:472px;height:200px;display:flex;align-items:center;gap:22px;background:#1B1E24;border-radius:12px;padding:0 26px">
+<div style="width:64px;height:64px;flex:none;display:flex;align-items:center;justify-content:center;border:2px solid #D97757;border-radius:50%"><x-icon name="Wrench" style="color:#F0B39E;width:28px;height:28px"></x-icon></div>
+<div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:700;color:#F4F5F7">lookup_order</h3><p style="font-size:24px;line-height:1.4;color:#C9CDD3">루프가 실행해 주기를 기다림</p></div>
+</div>
+<aside>원문 제목: Text alone is not the answer (WRONG WAY 2: ANY TEXT). Claude (Text + lookup_order block) → Loop (Any text = final answer) → answer → Alex (Sees only the first line) / 점선 → lookup_order (Waits for the loop). 응답에 텍스트와 tool_use 블록이 함께 들어 있을 수 있으므로, 텍스트가 있다는 사실만으로 끝났다고 보면 도구 요청이 실행되지 않습니다.</aside>
+</section>
