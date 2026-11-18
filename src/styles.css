@@ -170,6 +170,21 @@ h2 {
 .crumb a:hover {
   color: var(--accent);
 }
+.note-home {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  vertical-align: middle;
+}
+.note-home:hover,
+.note-home:focus-visible {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
 
 .panel {
   background: var(--sheet);

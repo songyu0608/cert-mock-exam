@@ -484,6 +484,10 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await expect(page).toHaveTitle('CCAR-F 정리노트 07 - ShopAssist 소개 - 도구와 규칙');
   await page.reload();
   await expect(page.getByRole('button', { name: '인쇄 / PDF 저장' })).toBeVisible();
+  await page.getByRole('link', { name: '사이트 홈', exact: true }).click();
+  await expect(page).toHaveURL('/');
+  await page.goBack();
+  await expect(page).toHaveTitle('CCAR-F 정리노트 07 - ShopAssist 소개 - 도구와 규칙');
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.guide-bar')).toBeHidden();
   await expect(page.locator('.theory-nav')).toBeHidden();
