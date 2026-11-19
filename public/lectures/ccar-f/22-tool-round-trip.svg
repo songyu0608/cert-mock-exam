@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="344" viewBox="0 0 480 344" role="img" aria-labelledby="title desc">
+  <title id="title">주문 조회 한 번에 필요한 두 번의 API 요청</title>
+  <desc id="desc">왼쪽은 ShopAssist 코드, 오른쪽은 Claude API다. 첫 번째 응답과 두 번째 요청 사이에 왼쪽 코드가 주문 조회 함수를 실행한다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 8 4 0 8Z" fill="#47645b"/></marker>
+  </defs>
+  <rect width="480" height="344" rx="14" fill="#f4f7f4"/>
+  <g stroke="#71867e" stroke-width="1.5">
+    <rect x="12" y="12" width="146" height="40" rx="8" fill="#d9eee5"/>
+    <rect x="322" y="12" width="146" height="40" rx="8" fill="#fff"/>
+    <path d="M85 54v270 M395 54v270" stroke-dasharray="4 5"/>
+    <rect x="12" y="161" width="146" height="50" rx="8" fill="#d9eee5"/>
+  </g>
+  <g stroke="#47645b" stroke-width="2" marker-end="url(#arrow)">
+    <path d="M85 94h307"/><path d="M395 145H88"/><path d="M85 250h307"/><path d="M395 309H88"/>
+  </g>
+  <g text-anchor="middle" fill="#1c372d" font-family="'Malgun Gothic',sans-serif">
+    <g font-size="19" font-weight="bold">
+      <text x="85" y="39">ShopAssist 코드</text><text x="395" y="39">Claude API</text>
+    </g>
+    <g font-size="17">
+      <text x="240" y="84">요청 1 · 질문과 도구 정의</text>
+      <text x="240" y="135">tool_use · 조회할 주문 ID</text>
+      <text x="85" y="182">lookup_order</text><text x="85" y="203">함수 실행</text>
+      <text x="240" y="240">요청 2 · tool_result 포함</text>
+      <text x="240" y="299">end_turn · 반품 기한 안내</text>
+    </g>
+  </g>
+</svg>
