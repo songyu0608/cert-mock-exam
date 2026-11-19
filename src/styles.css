@@ -568,18 +568,38 @@ select.sel {
   gap: 12px;
   flex-wrap: wrap;
 }
-.bar-title {
-  font-weight: 600;
+.session-heading {
+  display: flex;
+  align-items: center;
+  gap: inherit;
   flex: 1;
   min-width: 0;
+}
+.bar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  min-width: 0;
+  font-weight: 600;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 .bar-mode {
   font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 @media (max-width: 430px) {
+  .session-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    line-height: 1.2;
+  }
+  .bar-in,
+  .sv .sv-bar-in {
+    column-gap: 8px;
+    padding-block: 4px;
+  }
   .bar-mode {
     display: none;
   }

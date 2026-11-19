@@ -308,6 +308,11 @@ test('AIB-C01 실전은 문항 수를 고르고 시간이 비례한다', async (
     page.getByRole('region', { name: '문항 이동' }).getByRole('button', { name: /^\d+번/ }),
   ).toHaveCount(50);
   await expect(page.getByRole('timer')).toHaveText(/^1:(40:00|39:5\d)$/);
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  const home = (await page.getByRole('link', { name: '사이트 홈' }).boundingBox())!;
+  const exit = (await page.getByRole('link', { name: '나가기' }).boundingBox())!;
+  expect(exit.y + exit.height / 2).toBeCloseTo(home.y + home.height / 2, 0);
 });
 
 test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오별로 묶어 출제하고 2단 화면으로 푼다', async ({
@@ -482,6 +487,15 @@ test('시나리오형 시험(CCAR-F): 무작위 조합은 시나리오 4개에�
     /무작위 조합 · S\d · [A-D](, S\d · [A-D]){3}/,
   );
   await expect(page.locator('.sv-clock .timer')).toHaveText(/^(2:00:00|1:59:5\d)$/);
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 720 });
+    const title = page.locator('.bar-title');
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    expect(await title.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const position = (await title.boundingBox())!;
+    const pause = (await page.locator('.sv-pause').boundingBox())!;
+    expect(position.x + position.width).toBeLessThanOrEqual(pause.x);
+  }
 });
 
 test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 번호가 반영된다', async ({ page }) => {

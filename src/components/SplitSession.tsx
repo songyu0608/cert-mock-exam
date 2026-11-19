@@ -253,13 +253,15 @@ export function SplitSession({
       <header className="sv-bar" inert={confirming}>
         <div className="sv-bar-in">
           <HomeLink label={t.home} />
-          <span className="code">{exam.code}</span>
-          <span className="bar-title">
-            <span className="bar-mode" lang="ko">
-              {sessionLabel(session)} ·{' '}
+          <div className="session-heading">
+            <span className="code">{exam.code}</span>
+            <span className="bar-title">
+              <span className="bar-mode" lang="ko">
+                {sessionLabel(session)} ·
+              </span>{' '}
+              <span>{review ? t.review : t.pos(i + 1, total)}</span>
             </span>
-            {review ? t.review : t.pos(i + 1, total)}
-          </span>
+          </div>
           {session.deadline && (
             <button
               type="button"

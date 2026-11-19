@@ -166,11 +166,15 @@ export function SessionPage({ exam }: { exam: Exam }) {
       <div className="bar-top">
         <div className="bar-in">
           <HomeLink />
-          <span className="code">{exam.code}</span>
-          <span className="bar-title">
-            <span className="bar-mode">{sessionLabel(session)} · </span>
-            {session.current + 1}/{total}
-          </span>
+          <div className="session-heading">
+            <span className="code">{exam.code}</span>
+            <span className="bar-title">
+              <span className="bar-mode">{sessionLabel(session)} ·</span>{' '}
+              <span>
+                {session.current + 1}/{total}
+              </span>
+            </span>
+          </div>
           {isMock && session.deadline && (
             <Timer
               deadline={session.deadline}
