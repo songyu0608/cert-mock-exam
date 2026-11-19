@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { useEffect, useRef } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { guideUrl, hasQuestions } from '../data/exams.ts';
@@ -24,6 +25,7 @@ export function GuideView({ exam, guideId }: { exam: Exam; guideId: string }) {
   if (!guide || !url)
     return (
       <main className="wrap stack">
+        <HomeLink />
         <h1>가이드를 찾을 수 없습니다</h1>
         <p>
           <a href={paths.guides()} onClick={onLinkClick}>
@@ -36,6 +38,7 @@ export function GuideView({ exam, guideId }: { exam: Exam; guideId: string }) {
     <div className="guide-view">
       <div className="guide-bar">
         <nav className="crumb" aria-label="위치">
+          <HomeLink />
           <a href={paths.guides()} onClick={onLinkClick}>
             가이드
           </a>{' '}

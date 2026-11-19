@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { TopTabs } from '../components/TopTabs.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
 import { exams } from '../data/exams.ts';
@@ -12,7 +13,10 @@ export function TheoryList({ tab }: { tab: 'theory' | 'notes' }) {
   return (
     <main className="wrap stack">
       <header>
-        <h1>자격증 모의고사</h1>
+        <div className="row">
+          <HomeLink />
+          <h1>자격증 {tab === 'notes' ? '노트' : '이론'}</h1>
+        </div>
         <p className="lede">시험별 {label}를 읽습니다.</p>
       </header>
       <TopTabs current={tab} />

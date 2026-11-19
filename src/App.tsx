@@ -1,3 +1,4 @@
+import { HomeLink } from './components/HomeLink.tsx';
 import { lazy, Suspense, useEffect } from 'react';
 import { getExam, hasQuestions } from './data/exams.ts';
 import { ExamHome } from './pages/ExamHome.tsx';
@@ -71,7 +72,14 @@ export function App() {
   const theory = theoryOf(exam, route);
   if (exam && theory)
     return (
-      <Suspense fallback={<main className="wrap muted">불러오는 중…</main>}>
+      <Suspense
+        fallback={
+          <main className="wrap stack">
+            <HomeLink />
+            <p className="muted">불러오는 중…</p>
+          </main>
+        }
+      >
         <TheoryView
           key={`${exam.id}/${theory.theory.id}`}
           exam={exam}
@@ -88,12 +96,8 @@ export function App() {
     return <ResultPage key={route.attemptId} exam={exam} attemptId={route.attemptId} />;
   return (
     <main className="wrap stack">
+      <HomeLink />
       <h1>페이지를 찾을 수 없습니다</h1>
-      <p>
-        <a href={paths.list()} onClick={onLinkClick}>
-          시험 목록으로
-        </a>
-      </p>
     </main>
   );
 }
@@ -101,6 +105,7 @@ export function App() {
 function ReadingOnly({ exam }: { exam: Exam }) {
   return (
     <main className="wrap stack">
+      <HomeLink />
       <h1>
         <span className="code">{exam.code}</span> {exam.name}
       </h1>
@@ -121,11 +126,6 @@ function ReadingOnly({ exam }: { exam: Exam }) {
           </li>
         ))}
       </ul>
-      <p>
-        <a href={paths.list()} onClick={onLinkClick}>
-          시험 목록으로
-        </a>
-      </p>
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
@@ -23,6 +24,7 @@ export function ResultPage({ exam, attemptId }: { exam: Exam; attemptId: string 
   if (!attempt) {
     return (
       <main className="wrap stack">
+        <HomeLink />
         <h1>결과를 찾을 수 없습니다</h1>
         <p>
           <a href={paths.exam(exam.id)} onClick={onLinkClick}>
@@ -61,6 +63,7 @@ export function ResultPage({ exam, attemptId }: { exam: Exam; attemptId: string 
     <main className="wrap stack">
       <div className="crumb-row">
         <nav className="crumb">
+          <HomeLink />
           <a href={paths.exam(exam.id)} onClick={onLinkClick}>
             ← {exam.code} 시험 홈
           </a>

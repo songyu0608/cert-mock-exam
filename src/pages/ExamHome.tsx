@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { Fragment, useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
@@ -196,9 +197,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
     <main className="wrap stack">
       <div className="crumb-row">
         <nav className="crumb">
-          <a href={paths.list()} onClick={onLinkClick}>
-            ← 시험 목록
-          </a>
+          <HomeLink />
         </nav>
         <ThemeToggle />
       </div>

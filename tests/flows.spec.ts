@@ -15,6 +15,21 @@ test.afterEach(async ({ page }) => {
 // 같은 코드의 한국어판과 일본어판이 함께 있어 이름까지 맞춘다.
 const AIB_KO = /AIB-C01 AWS Certified AI Business Strategist(?! \(日本語\))/;
 
+test('홈을 제외한 각 탭에서 집 아이콘으로 시험 목록에 돌아간다', async ({ page }) => {
+  await page.goto('/');
+  const home = page.getByRole('link', { name: '사이트 홈', exact: true });
+  for (const name of ['가이드', '이론', '노트']) {
+    const tabs = page.getByRole('navigation', { name: '화면' });
+    await expect(home).toHaveCount(0);
+    await tabs.getByRole('link', { name, exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(`자격증 ${name}`);
+    await expect(home).toHaveAttribute('href', '/');
+    await home.click();
+    await expect(page).toHaveURL('/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('자격증 모의고사');
+  }
+});
+
 test('시험 목록에 AWS 시험이 모두 보이고, 주소로 바로 들어가도 열린다', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('link', { name: /AIB-C01/ })).toHaveCount(2);
@@ -293,6 +308,11 @@ test('AIB-C01 실전은 문항 수를 고르고 시간이 비례한다', async (
     page.getByRole('region', { name: '문항 이동' }).getByRole('button', { name: /^\d+번/ }),
   ).toHaveCount(50);
   await expect(page.getByRole('timer')).toHaveText(/^1:(40:00|39:5\d)$/);
+  await page.setViewportSize({ width: 320, height: 720 });
+  await page.evaluate(() => document.fonts.ready.then(() => undefined));
+  const home = (await page.getByRole('link', { name: '사이트 홈' }).boundingBox())!;
+  const exit = (await page.getByRole('link', { name: '나가기' }).boundingBox())!;
+  expect(exit.y + exit.height / 2).toBeCloseTo(home.y + home.height / 2, 0);
 });
 
 test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오별로 묶어 출제하고 2단 화면으로 푼다', async ({
@@ -408,7 +428,7 @@ test('시나리오형 시험(CCAR-F): 회차를 골라 시작하면 시나리오
   await expect(page.locator('.score .big')).toBeVisible();
 
   // 시험 목록으로 돌아가면 업체 테마를 지운다.
-  await page.goto('/');
+  await page.getByRole('link', { name: '사이트 홈', exact: true }).click();
   await expect(page.locator('html')).not.toHaveAttribute('data-vendor', 'anthropic');
 });
 
@@ -467,6 +487,15 @@ test('시나리오형 시험(CCAR-F): 무작위 조합은 시나리오 4개에�
     /무작위 조합 · S\d · [A-D](, S\d · [A-D]){3}/,
   );
   await expect(page.locator('.sv-clock .timer')).toHaveText(/^(2:00:00|1:59:5\d)$/);
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 720 });
+    const title = page.locator('.bar-title');
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    expect(await title.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const position = (await title.boundingBox())!;
+    const pause = (await page.locator('.sv-pause').boundingBox())!;
+    expect(position.x + position.width).toBeLessThanOrEqual(pause.x);
+  }
 });
 
 test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 번호가 반영된다', async ({ page }) => {
@@ -484,9 +513,14 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await expect(page).toHaveTitle('CCAR-F 정리노트 07 - ShopAssist 소개 - 도구와 규칙');
   await page.reload();
   await expect(page.getByRole('button', { name: '인쇄 / PDF 저장' })).toBeVisible();
+  await page.getByRole('link', { name: '사이트 홈', exact: true }).click();
+  await expect(page).toHaveURL('/');
+  await page.goBack();
+  await expect(page).toHaveTitle('CCAR-F 정리노트 07 - ShopAssist 소개 - 도구와 규칙');
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.guide-bar')).toBeHidden();
   await expect(page.locator('.theory-nav')).toBeHidden();
+  await expect(page.locator('.note-pagination')).toBeHidden();
   await expect(page.locator('.theory-note h1')).toBeVisible();
   const notePath = '/theory/anthropic-ccar-f/lectures-ko/';
   await page.goto(notePath + encodeURIComponent('07 shopassist 소개 - 도구와 규칙'));
@@ -494,6 +528,31 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await page.goto(notePath + encodeURIComponent('99 없는 노트'));
   await expect(page.getByRole('heading', { name: '노트를 찾을 수 없습니다' })).toBeVisible();
   await expect(page).toHaveTitle('CCAR-F 정리노트');
+});
+
+test('정리노트 하단에서 목록 순서대로 이전·다음 노트를 읽는다', async ({ page }) => {
+  const home = '/theory/anthropic-ccar-f/lectures-ko';
+  await page.goto(home);
+  const pager = page.getByRole('navigation', { name: '정리노트 이동' });
+  const previous = pager.getByRole('link', { name: /이전 노트/ });
+  const next = pager.getByRole('link', { name: /다음 노트/ });
+  await expect(next).toContainText('04 LLM은 메시지를 어떻게 읽고 답할까');
+  await expect(previous).toHaveCount(0);
+  await next.click();
+  await expect(page).toHaveTitle(/정리노트 04/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(next).toContainText('05 Claude 앱과 API');
+  await expect(previous).toContainText('03 시험 형식');
+  await previous.click();
+  await expect(page).toHaveURL(home);
+
+  const toggle = page.getByRole('button', { name: /^노트 목록/ });
+  if (await toggle.isVisible()) await toggle.click();
+  const entries = page.locator('.theory-nav').getByRole('link');
+  const penultimate = await entries.nth(-2).innerText();
+  await entries.last().click();
+  await expect(previous).toContainText(penultimate);
+  await expect(next).toHaveCount(0);
 });
 
 test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동작한다', async ({ page }) => {
@@ -504,6 +563,7 @@ test('이론 탭: 노트를 열고 링크·접는 상자·카드·검색이 동�
   await expect(page).toHaveURL(/\/theory\/sample-all-types\/ko$/);
   const note = page.locator('.theory-note');
   await expect(note.getByRole('heading', { name: '견본 이론 홈' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: '정리노트 이동' })).toHaveCount(0);
   await expect(note.locator('.callout-info .callout-title')).toHaveText('이 보관함');
   const quote = note.locator('details.callout-quote');
   await expect(quote.getByText('접혀 있는 본문')).toBeHidden();

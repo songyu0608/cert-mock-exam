@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { useEffect, useState } from 'react';
 import {
@@ -13,7 +14,6 @@ import {
 } from '../lib/sync.ts';
 import { useSyncStatus } from '../lib/useRecords.ts';
 import { setThemePref, useTheme, type ThemePref } from '../lib/theme.ts';
-import { onLinkClick, paths } from '../router.ts';
 
 const time = (at: number) => new Date(at).toLocaleString('ko-KR');
 
@@ -57,9 +57,7 @@ export function SettingsPage() {
     <main className="wrap stack">
       <div className="crumb-row">
         <nav className="crumb">
-          <a href={paths.list()} onClick={onLinkClick}>
-            ← 시험 목록
-          </a>
+          <HomeLink />
         </nav>
         <ThemeToggle />
       </div>

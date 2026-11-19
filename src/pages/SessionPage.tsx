@@ -1,3 +1,4 @@
+import { HomeLink } from '../components/HomeLink.tsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { QuestionView } from '../components/QuestionView.tsx';
 import { SplitSession } from '../components/SplitSession.tsx';
@@ -61,6 +62,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
   if (!session) {
     return (
       <main className="wrap stack">
+        <HomeLink />
         <h1>진행 중인 풀이가 없습니다</h1>
         <p>
           <a href={paths.exam(exam.id)} onClick={onLinkClick}>
@@ -70,8 +72,15 @@ export function SessionPage({ exam }: { exam: Exam }) {
       </main>
     );
   }
-  if (error) return <main className="wrap note">문항을 불러오지 못했습니다: {error}</main>;
-  if (!data) return <main className="wrap muted">불러오는 중…</main>;
+  if (error || !data)
+    return (
+      <main className="wrap stack">
+        <HomeLink />
+        <p className={error ? 'note' : 'muted'}>
+          {error ? `문항을 불러오지 못했습니다: ${error}` : '불러오는 중…'}
+        </p>
+      </main>
+    );
 
   const total = session.itemKeys.length;
   const key = session.itemKeys[session.current];
@@ -80,6 +89,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
     // 문항 파일이 바뀌어 없어진 item. 채점에서도 빠진다.
     return (
       <main className="wrap stack">
+        <HomeLink />
         <p className="note">
           {session.current + 1}번 문항은 문항 파일에서 빠져 표시할 수 없습니다.
         </p>
@@ -155,11 +165,16 @@ export function SessionPage({ exam }: { exam: Exam }) {
     <>
       <div className="bar-top">
         <div className="bar-in">
-          <span className="code">{exam.code}</span>
-          <span className="bar-title">
-            <span className="bar-mode">{sessionLabel(session)} · </span>
-            {session.current + 1}/{total}
-          </span>
+          <HomeLink />
+          <div className="session-heading">
+            <span className="code">{exam.code}</span>
+            <span className="bar-title">
+              <span className="bar-mode">{sessionLabel(session)} ·</span>{' '}
+              <span>
+                {session.current + 1}/{total}
+              </span>
+            </span>
+          </div>
           {isMock && session.deadline && (
             <Timer
               deadline={session.deadline}

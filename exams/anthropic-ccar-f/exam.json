@@ -130,7 +130,7 @@
       "id": "lectures-ko",
       "tab": "notes",
       "title": "정리노트(한국어)",
-      "description": "노트 3~12 · 시험 형식과 실무 시나리오, Claude와 에이전트의 원리, 첫 API 요청부터 채팅 화면 연결까지",
+      "description": "시험 형식과 실무 시나리오, Claude API 실습, 프롬프트 평가와 코드 리뷰 예시를 다루는 정리노트",
       "home": "03 시험 형식",
       "lang": "ko"
     }
