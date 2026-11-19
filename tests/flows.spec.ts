@@ -22,9 +22,11 @@ test('홈을 제외한 각 탭에서 집 아이콘으로 시험 목록에 돌아
     const tabs = page.getByRole('navigation', { name: '화면' });
     await expect(home).toHaveCount(0);
     await tabs.getByRole('link', { name, exact: true }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(`자격증 ${name}`);
     await expect(home).toHaveAttribute('href', '/');
     await home.click();
     await expect(page).toHaveURL('/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('자격증 모의고사');
   }
 });
 

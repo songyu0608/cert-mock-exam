@@ -15,7 +15,7 @@ export function TheoryList({ tab }: { tab: 'theory' | 'notes' }) {
       <header>
         <div className="row">
           <HomeLink />
-          <h1>자격증 모의고사</h1>
+          <h1>자격증 {tab === 'notes' ? '노트' : '이론'}</h1>
         </div>
         <p className="lede">시험별 {label}를 읽습니다.</p>
       </header>

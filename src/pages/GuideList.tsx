@@ -12,7 +12,7 @@ export function GuideList() {
       <header>
         <div className="row">
           <HomeLink />
-          <h1>자격증 모의고사</h1>
+          <h1>자격증 가이드</h1>
         </div>
         <p className="lede">시험별 공식 가이드를 읽습니다.</p>
       </header>
