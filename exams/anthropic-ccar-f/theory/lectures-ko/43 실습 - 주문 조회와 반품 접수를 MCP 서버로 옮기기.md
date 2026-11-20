@@ -8,7 +8,7 @@ lab: true
 
 ## 주문 조회 하나로 연결을 확인하기
 
-[[41 실습 - 주문 조회와 반품 거절을 코드로 구분하기|41번 노트]]의 주문 데이터와 두 함수는 그대로 재사용합니다. 같은 폴더에 `mcp_server.py`를 만듭니다. 아래 예시는 MCP Python SDK 1.x의 `FastMCP`를 사용합니다. `tool_errors.py`에서 두 함수를 가져오므로 그 파일의 실습 실행문은 `if __name__ == "__main__":` 아래에 둡니다. [MCP Python SDK 예제](https://github.com/modelcontextprotocol/python-sdk/tree/v1.12.4#quickstart)
+[[41 실습 - 주문 조회와 반품 거절을 코드로 구분하기|41번 노트]]의 주문 데이터와 두 함수는 그대로 재사용합니다. 같은 폴더에 `mcp_server.py`를 만듭니다. 아래 예시는 MCP Python SDK 1.30.0의 `FastMCP`를 사용합니다. 실습용 가상 환경에 `python -m pip install mcp==1.30.0`으로 설치할 수 있습니다. `tool_errors.py`에서 두 함수를 가져오므로 그 파일의 실습 실행문은 `if __name__ == "__main__":` 아래에 둡니다. [MCP Python SDK 예제](https://github.com/modelcontextprotocol/python-sdk/tree/v1.30.0)
 
 ```python
 import json
