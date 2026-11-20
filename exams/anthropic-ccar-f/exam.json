@@ -132,6 +132,21 @@
       "title": "정리노트(한국어)",
       "description": "시험 형식과 실무 시나리오, Claude API 실습, 프롬프트 평가와 코드 리뷰 예시를 다루는 정리노트",
       "home": "03 시험 형식",
+      "sections": [
+        { "first": 3, "last": 8, "title": "기초" },
+        { "first": 9, "last": 15, "title": "Claude API 활용" },
+        { "first": 16, "last": 21, "title": "프롬프트 엔지니어링과 평가" },
+        { "first": 22, "last": 33, "title": "구조화된 출력과 정보 추출" },
+        { "first": 34, "last": 43, "title": "도구, MCP와 에이전트 루프" },
+        { "first": 44, "last": 54, "title": "고객 지원 에이전트" },
+        { "first": 55, "last": 66, "title": "멀티 에이전트 시스템" },
+        { "first": 67, "last": 87, "title": "Claude Code 설정과 워크플로" },
+        { "first": 88, "last": 94, "title": "CI에서의 Claude Code 활용과 코드 리뷰 설계" },
+        { "first": 95, "last": 98, "title": "시험 대비 종합 정리" },
+        { "first": 99, "last": 102, "title": "시험 범위 밖의 보충 주제" },
+        { "first": 103, "last": 106, "title": "비개발자를 위한 기초" },
+        { "first": 107, "last": 117, "title": "강사 인터뷰: 시험 준비부터 실무 적용까지" }
+      ],
       "lang": "ko"
     }
   ],

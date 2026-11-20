@@ -40,6 +40,8 @@ exams/
 | `guides[]`     | 아니요 | 읽기 자료 `{ id, title, description? }`. 파일은 `guides/<id>.html`(완결된 HTML 한 장). 첫 화면 "가이드" 탭과 시험 홈에 링크가 생긴다                                                                                                                                                                                                     |
 | `theories[]`   | 아니요 | 이론 노트 보관함 `{ id, title, description?, home, lang? }`. 파일은 `theory/<id>/<폴더>/<노트>.md`(Obsidian 보관함 그대로), `home`은 첫 화면 노트 이름, `lang`(`ko` 기본, `ja`, `en`)은 본문 언어. 한 시험에 여러 개(예: 한국어판·일본어판)를 둘 수 있다. 첫 화면 탭(`tab`: 기본 `theory`, 정리노트는 `notes`)과 시험 홈에 링크가 생긴다 |
 
+정리노트(`tab: "notes"`)의 첫 화면은 목차다. `home`은 첫 노트 이름이고 개별 노트는 이름이 붙은 주소로 연다. `sections`에 `{ first, last, title }`을 순서대로 적으면 파일명 앞의 번호를 양 끝을 포함한 범위와 대조해 섹션을 구성한다. 목차에는 노트가 있는 섹션만 표시한다.
+
 ## questions.json
 
 모든 문항의 공통 필드:

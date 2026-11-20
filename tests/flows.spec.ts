@@ -505,11 +505,20 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
   await page.getByRole('navigation', { name: '화면' }).getByRole('link', { name: '노트' }).click();
   await expect(page).toHaveURL(/\/notes$/);
   await notes.click();
-  await expect(page).toHaveTitle('CCAR-F 정리노트 03 - 시험 형식');
-  await expect(page.getByRole('button', { name: '인쇄 / PDF 저장' })).toBeVisible();
-  const toggle = page.getByRole('button', { name: /^노트 목록/ });
-  if (await toggle.isVisible()) await toggle.click();
-  await page.locator('.theory-nav').getByRole('link', { name: /^07 / }).click();
+  await expect(page).toHaveTitle('CCAR-F 정리노트 목차');
+  const contents = page.getByRole('navigation', { name: '정리노트 목차' });
+  await expect(page.locator('.theory-note')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '인쇄 / PDF 저장' })).toHaveCount(0);
+  const firstSection = contents
+    .locator('details')
+    .filter({ has: page.getByText('섹션 1. 기초', { exact: false }) });
+  await expect(firstSection.getByRole('link', { name: /^03 시험 형식/ })).toBeVisible();
+  const search = contents.getByRole('searchbox');
+  await search.fill('Claude API 활용');
+  await expect(contents.getByRole('link', { name: /^09 / })).toBeVisible();
+  await expect(contents.getByRole('link', { name: /^07 / })).toHaveCount(0);
+  await search.fill('');
+  await firstSection.getByRole('link', { name: /^07 / }).click();
   await expect(page).toHaveTitle('CCAR-F 정리노트 07 - ShopAssist 소개 - 도구와 규칙');
   await page.reload();
   await expect(page.getByRole('button', { name: '인쇄 / PDF 저장' })).toBeVisible();
@@ -533,6 +542,10 @@ test('정리노트는 노트 탭에서 열리고 인쇄 제목에 현재 노트 
 test('정리노트 하단에서 목록 순서대로 이전·다음 노트를 읽는다', async ({ page }) => {
   const home = '/theory/anthropic-ccar-f/lectures-ko';
   await page.goto(home);
+  const contents = page.getByRole('navigation', { name: '정리노트 목차' });
+  await contents.getByRole('link', { name: /^03 / }).click();
+  const firstNoteUrl = page.url();
+  await expect(page).toHaveTitle('CCAR-F 정리노트 03 - 시험 형식');
   const pager = page.getByRole('navigation', { name: '정리노트 이동' });
   const previous = pager.getByRole('link', { name: /이전 노트/ });
   const next = pager.getByRole('link', { name: /다음 노트/ });
@@ -544,14 +557,21 @@ test('정리노트 하단에서 목록 순서대로 이전·다음 노트를 읽
   await expect(next).toContainText('05 Claude 앱과 API');
   await expect(previous).toContainText('03 시험 형식');
   await previous.click();
-  await expect(page).toHaveURL(home);
+  await expect(page).toHaveURL(firstNoteUrl);
 
   const toggle = page.getByRole('button', { name: /^노트 목록/ });
   if (await toggle.isVisible()) await toggle.click();
-  const entries = page.locator('.theory-nav').getByRole('link');
-  const penultimate = await entries.nth(-2).innerText();
+  await page.locator('.theory-nav').getByRole('link', { name: /^08 / }).click();
+  await next.click();
+  await expect(page).toHaveTitle(/정리노트 09/);
+  await expect(previous).toContainText('08 ');
+  await page.getByRole('link', { name: 'CCAR-F 정리노트 목차' }).click();
+  const lastSection = contents.locator('details').last();
+  await lastSection.locator('summary').click();
+  const entries = contents.locator('li a');
+  const penultimate = await entries.nth(-2).textContent();
   await entries.last().click();
-  await expect(previous).toContainText(penultimate);
+  await expect(previous).toContainText(penultimate!);
   await expect(next).toHaveCount(0);
 });
 

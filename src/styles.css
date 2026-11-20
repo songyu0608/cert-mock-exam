@@ -1174,6 +1174,31 @@ details.scenario > p {
 .theory-nav-toggle {
   display: none;
 }
+.study-contents-body {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px 72px;
+}
+.study-contents h1 {
+  margin: 0 0 20px;
+}
+.study-contents details {
+  margin: 10px 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+.study-contents summary {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.study-contents .theory-list {
+  margin: 0 16px 14px 24px;
+}
+.study-contents .theory-list a {
+  padding: 7px 10px;
+}
 .theory-search {
   width: 100%;
   border: 1px solid var(--line);

@@ -36,21 +36,33 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
   const [navOpen, setNavOpen] = useState(false);
 
   const index = useMemo(() => new Map(notes?.map((n) => [n.name.toLowerCase(), n])), [notes]);
-  const current = index.get((note ?? theory.home).toLowerCase());
+  const isContents = isStudyNote && !note;
+  const current = isContents ? undefined : index.get((note ?? theory.home).toLowerCase());
   useEffect(() => {
     if (!isStudyNote) return;
     const title = current?.name.replace(/^(\d+)\s+/, '$1 - ');
-    document.title = title ? `${exam.code} 정리노트 ${title}` : `${exam.code} 정리노트`;
-  }, [current, exam.code, isStudyNote]);
+    document.title = [exam.code, '정리노트', isContents ? '목차' : title].filter(Boolean).join(' ');
+  }, [current, exam.code, isContents, isStudyNote]);
   const hrefOf = (name: string) =>
-    name.toLowerCase() === theory.home.toLowerCase()
+    !isStudyNote && name.toLowerCase() === theory.home.toLowerCase()
       ? paths.theory(exam.id, theory.id)
       : paths.theory(exam.id, theory.id, name);
 
   // 폴더별 노트 목록. 첫 화면 노트는 자기 폴더 맨 위에 둔다.
   const folders = useMemo(() => {
     const map = new Map<string, Note[]>();
-    for (const n of notes ?? []) map.set(n.folder, [...(map.get(n.folder) ?? []), n]);
+    for (const n of notes ?? []) {
+      let group = n.folder;
+      if (isStudyNote && theory.sections) {
+        const number = Number(n.name.match(/^(\d+)\s/)?.[1]);
+        const section = theory.sections.findIndex((s) => s.first <= number && number <= s.last);
+        const match = theory.sections[section];
+        if (match) group = `섹션 ${section + 1}. ${match.title}`;
+      }
+      const list = map.get(group);
+      if (list) list.push(n);
+      else map.set(group, [n]);
+    }
     const isHome = (n: Note) => (n.name.toLowerCase() === theory.home.toLowerCase() ? 0 : 1);
     return [...map.entries()]
       .sort(([a], [b]) => byName(a, b))
@@ -58,19 +70,14 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
         ([f, list]) =>
           [f, list.sort((a, b) => isHome(a) - isHome(b) || byName(a.name, b.name))] as const,
       );
-  }, [notes, theory.home]);
+  }, [notes, theory.home, theory.sections, isStudyNote]);
   const readingOrder = isStudyNote ? folders.flatMap(([, list]) => list) : [];
   const position = current ? readingOrder.indexOf(current) : -1;
 
   const q = query.trim().toLowerCase();
-  const found = q
-    ? (notes ?? [])
-        .filter((n) => [n.name, ...n.aliases].some((s) => s.toLowerCase().includes(q)))
-        .sort((a, b) => byName(a.name, b.name))
-    : [];
-
   const go = (e: MouseEvent<HTMLAnchorElement>) => {
     setNavOpen(false);
+    if (isStudyNote) setQuery('');
     onLinkClick(e);
   };
   const link = (n: Note) => (
@@ -91,6 +98,51 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
       </a>
     );
 
+  const visibleGroups = folders.flatMap(([folder, list]) => {
+    const matches =
+      !q || (isStudyNote && folder.toLowerCase().includes(q))
+        ? list
+        : list.filter((n) => [n.name, ...n.aliases].some((s) => s.toLowerCase().includes(q)));
+    return matches.length ? [{ folder, list: matches }] : [];
+  });
+  const noteList = (list: Note[], root = false) => (
+    <ul className={root ? 'theory-list theory-root' : 'theory-list'}>
+      {list.map((n) => (
+        <li key={n.name}>{link(n)}</li>
+      ))}
+    </ul>
+  );
+  const directory = (
+    <>
+      <input
+        type="search"
+        className="theory-search"
+        placeholder={isStudyNote ? '섹션·노트 찾기' : '노트 찾기(이름·별칭)'}
+        aria-label="노트 찾기"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      {q && !visibleGroups.length && <p className="muted small">찾는 노트가 없습니다.</p>}
+      {q && !isStudyNote
+        ? noteList(visibleGroups.flatMap((g) => g.list).sort((a, b) => byName(a.name, b.name)))
+        : visibleGroups.map(({ folder, list }, i) =>
+            folder ? (
+              <details
+                key={folder}
+                open={!!q || (current ? list.includes(current) : isContents && i === 0)}
+              >
+                <summary>
+                  {folderLabel(folder)} <span className="muted small">{list.length}</span>
+                </summary>
+                {noteList(list)}
+              </details>
+            ) : (
+              <div key={folder}>{noteList(list, true)}</div>
+            ),
+          )}
+    </>
+  );
+
   return (
     <div className={isStudyNote ? 'theory study-notes' : 'theory'}>
       <div className="guide-bar">
@@ -100,8 +152,9 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
             {isStudyNote ? '노트' : '이론'}
           </a>{' '}
           /{' '}
-          <a href={paths.theory(exam.id, theory.id)} onClick={onLinkClick}>
-            <span className="code">{exam.code}</span> <span lang={theory.lang}>{theory.title}</span>
+          <a href={paths.theory(exam.id, theory.id)} onClick={go}>
+            <span className="code">{exam.code}</span>{' '}
+            <span lang={theory.lang}>{isStudyNote ? '정리노트 목차' : theory.title}</span>
           </a>
         </nav>
         <span className="row small">
@@ -130,70 +183,38 @@ export function TheoryView({ exam, theory, note }: { exam: Exam; theory: Theory;
           <ThemeToggle />
         </span>
       </div>
-      <div className="theory-body">
-        <aside className={navOpen ? 'theory-nav open' : 'theory-nav'} aria-label="노트 목록">
-          <button
-            type="button"
-            className="btn sm theory-nav-toggle"
-            aria-expanded={navOpen}
-            onClick={() => setNavOpen(!navOpen)}
-          >
-            {navOpen ? '노트 목록 닫기' : '노트 목록'}
-            {current ? ` · ${current.name}` : ''}
-          </button>
-          <div className="theory-nav-in">
-            <input
-              type="search"
-              className="theory-search"
-              placeholder="노트 찾기(이름·별칭)"
-              aria-label="노트 찾기"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            {q ? (
-              <ul className="theory-list">
-                {found.map((n) => (
-                  <li key={n.name}>{link(n)}</li>
-                ))}
-                {!found.length && <li className="muted small">찾는 노트가 없습니다.</li>}
-              </ul>
-            ) : (
-              folders.map(([folder, list]) =>
-                // 보관함 맨 위에 있는 노트(폴더 없음)는 묶지 않고 바로 보여 준다.
-                folder === '' ? (
-                  <ul key="" className="theory-list theory-root">
-                    {list.map((n) => (
-                      <li key={n.name}>{link(n)}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <details key={folder} open={list.includes(current!)}>
-                    <summary>
-                      {folderLabel(folder)} <span className="muted small">{list.length}</span>
-                    </summary>
-                    <ul className="theory-list">
-                      {list.map((n) => (
-                        <li key={n.name}>{link(n)}</li>
-                      ))}
-                    </ul>
-                  </details>
-                ),
-              )
-            )}
-          </div>
-        </aside>
+      <div className={isContents ? 'study-contents-body' : 'theory-body'}>
+        {!isContents && (
+          <aside className={navOpen ? 'theory-nav open' : 'theory-nav'} aria-label="노트 목록">
+            <button
+              type="button"
+              className="btn sm theory-nav-toggle"
+              aria-expanded={navOpen}
+              onClick={() => setNavOpen(!navOpen)}
+            >
+              {navOpen ? '노트 목록 닫기' : '노트 목록'}
+              {current ? ` · ${current.name}` : ''}
+            </button>
+            <div className="theory-nav-in">{directory}</div>
+          </aside>
+        )}
         {error ? (
           <main className="theory-main">
             <p className="note">노트를 불러오지 못했습니다: {error}</p>
           </main>
         ) : !notes ? (
           <main className="theory-main muted">불러오는 중…</main>
+        ) : isContents ? (
+          <main className="study-contents">
+            <h1>{exam.code} 정리노트 목차</h1>
+            <nav aria-label="정리노트 목차">{directory}</nav>
+          </main>
         ) : !current ? (
           <main className="theory-main stack">
             <h1>노트를 찾을 수 없습니다</h1>
             <p>
               <a href={paths.theory(exam.id, theory.id)} onClick={onLinkClick}>
-                {theory.home}(으)로
+                {isStudyNote ? '정리노트 목차로' : `${theory.home}(으)로`}
               </a>
             </p>
           </main>
