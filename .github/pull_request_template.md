@@ -12,6 +12,6 @@
 
 - [ ] 기존 문항 id를 바꾸지 않음
 - [ ] 비밀 값 커밋 없음
-- [ ] 교차 리뷰 요청 (`AGENTS.md` §2: Claude 구현 → `@codex review`, Codex 구현 → Claude 리뷰)
+- [ ] 교차 리뷰는 사용자가 요청 (`AGENTS.md` §2: Claude 구현 → Codex 리뷰, Codex 구현 → Claude 리뷰)
 
 ## 남은 일 / 리뷰어에게

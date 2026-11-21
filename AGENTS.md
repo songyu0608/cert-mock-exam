@@ -15,8 +15,8 @@ choi(GitHub: `songyu0608`)가 혼자 쓰는 자격증 모의고사 사이트. �
 ## 2. 교차 리뷰 (Claude ↔ Codex)
 
 1. **한쪽이 구현하면 다른 쪽이 리뷰한다.** Claude가 연 PR은 Codex가, Codex가 연 PR은 Claude가 리뷰한다.
-2. 구현한 AI는 PR을 연 뒤 리뷰를 요청한다.
-   - Claude 구현 → PR에 `@codex review` 코멘트로 Codex 리뷰 요청
+2. 리뷰 요청은 사용자가 직접 한다. AI는 PR에 `@codex review` 같은 리뷰 요청 코멘트를 남기지 않는다.
+   - Claude 구현 → 사용자가 Codex에게 리뷰를 맡긴다
    - Codex 구현 → 사용자가 Claude에게 PR 리뷰를 맡긴다
 3. 리뷰 절차·확인 항목·결과 작성 기준은 [`docs/REVIEW.md`](docs/REVIEW.md)를 따른다.
 4. 지적 사항은 구현한 AI가 고치고, 리뷰한 AI가 다시 확인한다.
@@ -29,7 +29,7 @@ choi(GitHub: `songyu0608`)가 혼자 쓰는 자격증 모의고사 사이트. �
 2. 작업 1개 = 브랜치 1개 = PR 1개.
 3. PR 전에 모든 검사를 통과시킨다: `pnpm format:check && pnpm lint && pnpm check && pnpm test && pnpm build && pnpm test:e2e`
 4. PR 본문은 `.github/pull_request_template.md`를 따른다.
-5. PR을 열면 §2대로 리뷰를 요청한다.
+5. PR을 연 뒤 리뷰 요청은 §2대로 사용자가 한다.
 
 ## 4. 코드 규칙
 
