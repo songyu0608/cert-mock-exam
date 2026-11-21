@@ -1,6 +1,6 @@
 // 이론 정리 노트: exams/<시험 id>/theory/<보관함 id>/<폴더>/<노트>.md
 // 파일은 정적 자산으로 내보내고, 이론 화면을 열 때 그 시험의 노트를 모두 받는다(검색·역링크에 전체가 필요).
-import { linkTargets, parseNote, type PropValue } from '../lib/theory.ts';
+import { noteTargets, parseNote, type PropValue } from '../lib/theory.ts';
 
 const fixtures = import.meta.env.MODE === 'e2e';
 const files: Record<string, string> = {
@@ -18,6 +18,25 @@ const files: Record<string, string> = {
     : {}),
 };
 
+interface Diagram {
+  url: string;
+  description: string;
+}
+const diagrams: Record<string, Diagram> = {
+  ...import.meta.glob<Diagram>('../../exams/*/theory/*/assets/*.svg', {
+    query: '?theory-diagram',
+    import: 'default',
+    eager: true,
+  }),
+  ...(fixtures
+    ? import.meta.glob<Diagram>('../../tests/fixtures/exams/*/theory/*/assets/*.svg', {
+        query: '?theory-diagram',
+        import: 'default',
+        eager: true,
+      })
+    : {}),
+};
+
 export interface Note {
   name: string;
   folder: string;
@@ -25,12 +44,14 @@ export interface Note {
   aliases: string[];
   body: string;
   links: string[];
+  resolveImage: (name: string) => { url: string; alt: string } | undefined;
 }
 
 const entries = Object.entries(files).flatMap(([path, url]) => {
-  const m = /\/exams\/([^/]+)\/theory\/([^/]+)\/(?:(.+)\/)?([^/]+)\.md$/.exec(path);
-  return m?.[1] && m[2] && m[4]
-    ? [{ examId: m[1], theoryId: m[2], folder: m[3] ?? '', name: m[4], url }]
+  const [, vault, examId, theoryId, folder, name] =
+    /^(.*\/exams\/([^/]+)\/theory\/([^/]+))\/(?:(.+)\/)?([^/]+)\.md$/.exec(path) ?? [];
+  return vault && examId && theoryId && name
+    ? [{ examId, theoryId, vault, folder: folder ?? '', name, url }]
     : [];
 });
 
@@ -54,7 +75,11 @@ export function loadTheory(examId: string, theoryId: string): Promise<Note[]> {
               props,
               aliases: Array.isArray(aliases) ? aliases : [aliases],
               body,
-              links: linkTargets(body),
+              links: noteTargets(body).notes,
+              resolveImage(name: string) {
+                const image = diagrams[`${e.vault}/assets/${name}`];
+                return image && { url: image.url, alt: `${e.name}: ${image.description}` };
+              },
             };
           }),
         )

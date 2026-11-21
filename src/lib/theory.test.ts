@@ -3,7 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { describe, expect, it } from 'vitest';
-import { folderLabel, linkTargets, parseNote, remarkObsidian, toMarkdown } from './theory.ts';
+import { folderLabel, noteTargets, parseNote, remarkObsidian, toMarkdown } from './theory.ts';
 
 const render = (md: string) =>
   renderToStaticMarkup(
@@ -83,8 +83,26 @@ describe('toMarkdown', () => {
     );
   });
 
-  it('링크 대상 목록(인라인 코드 안은 뺀다)', () => {
-    expect(linkTargets('[[a]] [[b|별칭]] [[a#제목]] `[[c]]`')).toEqual(['a', 'b']);
+  it('SVG 임베드는 카드 제목과 설명이 있는 이미지로 바꾸고 코드 예시는 보존한다', () => {
+    const source = '![[그림.svg]]\n\n`![[그림.svg]]`\n\n~~~md\n![[그림.svg]]\n~~~';
+    const md = toMarkdown(source, resolve, (name) =>
+      name === '그림.svg'
+        ? { url: '/assets/diagram-123.svg', alt: '개념 A: [가]와 나를 비교한다.' }
+        : undefined,
+    );
+    const html = render(md);
+    expect(html).toContain(
+      '<img src="/assets/diagram-123.svg" alt="개념 A: [가]와 나를 비교한다."',
+    );
+    expect(html.match(/<img /g)).toHaveLength(1);
+    expect(html).toContain('<code>![[그림.svg]]</code>');
+    expect(toMarkdown('![[없는.svg]]', resolve)).toBe('없는.svg');
+  });
+
+  it('그림과 역링크 대상을 구분하고 코드 안은 제외한다', () => {
+    expect(
+      noteTargets('[[a]] [[b|별칭]] [[a#제목]] `[[c]]` ![[그림.svg]]\n~~~\n![[예시.svg]]\n~~~'),
+    ).toEqual({ notes: ['a', 'b'], images: ['그림.svg'] });
   });
 });
 
