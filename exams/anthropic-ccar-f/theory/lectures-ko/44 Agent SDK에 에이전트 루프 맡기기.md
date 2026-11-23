@@ -18,7 +18,9 @@
 
 개발자를 돕는 에이전트라면 파일을 읽고 쓰거나, 코드에서 텍스트를 찾거나, 셸 명령을 실행할 수 있어야 합니다. 램프 환불을 상담하는 ShopAssist에는 그런 기능을 쓸 일이 없습니다. 사용할 내장 도구 집합을 비워 두고 스토어의 MCP 서버를 연결합니다. 서버가 제공할 도구는 고객 확인(`get_customer`), 주문 조회(`lookup_order`), 환불 처리(`process_refund`), 상담원 연결(`escalate_to_human`)입니다. 이렇게 하면 Claude가 고객 문의에 필요한 도구 중에서 고를 수 있습니다. 도구가 하나 늘 때마다 Claude의 선택도 어려워지므로, 에이전트에는 그 일에 필요한 도구만 주고 그 이상은 주지 않습니다.
 
-이때 **도구를 제공하는 설정**과 **호출을 미리 승인하는 설정**을 구분해 보세요. SDK의 `tools`는 내장 도구의 범위를 정합니다. `allowedTools`(Python에서는 `allowed_tools`)는 별도 확인 없이 호출하도록 승인할 도구를 정합니다. 이 목록에 네 가지 이름만 적어도 다른 모든 도구가 자동으로 사라지는 것은 아닙니다. 연결할 서버와 제공할 도구를 먼저 정하고, 그중 어떤 호출을 미리 승인할지 설정합니다. [Agent SDK 권한 문서](https://code.claude.com/docs/en/agent-sdk/permissions)
+여기에 allowed tools라는 옵션을 하나 더 설정합니다. 강의 설명으로는 이 에이전트가 쓸 수 있는 도구 목록입니다. Python에서는 같은 옵션을 밑줄을 넣어 `allowed_tools`로 씁니다.
+
+> 제품 참고: 현재 Agent SDK 문서 기준으로 `tools`는 제공할 내장 도구의 범위를 정하고, `allowedTools`(Python에서는 `allowed_tools`)는 별도 확인 없이 호출하도록 미리 승인할 도구를 정합니다. 이 목록에 네 가지 이름만 적어도 다른 도구가 자동으로 막히지는 않습니다. 시험에서는 강의 설명대로 allowed tools를 에이전트가 쓸 수 있는 도구 목록으로 이해합니다. [Agent SDK 권한 문서](https://code.claude.com/docs/en/agent-sdk/permissions)
 
 ## 환불이 실행되기 전에 규칙 적용하기
 
