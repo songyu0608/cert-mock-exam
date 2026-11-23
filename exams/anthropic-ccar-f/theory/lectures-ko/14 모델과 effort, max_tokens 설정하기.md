@@ -33,8 +33,8 @@ ShopAssist의 두 줄 요약은 간단하고 모든 상담이 끝날 때마다 �
 
 [[10 실습 - 코드로 첫 요청 보내기|10번 노트]]에서 첫 응답의 `stop_reason`을 확인했던 것을 떠올려 보세요. 이 필드에는 **왜 생성이 끝났는지**가 들어 있습니다. 모델이 답변을 마치면 `end_turn`, 출력 한도에 걸리면 `max_tokens`가 돌아옵니다. 요청을 보낼 때의 `max_tokens`는 우리가 정한 숫자이고, 응답의 `stop_reason`에 든 `max_tokens`는 그 숫자에 닿았다는 표시입니다.
 
-따라서 서버는 채팅창에 답을 보내기 전에 `stop_reason`부터 확인합니다. 한도에 걸렸다면 답변에 필요한 만큼 한도를 높이거나, 같은 내용을 더 짧게 답해 달라고 지침을 바꿔 다시 요청할 수 있습니다. 재요청한 답도 종료 사유를 확인한 뒤 보여 줍니다. 특정 문구가 나오면 생성을 끝내고 싶을 때는 그 문구를 중단 시퀀스(`stop_sequences`)로 지정할 수도 있습니다.
+따라서 서버는 채팅창에 답을 보내기 전에 `stop_reason`부터 확인합니다. 한도에 걸렸다면 답변에 필요한 만큼 한도를 높이거나, 같은 내용을 더 짧게 답해 달라고 지침을 바꿔 다시 요청하거나, 같은 요청을 그대로 다시 보낼 수 있습니다. 재요청한 답도 종료 사유를 확인한 뒤 보여 줍니다. 특정 문구가 나오면 생성을 끝내고 싶을 때는 그 문구를 중단 시퀀스(`stop_sequences`)로 지정할 수도 있습니다.
 
-오래된 예제에는 `temperature`, `top_p`, `top_k`를 조정하거나 Claude가 쓸 답의 첫머리를 미리 적어 주는 프리필(prefill)이 나옵니다. 원문은 예시에 사용한 모델에서 이런 설정이 거부될 수 있으며 시험 범위에서도 다루지 않는다고 설명합니다. 이 실습에서는 생략합니다. 실제 요청을 작성할 때는 사용할 모델 버전이 어떤 설정을 지원하는지 확인하세요. [Anthropic 모델별 사양](https://platform.claude.com/docs/en/models/overview) · [effort 설정 안내](https://platform.claude.com/docs/en/build-with-claude/effort)
+오래된 예제에는 `temperature`, `top_p`, `top_k`를 조정하거나 Claude가 쓸 답의 첫머리를 미리 적어 주는 프리필(prefill)이 나옵니다. 원문은 현재의 Opus, Sonnet, Fable 모델이 이런 설정을 거부하며 시험 범위에서도 다루지 않는다고 설명합니다. 이 실습에서는 생략합니다. 실제 요청을 작성할 때는 사용할 모델 버전이 어떤 설정을 지원하는지 확인하세요. [Anthropic 모델별 사양](https://platform.claude.com/docs/en/models/overview) · [effort 설정 안내](https://platform.claude.com/docs/en/build-with-claude/effort)
 
 처음의 두 문제로 돌아가 봅시다. 상담 로그는 Haiku가 요약하고, 고객 대화는 Sonnet이 문의 난도에 맞는 `effort`로 처리합니다. 알렉스에게 답을 보낼 때는 서버가 종료 사유를 검사합니다. 단계를 나눠 모델과 설정을 고르면 단순한 일에 드는 비용을 줄일 수 있고, 끊긴 답도 고객보다 먼저 발견할 수 있습니다.

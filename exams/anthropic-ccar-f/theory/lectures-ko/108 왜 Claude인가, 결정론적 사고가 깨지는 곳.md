@@ -1,6 +1,6 @@
 # 108. 왜 Claude인가, 결정론적 사고가 깨지는 곳
 
-> 참고: 인터뷰 원문은 자동 자막으로 보이며 인식 오류가 있습니다. "plot code", "Cloud Code"는 Claude Code로, "wipe coding"은 바이브 코딩(vibe coding)으로, "ChargeGPT"는 ChatGPT로 바로잡아 옮겼습니다.
+> 참고: 인터뷰 원문은 자동 자막으로 보이며 인식 오류가 있습니다. "Cloud Code"는 Claude Code로, "wipecoding"은 바이브 코딩(vibe coding)으로, "ChargeGPT"는 ChatGPT로 바로잡아 옮겼습니다.
 
 ## 왜 Claude인가
 
