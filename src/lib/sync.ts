@@ -102,7 +102,7 @@ export const lastSyncedAt = () => loadConfig().lastOk ?? null;
 
 // ---- 서버와 주고받기 ----
 
-export interface RemoteAttempt {
+interface RemoteAttempt {
   seq: number;
   examId: string;
   id: string;

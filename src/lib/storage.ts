@@ -13,7 +13,7 @@ import type { Attempt, Session } from './session.ts';
 const PREFIX = 'cme:v1';
 export const MAX_ATTEMPTS = 30;
 
-export interface ItemStat {
+interface ItemStat {
   /** 푼 횟수 */
   n: number;
   /** 점수 합(0~1씩) */
@@ -22,10 +22,10 @@ export interface ItemStat {
   last: number;
   at: number;
 }
-export type Stats = Record<string, ItemStat>;
+type Stats = Record<string, ItemStat>;
 
 /** 결과 하나의 문항별 점수 */
-export interface ScoreEntry {
+interface ScoreEntry {
   id: string;
   at: number;
   s: Record<string, number>;
@@ -65,7 +65,7 @@ export const saveActive = (s: Session) => write(`active:${s.examId}`, s);
 export const clearActive = (examId: string) => write(`active:${examId}`, null);
 
 export const loadResetAt = (examId: string) => read<number>(`reset:${examId}`, 0);
-export const loadRemoved = (examId: string) => read<string[]>(`removed:${examId}`, []);
+const loadRemoved = (examId: string) => read<string[]>(`removed:${examId}`, []);
 
 export function loadAttempts(examId: string): Attempt[] {
   const at = loadResetAt(examId);
@@ -79,7 +79,7 @@ export function loadAttempt(examId: string, id: string): Attempt | undefined {
   return loadAttempts(examId).find((a) => a.id === id);
 }
 
-export const toScoreEntry = (a: Attempt): ScoreEntry => ({
+const toScoreEntry = (a: Attempt): ScoreEntry => ({
   id: a.id,
   at: a.finishedAt,
   s: a.itemScores,
@@ -105,7 +105,7 @@ export function loadScores(examId: string): ScoreEntry[] {
   return [...list, ...missing].filter((e) => e.at > at && !removed.has(e.id));
 }
 
-export function computeStats(scores: readonly ScoreEntry[]): Stats {
+function computeStats(scores: readonly ScoreEntry[]): Stats {
   const stats: Stats = {};
   for (const e of [...scores].sort((a, b) => a.at - b.at)) {
     for (const [key, score] of Object.entries(e.s)) {

@@ -14,7 +14,7 @@ interface D1Database {
   prepare(sql: string): D1PreparedStatement;
   batch(statements: D1PreparedStatement[]): Promise<unknown[]>;
 }
-export interface Env {
+interface Env {
   DB: D1Database;
   ASSETS: { fetch(req: Request): Promise<Response> };
   /** 등록 코드(키의 SHA-256 16진수)를 쉼표로 구분해 나열한 값 */
@@ -127,7 +127,7 @@ async function pull(env: Env, who: string, since: number) {
   };
 }
 
-export async function handleApi(req: Request, env: Env): Promise<Response> {
+async function handleApi(req: Request, env: Env): Promise<Response> {
   const url = new URL(req.url);
   const who = await owner(req, env);
   if (!who) return json({ error: 'unauthorized' }, 401);

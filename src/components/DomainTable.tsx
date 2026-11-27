@@ -1,10 +1,10 @@
 import type { Exam } from '../data/schema.ts';
 
-export function barClass(pct: number): string {
+function barClass(pct: number): string {
   return pct >= 80 ? 'ok' : pct >= 60 ? 'mid' : 'bad';
 }
 
-export interface DomainRow {
+interface DomainRow {
   id: string;
   /** 정답률(%) 또는 데이터 없음 */
   pct: number | null;
