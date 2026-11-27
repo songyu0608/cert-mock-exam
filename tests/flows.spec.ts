@@ -66,6 +66,50 @@ test('연습: 7가지 유형 모두 정답을 입력하면 100%', async ({ page 
   await expect(page.getByText('틀린 문항이 없습니다.')).toBeVisible();
 });
 
+for (const scenario of [
+  {
+    code: 'SAMPLE-01',
+    id: 'sample-all-types',
+    domain: '2',
+    set: undefined,
+    keys: ['s-case#1', 's-case#2', 's-ps#1', 's-ps#2'],
+  },
+  {
+    code: 'CCAR-F',
+    id: 'anthropic-ccar-f',
+    domain: '1',
+    set: 'S1 · A',
+    keys: ['ccarf-0451', 'ccarf-0452', 'ccarf-0453', 'ccarf-0454', 'ccarf-0455'],
+  },
+]) {
+  test(`연습 필터: ${scenario.code}의 표시 문항 수와 실제 출제 범위가 일치한다`, async ({
+    page,
+  }) => {
+    await openExam(page, scenario.code);
+    const card = modeCard(page, '연습');
+    if (scenario.set) {
+      const sets = card.getByRole('group', { name: '회차', exact: true });
+      for (const button of await sets.getByRole('button').all()) {
+        if ((await button.innerText()) !== scenario.set) await button.click();
+      }
+    }
+    const domains = card.getByRole('group', { name: '도메인', exact: true });
+    for (const button of await domains.getByRole('button').all()) await button.click();
+    await card.getByRole('combobox').selectOption('all');
+    await expect(card.getByRole('combobox')).toContainText('전체 (0)');
+    await expect(card.getByRole('button', { name: '시작', exact: true })).toBeDisabled();
+    await domains.getByRole('button', { name: `도메인 ${scenario.domain}`, exact: true }).click();
+    await expect(card.getByRole('combobox')).toContainText(`전체 (${scenario.keys.length})`);
+    await card.getByRole('button', { name: '시작', exact: true }).click();
+    await expect(page.locator('.bar-title')).toContainText(`1/${scenario.keys.length}`);
+    const keys = await page.evaluate((id) => {
+      const active = JSON.parse(localStorage.getItem(`cme:v1:active:${id}`) ?? 'null');
+      return active?.itemKeys as string[];
+    }, scenario.id);
+    expect(keys.sort()).toEqual(scenario.keys);
+  });
+}
+
 test('연습: 오답이면 정답과 해설을 보여 주고, 오답 다시 풀기에 들어간다', async ({ page }) => {
   await openExam(page, 'SAMPLE-01');
   const card = modeCard(page, '연습');
