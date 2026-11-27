@@ -124,6 +124,15 @@ export function SessionPage({ exam }: { exam: Exam }) {
   const setAnswer = (a: Answer) =>
     setSession((s) => (s ? { ...s, answers: { ...s.answers, [key]: a } } : s));
 
+  const toggleFlag = () =>
+    setSession((s) => {
+      if (!s) return s;
+      const flagged = { ...s.flagged };
+      if (flagged[key]) delete flagged[key];
+      else flagged[key] = true;
+      return { ...s, flagged };
+    });
+
   const go = (to: number) => {
     // 지금 문항을 다시 누른 것은 이동이 아니므로 잠그지 않는다.
     if (to < 0 || to >= total || to === session.current) return;
@@ -155,6 +164,10 @@ export function SessionPage({ exam }: { exam: Exam }) {
         setSession={setSession}
         item={item}
         go={go}
+        answeredCount={answeredCount}
+        onAnswer={setAnswer}
+        onFlag={toggleFlag}
+        onPause={togglePause}
         onExpire={() => finish(true)}
         onSubmit={() => finish()}
         saveFailed={saveFailed}
@@ -248,15 +261,7 @@ export function SessionPage({ exam }: { exam: Exam }) {
                 session={session}
                 item={item}
                 go={go}
-                onFlag={() =>
-                  setSession((s) => {
-                    if (!s) return s;
-                    const flagged = { ...s.flagged };
-                    if (flagged[key]) delete flagged[key];
-                    else flagged[key] = true;
-                    return { ...s, flagged };
-                  })
-                }
+                onFlag={toggleFlag}
                 onSubmit={() => setConfirming(true)}
                 onPause={session.deadline ? togglePause : undefined}
               />

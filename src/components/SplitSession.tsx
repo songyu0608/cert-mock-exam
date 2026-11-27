@@ -14,13 +14,7 @@ import {
 import type { Exam } from '../data/schema.ts';
 import { itemSummary, stemLead, type Item, type ItemBody } from '../lib/items.ts';
 import { correctCount, isTouched, type Answer } from '../lib/scoring.ts';
-import {
-  pauseSession,
-  resumeSession,
-  sessionLabel,
-  toggleStrike,
-  type Session,
-} from '../lib/session.ts';
+import { sessionLabel, toggleStrike, type Session } from '../lib/session.ts';
 import { Markdown } from './Markdown.tsx';
 import { QuestionView } from './QuestionView.tsx';
 import { Timer } from './Timer.tsx';
@@ -122,6 +116,10 @@ interface Props {
   item: Item;
   /** 문항 이동(잠금 처리는 SessionPage가 한다) */
   go: (to: number) => void;
+  answeredCount: number;
+  onAnswer: (answer: Answer) => void;
+  onFlag: () => void;
+  onPause: () => void;
   onExpire: () => void;
   onSubmit: () => void;
   saveFailed: boolean;
@@ -134,6 +132,10 @@ export function SplitSession({
   setSession,
   item,
   go,
+  answeredCount,
+  onAnswer,
+  onFlag,
+  onPause,
   onExpire,
   onSubmit,
   saveFailed,
@@ -156,9 +158,6 @@ export function SplitSession({
   const key = item.key;
   const flagged = !!session.flagged[key];
   const flagCount = Object.keys(session.flagged).length;
-  const answeredCount = session.itemKeys.filter((k) =>
-    isTouched(session.answers[k], session.views[k]),
-  ).length;
   const scenario = item.scenarioId
     ? exam.scenarios.find((s) => s.id === item.scenarioId)
     : undefined;
@@ -220,18 +219,6 @@ export function SplitSession({
   };
   const next = () => (i < total - 1 ? go(i + 1) : openReview());
 
-  const setAnswer = (a: Answer) =>
-    setSession((s) => (s ? { ...s, answers: { ...s.answers, [key]: a } } : s));
-  const toggleFlag = () =>
-    setSession((s) => {
-      if (!s) return s;
-      const f = { ...s.flagged };
-      if (f[key]) delete f[key];
-      else f[key] = true;
-      return { ...s, flagged: f };
-    });
-  const togglePause = () =>
-    setSession((s) => (s ? (s.pausedAt !== undefined ? resumeSession(s) : pauseSession(s)) : s));
   const toggleTimer = () => setSession((s) => (s ? { ...s, timerHidden: !s.timerHidden } : s));
   const strike = (option: number) => setSession((s) => (s ? toggleStrike(s, key, option) : s));
 
@@ -269,7 +256,7 @@ export function SplitSession({
               aria-pressed={paused}
               aria-label={paused ? t.resume : t.pause}
               title={paused ? t.resume : t.pause}
-              onClick={togglePause}
+              onClick={onPause}
             >
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 {paused ? <path d="M4.5 2.5v11l9-5.5z" /> : <path d="M4.5 2.5v11M11.5 2.5v11" />}
@@ -283,7 +270,7 @@ export function SplitSession({
               className="sv-flag"
               aria-pressed={flagged}
               disabled={paused}
-              onClick={toggleFlag}
+              onClick={onFlag}
             >
               <svg viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M3.5 14.5V2h8.5l-2 3 2 3H3.5" />
@@ -332,7 +319,7 @@ export function SplitSession({
           <div className="sv-paused-in">
             <h2 id="sv-paused-h">{t.pausedTitle}</h2>
             <p>{t.pausedBody}</p>
-            <button type="button" className="btn primary" ref={resumeRef} onClick={togglePause}>
+            <button type="button" className="btn primary" ref={resumeRef} onClick={onPause}>
               {t.resume}
             </button>
           </div>
@@ -456,7 +443,7 @@ export function SplitSession({
                     struck={session.struck?.[key] ?? []}
                     locked={!!session.locked[key]}
                     name={key}
-                    onChange={setAnswer}
+                    onChange={onAnswer}
                     onStrike={strike}
                     labels={t}
                   />
@@ -469,7 +456,7 @@ export function SplitSession({
                   item={item}
                   view={session.views[key]!}
                   answer={session.answers[key]!}
-                  onChange={setAnswer}
+                  onChange={onAnswer}
                   reveal={false}
                   disabled={!!session.locked[key]}
                   number={i + 1}

@@ -3,7 +3,7 @@ import { ThemeToggle } from '../components/ThemeToggle.tsx';
 import { Fragment, useMemo, useState } from 'react';
 import { DomainTable } from '../components/DomainTable.tsx';
 import { VendorBadge } from '../components/VendorBadge.tsx';
-import { inHiddenSet, type Exam } from '../data/schema.ts';
+import { inHiddenSet, itemCount, type Exam } from '../data/schema.ts';
 import { flattenQuestion } from '../lib/items.ts';
 import { shuffle } from '../lib/scoring.ts';
 import {
@@ -53,8 +53,11 @@ export function ExamHome({ exam }: { exam: Exam }) {
   const sets = useMemo(() => exam.sets.filter((s) => !s.hidden), [exam]);
   const [practiceSets, setPracticeSets] = useState<string[]>(sets.map((s) => s.id));
   const scenarioExam = !!exam.mock.scenarios;
-  const inPracticeSets = (set?: string) =>
-    !exam.sets.length || (set !== undefined && practiceSets.includes(set));
+  const practicePool = (data?.questions ?? []).filter(
+    (q) =>
+      domains.includes(q.domain.split('.')[0] ?? '') &&
+      (!exam.sets.length || (q.set !== undefined && practiceSets.includes(q.set))),
+  );
   const [practiceN, setPracticeN] = useState<number | 'all'>(20);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetFailed, setResetFailed] = useState(false);
@@ -99,7 +102,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
   const setSizes = useMemo(() => {
     const out: Record<string, number> = {};
     for (const q of data?.questions ?? [])
-      if (q.set !== undefined) out[q.set] = (out[q.set] ?? 0) + flattenQuestion(q).length;
+      if (q.set !== undefined) out[q.set] = (out[q.set] ?? 0) + itemCount(q);
     return out;
   }, [data]);
 
@@ -163,17 +166,13 @@ export function ExamHome({ exam }: { exam: Exam }) {
       const picked = pickMockQuestions(exam, data.questions, mockN);
       s = createSession(exam, picked, 'mock', { minutes: mockMinutes(exam, mockN) });
     } else if (mode === 'practice') {
-      const pool = shuffle(
-        data.questions.filter(
-          (q) => domains.includes(q.domain.split('.')[0] ?? '') && inPracticeSets(q.set),
-        ),
-      );
+      const pool = shuffle(practicePool);
       const picked = [];
       let n = 0;
       for (const q of pool) {
         if (practiceN !== 'all' && n >= practiceN) break;
         picked.push(q);
-        n += flattenQuestion(q).length;
+        n += itemCount(q);
       }
       s = createSession(exam, picked, 'practice');
     } else {
@@ -186,11 +185,7 @@ export function ExamHome({ exam }: { exam: Exam }) {
     launch(s);
   };
 
-  const practiceAvailable = data
-    ? data.questions
-        .filter((q) => domains.includes(q.domain.split('.')[0] ?? '') && inPracticeSets(q.set))
-        .flatMap(flattenQuestion).length
-    : 0;
+  const practiceAvailable = practicePool.reduce((n, q) => n + itemCount(q), 0);
   const blocked = !!active;
 
   return (
