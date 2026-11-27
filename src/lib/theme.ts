@@ -5,7 +5,7 @@ import { useSyncExternalStore } from 'react';
 import { read, write } from './storage.ts';
 
 export type ThemePref = 'system' | 'light' | 'dark';
-export type Theme = 'light' | 'dark';
+type Theme = 'light' | 'dark';
 
 const KEY = 'theme';
 const EVENT = 'cme:theme-changed';
@@ -14,7 +14,7 @@ const DARK_QUERY = '(prefers-color-scheme: dark)';
 // 저장하지 못했을 때(저장소 차단·공간 부족)도 화면과 버튼 상태가 어긋나지 않도록 이 탭에서 고른 값을 들고 있는다.
 let chosen: ThemePref | undefined;
 
-export function getThemePref(): ThemePref {
+function getThemePref(): ThemePref {
   if (chosen) return chosen;
   const v = read<unknown>(KEY, 'system');
   return v === 'light' || v === 'dark' ? v : 'system';
@@ -29,7 +29,7 @@ function systemTheme(): Theme {
 }
 
 /** 지금 화면에 보이는 테마 */
-export function currentTheme(): Theme {
+function currentTheme(): Theme {
   const pref = getThemePref();
   return pref === 'system' ? systemTheme() : pref;
 }

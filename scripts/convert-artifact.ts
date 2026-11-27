@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { examSchema, questionsFileSchema, crossCheck } from '../src/data/schema.ts';
 import type { Exam, Question } from '../src/data/schema.ts';
 
-export interface ArtifactCfg {
+interface ArtifactCfg {
   code: string;
   name: string;
   level?: string;
@@ -39,7 +39,7 @@ export interface ArtifactCfg {
   sourceNote?: string;
 }
 
-export interface ArtifactQuestion {
+interface ArtifactQuestion {
   t: string;
   y: 's' | 'm' | 'o' | 'p';
   q: string;
@@ -62,7 +62,7 @@ function readJsonScript(html: string, id: string): unknown {
   return JSON.parse(m[1]);
 }
 
-export function convertExam(cfg: ArtifactCfg, examId: string, vendor: string, lang = 'ko'): Exam {
+function convertExam(cfg: ArtifactCfg, examId: string, vendor: string, lang = 'ko'): Exam {
   const sources: Exam['sources'] = [];
   const note = cfg.sourceNote ?? '';
   const checked = note.match(/(\d{4}-\d{2}-\d{2})\s*(?:확인|確認)/)?.[1];
@@ -108,7 +108,7 @@ export function convertExam(cfg: ArtifactCfg, examId: string, vendor: string, la
   };
 }
 
-export function convertQuestion(src: ArtifactQuestion, id: string): Question {
+function convertQuestion(src: ArtifactQuestion, id: string): Question {
   const base = {
     id,
     domain: src.t,

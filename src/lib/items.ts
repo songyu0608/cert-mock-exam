@@ -19,7 +19,6 @@ type Body =
     };
 
 export type ItemBody = Body;
-export type ItemType = Body['type'];
 
 export interface Item {
   /** 기록에 쓰는 고유 키. 일반 문항은 문항 id, 펼친 문항은 `id#번호`(1부터) */

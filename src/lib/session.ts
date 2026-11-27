@@ -13,7 +13,7 @@ import {
 
 export type Mode = 'mock' | 'practice' | 'review';
 
-export const MODE_LABEL: Record<Mode, string> = {
+const MODE_LABEL: Record<Mode, string> = {
   mock: '실전 모의고사',
   practice: '연습',
   review: '오답 다시 풀기',
@@ -47,7 +47,7 @@ export interface Session {
   pausedMs?: number;
 }
 
-export interface DomainResult {
+interface DomainResult {
   total: number;
   score: number;
 }
@@ -72,7 +72,7 @@ export interface Attempt {
   session: Session;
 }
 
-export function newId(): string {
+function newId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
@@ -381,7 +381,7 @@ export function toggleStrike(session: Session, key: string, option: number): Ses
 }
 
 /** 연습·오답 모드에서 채점 대상인 item(정답 확인한 것), 실전 모드는 전부 */
-export function gradedKeys(session: Session): string[] {
+function gradedKeys(session: Session): string[] {
   return session.mode === 'mock'
     ? session.itemKeys
     : session.itemKeys.filter((k) => session.checked[k]);
