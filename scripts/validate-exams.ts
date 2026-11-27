@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { crossCheck, examSchema, questionsFileSchema } from '../src/data/schema.ts';
 
-export function validateExamDir(dir: string): string[] {
+function validateExamDir(dir: string): string[] {
   const read = (f: string): unknown => JSON.parse(readFileSync(join(dir, f), 'utf8'));
   const errors: string[] = [];
   const exam = examSchema.safeParse(read('exam.json'));

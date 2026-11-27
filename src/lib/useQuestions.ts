@@ -3,7 +3,7 @@ import { loadQuestions } from '../data/exams.ts';
 import type { Question } from '../data/schema.ts';
 import { flattenAll, type Item } from './items.ts';
 
-export interface Loaded {
+interface Loaded {
   questions: Question[];
   items: Item[];
   itemsByKey: Map<string, Item>;

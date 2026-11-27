@@ -8,7 +8,7 @@
 
 export type PropValue = string | string[];
 
-export interface ParsedNote {
+interface ParsedNote {
   props: [string, PropValue][];
   body: string;
 }
@@ -67,7 +67,7 @@ export function linkTargets(body: string): string[] {
 }
 
 /** 제목의 id(= [[노트#제목]] 링크의 # 뒤). 공백을 하이픈으로 바꾼다. */
-export const headingId = (text: string) => text.trim().replace(/\s+/g, '-');
+const headingId = (text: string) => text.trim().replace(/\s+/g, '-');
 
 const escapeMd = (s: string) => s.replace(/([\\[\]*_`<>])/g, '\\$1');
 

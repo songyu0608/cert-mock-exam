@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 const text = z.string().trim().min(1);
 
-export const QUESTION_TYPES = [
+const QUESTION_TYPES = [
   'single',
   'multi',
   'ordering',
@@ -13,7 +13,6 @@ export const QUESTION_TYPES = [
   'yesno',
   'problem-solution',
 ] as const;
-export type QuestionType = (typeof QUESTION_TYPES)[number];
 
 export const examSchema = z
   .object({
@@ -264,7 +263,7 @@ export function itemCount(q: Question): number {
 }
 
 /** 크기가 sizes인 묶음들을 나누지 않고 골라 합을 정확히 n으로 만들 수 있는지(부분합). */
-export function canFill(sizes: number[], n: number): boolean {
+function canFill(sizes: number[], n: number): boolean {
   if (!Number.isInteger(n) || n < 0) return false;
   const reach = Array<boolean>(n + 1).fill(false);
   reach[0] = true;
